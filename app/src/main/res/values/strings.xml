@@ -3,11 +3,21 @@
     <string name="logo_description">Dentary Logo</string>
     <string name="app_slogan">Smart Patient Log</string>
     <string name="login_header_description">Doctor Image</string>
-    <string name="Login">Login</string>
+    <string name="login">Login</string>
     <string name="password">Password</string>
     <string name="email">Email Address</string>
     <string name="forget_password">Forgot password?</string>
     <string name="join">Join</string>
     <string name="have_no_account">Don\'t have an account?</string>
     <string name="create_new_account">Create a new account</string>
+    <string name="register">Register</string>
+    <string name="register_information">Registration Information</string>
+    <string name="username">Username</string>
+    <string name="confirm_password">Confirm Password</string>
+    <string name="clinic_information">Clinic Information</string>
+    <string name="clinic_name">Clinic Name</string>
+    <string name="clinic_phone_number">Contact Number</string>
+    <string name="clinic_address">Address</string>
+    <string name="register_confirm">Register</string>
+    <string name="have_account">Have an account?</string>
 </resources>

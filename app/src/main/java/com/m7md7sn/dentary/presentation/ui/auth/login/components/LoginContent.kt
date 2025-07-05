@@ -14,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -28,7 +26,10 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 
 @Composable
-fun LoginContent(modifier: Modifier = Modifier) {
+fun LoginContent(
+    onCreateNewAccountClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -37,7 +38,7 @@ fun LoginContent(modifier: Modifier = Modifier) {
 
     ) {
         Text(
-            text = stringResource(R.string.Login),
+            text = stringResource(R.string.login),
             modifier = Modifier.padding(bottom = 18.dp),
             style = TextStyle(
                 fontSize = 22.sp,
@@ -79,7 +80,9 @@ fun LoginContent(modifier: Modifier = Modifier) {
             )
         )
         TextButton(
-            onClick = {},
+            onClick = {
+                onCreateNewAccountClick()
+            },
         ) {
             Text(
                 text = stringResource(R.string.create_new_account),
@@ -99,6 +102,6 @@ fun LoginContent(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun LoginContentPrev() {
-    LoginContent()
+    LoginContent({})
 }
 

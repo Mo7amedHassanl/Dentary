@@ -4,11 +4,21 @@
     <string name="logo_description">Dentary Logo</string>
     <string name="app_slogan">Smart Patient Log</string>
     <string name="login_header_description">Doctor Image</string>
-    <string name="Login">تسجيل الدخول</string>
+    <string name="login">تسجيل الدخول</string>
     <string name="password">كلمة السر</string>
     <string name="email">البريد الإلكتروني</string>
     <string name="forget_password">نسيت كلمة السر؟</string>
     <string name="join">دخول</string>
     <string name="have_no_account">لا تملك حساب؟</string>
     <string name="create_new_account">أنشئ حسابا جديدا</string>
+    <string name="username">اسم المستخدم</string>
+    <string name="register">إنشاء حساب</string>
+    <string name="register_information">معلومات التسجيل</string>
+    <string name="confirm_password">تأكيد كلمة السر</string>
+    <string name="clinic_information">بيانات العيادة</string>
+    <string name="clinic_name">اسم العيادة</string>
+    <string name="clinic_phone_number">رقم التواصل</string>
+    <string name="clinic_address">المنطقة</string>
+    <string name="register_confirm">تسجيل</string>
+    <string name="have_account">لديك حساب؟</string>
 </resources>

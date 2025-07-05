@@ -14,6 +14,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.common.components.CommonTextField
@@ -40,7 +41,8 @@ fun LoginTextFields(
             onNext = { focusManager.moveFocus(focusDirection = FocusDirection.Down) }
         ),
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Next
+            imeAction = ImeAction.Next,
+            keyboardType = KeyboardType.Email
         ),
         isError = isEmailError,
         errorMessage = emailError,
@@ -56,7 +58,8 @@ fun LoginTextFields(
             onDone = { focusManager.clearFocus() }
         ),
         keyboardOptions = KeyboardOptions(
-            imeAction = ImeAction.Done
+            imeAction = ImeAction.Done,
+            keyboardType = KeyboardType.Password
         ),
         isError = isPasswordError,
         errorMessage = passwordError,

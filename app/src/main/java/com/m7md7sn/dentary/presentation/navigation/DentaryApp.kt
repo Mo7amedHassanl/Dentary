@@ -10,6 +10,7 @@ import androidx.navigation.compose.composable
 import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.ui.auth.login.LoginScreen
+import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 
 @Composable
@@ -36,7 +37,18 @@ fun DentaryNavHost(
                 )
             }
             composable(route = Screen.Login.route) {
-                LoginScreen()
+                LoginScreen(
+                    onCreateNewAccountClick = {
+                        navController.navigate(Screen.Register.route)
+                    },
+                )
+            }
+            composable(route = Screen.Register.route) {
+                RegisterScreen(
+                    onLoginClick = {
+                        navController.navigate(Screen.Login.route)
+                    },
+                )
             }
         }
     }
