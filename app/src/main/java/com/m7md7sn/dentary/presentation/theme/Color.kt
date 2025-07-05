@@ -16,4 +16,5 @@ val DentaryLightGray = Color(0xFFF0F2F8)
 val DentaryBlueGray = Color(0xFFD8DEEF)
 val DentaryGray = Color(0xFFAFAFB0)
 val DentaryDarkGray = Color(0xFF697988)
+val BackgroundColor = Color(0xFFF5F7FD)
 

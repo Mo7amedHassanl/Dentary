@@ -2,14 +2,11 @@ package com.m7md7sn.dentary.presentation.ui.splash
 
 import android.view.animation.OvershootInterpolator
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,7 +32,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigateToHome: () -> Unit,
+    onNavigate: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var scale = remember {
@@ -58,7 +54,7 @@ fun SplashScreen(
         )
         animationPhase = 1
         delay(800)
-        onNavigateToHome()
+        onNavigate()
     }
 
     SplashContent(modifier, animationPhase, scale)
@@ -103,7 +99,7 @@ private fun SplashContent(
 private fun SplashScreenPreviewEn() {
     DentaryTheme {
         SplashScreen(
-            onNavigateToHome = {}
+            onNavigate = {}
         )
     }
 }
@@ -113,7 +109,7 @@ private fun SplashScreenPreviewEn() {
 private fun SplashScreenPreviewAr() {
     DentaryTheme {
         SplashScreen(
-            onNavigateToHome = {}
+            onNavigate = {}
         )
     }
 }

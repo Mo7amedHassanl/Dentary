@@ -3,4 +3,12 @@
     <string name="app_name">Dentary</string>
     <string name="logo_description">Dentary Logo</string>
     <string name="app_slogan">Smart Patient Log</string>
+    <string name="login_header_description">Doctor Image</string>
+    <string name="Login">تسجيل الدخول</string>
+    <string name="password">كلمة السر</string>
+    <string name="email">البريد الإلكتروني</string>
+    <string name="forget_password">نسيت كلمة السر؟</string>
+    <string name="join">دخول</string>
+    <string name="have_no_account">لا تملك حساب؟</string>
+    <string name="create_new_account">أنشئ حسابا جديدا</string>
 </resources>
