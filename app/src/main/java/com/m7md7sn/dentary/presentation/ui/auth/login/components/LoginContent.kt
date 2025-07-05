@@ -22,11 +22,13 @@ import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.common.components.CommonButton
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
+import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 
 @Composable
 fun LoginContent(
+    onForgetPasswordClick: () -> Unit,
     onCreateNewAccountClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -60,7 +62,7 @@ fun LoginContent(
             isPasswordError = false,
         )
         ForgetPasswordButton(
-            onClick = {}
+            onClick = onForgetPasswordClick
         )
         Spacer(Modifier.height(8.dp))
         CommonButton(
@@ -87,10 +89,10 @@ fun LoginContent(
             Text(
                 text = stringResource(R.string.create_new_account),
                 style = TextStyle(
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     lineHeight = 20.sp,
-                    fontFamily = AlexandriaRegular,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = AlexandriaBold,
+                    fontWeight = FontWeight.Bold,
                     color = DentaryBlue,
                     textAlign = TextAlign.Center,
                 )
@@ -102,6 +104,6 @@ fun LoginContent(
 @Preview
 @Composable
 private fun LoginContentPrev() {
-    LoginContent({})
+    LoginContent({}, {})
 }
 

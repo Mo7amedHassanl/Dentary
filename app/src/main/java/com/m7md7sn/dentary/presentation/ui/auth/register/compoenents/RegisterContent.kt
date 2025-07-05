@@ -36,6 +36,7 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 
 @Composable
 fun RegisterContent(
+    onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -80,7 +81,7 @@ fun RegisterContent(
             isPasswordError = false,
             isConfirmPasswordError = false,
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
         RegisterSectionTitle(
             title = R.string.clinic_information,
             titleIcon = R.drawable.ic_clinic,
@@ -101,10 +102,10 @@ fun RegisterContent(
             isClinicAddressError = false,
             isClinicPhoneNumberError = false
         )
-        Spacer(Modifier.height(12.dp))
+        Spacer(Modifier.height(24.dp))
         CommonButton(
             text = stringResource(R.string.register_confirm),
-            onClick = {}
+            onClick = onRegisterClick
         )
         Spacer(Modifier.height(18.dp))
         Text(
@@ -124,10 +125,10 @@ fun RegisterContent(
             Text(
                 text = stringResource(R.string.login),
                 style = TextStyle(
-                    fontSize = 13.sp,
+                    fontSize = 14.sp,
                     lineHeight = 20.sp,
-                    fontFamily = AlexandriaRegular,
-                    fontWeight = FontWeight.Normal,
+                    fontFamily = AlexandriaBold,
+                    fontWeight = FontWeight.Bold,
                     color = DentaryBlue,
                     textAlign = TextAlign.Center,
                 )

@@ -20,4 +20,12 @@
     <string name="clinic_address">Address</string>
     <string name="register_confirm">Register</string>
     <string name="have_account">Have an account?</string>
+    <string name="confirm_your_email">تأكيد البريد الالكتروني</string>
+    <string name="did_not_receive_email">لم يصلك الرابط؟</string>
+    <string name="resend">إعادة الإرسال</string>
+    <string name="confirm_email">تأكيد</string>
+    <string name="email_verification_message">اضغط على الرابط في البريد الالكتروني\n لتأكيــد البريــد الالكتــرونــي</string>
+    <string name="reset_password">تغيير كلمة السر</string>
+    <string name="reset_password_message">ادخل البريد الإلكتروني وسيتم ارسال رابط\n لتغيير كلمة السر</string>
+    <string name="send">إرسال</string>
 </resources>

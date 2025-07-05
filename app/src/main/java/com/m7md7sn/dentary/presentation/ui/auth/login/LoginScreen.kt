@@ -22,6 +22,7 @@ import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginHeader
 
 @Composable
 fun LoginScreen(
+    onForgetPasswordClick: () -> Unit,
     onCreateNewAccountClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -39,7 +40,8 @@ fun LoginScreen(
             )
             LoginContent(
                 modifier = Modifier.weight(1f),
-                onCreateNewAccountClick = onCreateNewAccountClick
+                onCreateNewAccountClick = onCreateNewAccountClick,
+                onForgetPasswordClick = onForgetPasswordClick,
             )
         }
     }
@@ -49,7 +51,7 @@ fun LoginScreen(
 @Composable
 private fun LoginScreenPreviewEn() {
     DentaryTheme {
-        LoginScreen({})
+        LoginScreen({}, {})
     }
 }
 
@@ -57,6 +59,6 @@ private fun LoginScreenPreviewEn() {
 @Composable
 private fun LoginScreenPreviewAr() {
     DentaryTheme {
-        LoginScreen({})
+        LoginScreen({}, {})
     }
 }

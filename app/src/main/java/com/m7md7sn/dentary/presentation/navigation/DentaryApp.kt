@@ -9,7 +9,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
+import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificationScreen
 import com.m7md7sn.dentary.presentation.ui.auth.login.LoginScreen
+import com.m7md7sn.dentary.presentation.ui.auth.passwordreset.PasswordResetScreen
 import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 
@@ -41,6 +43,9 @@ fun DentaryNavHost(
                     onCreateNewAccountClick = {
                         navController.navigate(Screen.Register.route)
                     },
+                    onForgetPasswordClick = {
+                        navController.navigate(Screen.PasswordReset.route)
+                    },
                 )
             }
             composable(route = Screen.Register.route) {
@@ -48,7 +53,18 @@ fun DentaryNavHost(
                     onLoginClick = {
                         navController.navigate(Screen.Login.route)
                     },
+                    onRegisterClick = {
+                        navController.navigate(Screen.EmailVerification.route) {
+                            popUpTo(Screen.Register.route) { inclusive = true }
+                        }
+                    },
                 )
+            }
+            composable(route = Screen.EmailVerification.route) {
+                EmailVerificationScreen()
+            }
+            composable(route = Screen.PasswordReset.route) {
+                PasswordResetScreen()
             }
         }
     }

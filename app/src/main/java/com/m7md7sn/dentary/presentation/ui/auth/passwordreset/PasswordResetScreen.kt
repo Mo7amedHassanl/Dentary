@@ -1,7 +1,5 @@
-package com.m7md7sn.dentary.presentation.ui.auth.register
+package com.m7md7sn.dentary.presentation.ui.auth.passwordreset
 
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
@@ -12,17 +10,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
-import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginContent
-import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginHeader
-import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.RegisterContent
+import com.m7md7sn.dentary.presentation.ui.auth.emailverification.components.EmailVerificationContent
+import com.m7md7sn.dentary.presentation.ui.auth.passwordreset.components.PasswordResetContent
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.RegisterHeader
 
 @Composable
-fun RegisterScreen(
-    onRegisterClick: () -> Unit = {},
-    onLoginClick: () -> Unit = {},
-    modifier: Modifier = Modifier
-) {
+fun PasswordResetScreen(modifier: Modifier = Modifier) {
     val scrollState = rememberScrollState()
     Surface(
         color = BackgroundColor,
@@ -34,27 +27,23 @@ fun RegisterScreen(
                 .verticalScroll(scrollState),
         ) {
             RegisterHeader()
-            RegisterContent(
-                onLoginClick = onLoginClick,
-                onRegisterClick = onRegisterClick,
-                modifier = Modifier.fillMaxSize()
-            )
+            PasswordResetContent()
         }
     }
 }
 
 @Preview
 @Composable
-private fun RegisterScreenPreviewEn() {
+private fun PasswordResetScreenPreviewEn() {
     DentaryTheme {
-        RegisterScreen()
+        PasswordResetScreen()
     }
 }
 
 @Preview(locale = "ar")
 @Composable
-private fun RegisterScreenPreviewAr() {
+private fun PasswordResetScreenPreviewAr() {
     DentaryTheme {
-        RegisterScreen()
+        PasswordResetScreen()
     }
 }

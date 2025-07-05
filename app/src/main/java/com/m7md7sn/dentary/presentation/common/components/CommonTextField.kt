@@ -2,6 +2,7 @@ package com.m7md7sn.dentary.presentation.common.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
@@ -16,6 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
@@ -86,6 +88,7 @@ fun CommonTextField(
             }
         } else null,
         visualTransformation = visualTransformation,
-        enabled = enabled
+        enabled = enabled,
+        shape = RoundedCornerShape(20.dp)
     )
 }
