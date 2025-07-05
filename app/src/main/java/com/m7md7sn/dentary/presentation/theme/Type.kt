@@ -16,6 +16,7 @@ val googleFontProvider = GoogleFont.Provider(
     certificates = R.array.com_google_android_gms_fonts_certs
 )
 val Alexandria = GoogleFont("Alexandria")
+val Montserrat = GoogleFont("Montserrat")
 
 val AlexandriaBlack = FontFamily(
     Font(
@@ -49,6 +50,51 @@ val AlexandriaBold = FontFamily(
         googleFont = Alexandria,
         fontProvider = googleFontProvider,
         weight = FontWeight.Bold,
+        style = FontStyle.Normal
+    )
+)
+
+val MontserratRegular = FontFamily(
+    Font(
+        googleFont = Montserrat,
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Normal,
+        style = FontStyle.Normal
+    )
+)
+
+val MontserratMedium = FontFamily(
+    Font(
+        googleFont = Montserrat,
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Medium,
+        style = FontStyle.Normal
+    )
+)
+
+val MontserratBold = FontFamily(
+    Font(
+        googleFont = Montserrat,
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Bold,
+        style = FontStyle.Normal
+    )
+)
+
+val MontserratBlack = FontFamily(
+    Font(
+        googleFont = Montserrat,
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Black,
+        style = FontStyle.Normal
+    )
+)
+
+val MontserratLight = FontFamily(
+    Font(
+        googleFont = Montserrat,
+        fontProvider = googleFontProvider,
+        weight = FontWeight.Light,
         style = FontStyle.Normal
     )
 )
