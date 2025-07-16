@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -24,17 +25,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
 import com.m7md7sn.dentary.presentation.ui.splash.components.AnimatedLogo
 import com.m7md7sn.dentary.presentation.ui.splash.components.DentaryName
+import com.m7md7sn.dentary.presentation.ui.splash.components.SplashContent
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
-    onNavigate: () -> Unit,
-    modifier: Modifier = Modifier
+    onNavigateToHome: () -> Unit,
+    onNavigateToLogin: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: SplashViewModel = hiltViewModel()
 ) {
+    val uiState by viewModel.uiState.collectAsState()
     var scale = remember {
         Animatable(0f)
     }
@@ -54,62 +60,19 @@ fun SplashScreen(
         )
         animationPhase = 1
         delay(800)
-        onNavigate()
+        when (viewModel.checkAuthAndConnectivityState()) {
+            NavigationState.NavigateToHome -> onNavigateToHome()
+            NavigationState.NavigateToLogin -> onNavigateToLogin()
+        }
+    }
+
+    LaunchedEffect(true) {
+        if (viewModel.isUserSignedIn()) {
+            onNavigateToHome()
+        } else {
+            onNavigateToLogin()
+        }
     }
 
     SplashContent(modifier, animationPhase, scale)
-}
-
-@Composable
-private fun SplashContent(
-    modifier: Modifier,
-    animationPhase: Int,
-    scale: Animatable<Float, AnimationVector1D>
-) {
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(color = DentaryBlue),
-        contentAlignment = Alignment.Center,
-    ) {
-        AnimatedContent(
-            targetState = animationPhase,
-            transitionSpec = {
-                fadeIn(animationSpec = tween(0)) togetherWith fadeOut(animationSpec = tween(0))
-            }
-        ) { phase ->
-            Column(
-                modifier = Modifier.width(171.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
-                AnimatedLogo(
-                    scale = scale.value
-                )
-                if (phase == 1) {
-                    DentaryName()
-                }
-            }
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun SplashScreenPreviewEn() {
-    DentaryTheme {
-        SplashScreen(
-            onNavigate = {}
-        )
-    }
-}
-
-@Preview(locale = "ar")
-@Composable
-private fun SplashScreenPreviewAr() {
-    DentaryTheme {
-        SplashScreen(
-            onNavigate = {}
-        )
-    }
 }

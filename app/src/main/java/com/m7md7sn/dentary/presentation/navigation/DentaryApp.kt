@@ -32,11 +32,16 @@ fun DentaryNavHost(
         ) {
             composable(route = Screen.Splash.route) {
                 SplashScreen(
-                    onNavigate = {
+                    onNavigateToHome = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Splash.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Splash.route) { inclusive = true }
                         }
-                    }
+                    },
                 )
             }
             composable(route = Screen.Login.route) {

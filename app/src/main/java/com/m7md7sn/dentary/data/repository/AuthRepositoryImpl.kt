@@ -10,6 +10,10 @@ import com.m7md7sn.dentary.utils.Result
 class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource
 ): AuthRepository {
+    override suspend fun getCurrentUser(): UserInfo? {
+        return authDataSource.getCurrentUser()
+    }
+
     override suspend fun login(credentials: LoginCredentials): Result<UserInfo> {
         return authDataSource.login(credentials)
     }

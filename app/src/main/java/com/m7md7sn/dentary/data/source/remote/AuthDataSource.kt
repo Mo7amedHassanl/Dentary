@@ -7,6 +7,7 @@ import com.m7md7sn.dentary.utils.Result
 
 
 interface AuthDataSource {
+    suspend fun getCurrentUser(): UserInfo?
     suspend fun login(credentials: LoginCredentials): Result<UserInfo>
     suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo>
     suspend fun signOut(): Result<Unit>

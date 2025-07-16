@@ -13,6 +13,14 @@ import javax.inject.Inject
 class AuthDataSourceImpl @Inject constructor(
     private val auth: Auth
 ) : AuthDataSource {
+    override suspend fun getCurrentUser(): UserInfo? {
+        return try {
+            auth.retrieveUserForCurrentSession(updateSession = true)
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     override suspend fun login(credentials: LoginCredentials): Result<UserInfo> {
         return try {
             auth.signInWith(Email) {
