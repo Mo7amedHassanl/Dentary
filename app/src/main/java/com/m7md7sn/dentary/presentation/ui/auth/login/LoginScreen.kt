@@ -43,6 +43,7 @@ fun LoginScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(uiState.loginResult) {
         when (uiState.loginResult) {
@@ -77,7 +78,7 @@ fun LoginScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .verticalScroll(rememberScrollState(), enabled = true),
+                    .verticalScroll(scrollState, enabled = true),
             ) {
                 LoginHeader(
                     modifier = Modifier.weight(1f)

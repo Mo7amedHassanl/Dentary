@@ -75,7 +75,18 @@ fun DentaryNavHost(
                 EmailVerificationScreen()
             }
             composable(route = Screen.PasswordReset.route) {
-                PasswordResetScreen()
+                PasswordResetScreen(
+                    onNavigateToLogin = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.PasswordReset.route) { inclusive = true }
+                        }
+                    },
+                    onPasswordResetSent = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.PasswordReset.route) { inclusive = true }
+                        }
+                    },
+                )
             }
             composable(route = Screen.Home.route) {
                HomeScreen()

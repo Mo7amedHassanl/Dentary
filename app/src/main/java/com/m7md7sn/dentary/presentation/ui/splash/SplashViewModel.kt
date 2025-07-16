@@ -19,7 +19,7 @@ class SplashViewModel @Inject constructor(
     val uiState: StateFlow<SplashUiState> =
         _uiState.asStateFlow()
 
-    fun isUserSignedIn(): Boolean {
+    suspend fun isUserSignedIn(): Boolean {
         var isSignedIn = false
         viewModelScope.launch {
             isSignedIn = authRepository.getCurrentUser() != null
@@ -28,7 +28,7 @@ class SplashViewModel @Inject constructor(
         return isSignedIn
     }
 
-    fun checkAuthAndConnectivityState(): NavigationState {
+    suspend fun checkAuthAndConnectivityState(): NavigationState {
         val isSignedIn = isUserSignedIn()
 
         return when {

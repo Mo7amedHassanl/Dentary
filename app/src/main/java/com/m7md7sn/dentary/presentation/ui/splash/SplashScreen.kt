@@ -66,13 +66,5 @@ fun SplashScreen(
         }
     }
 
-    LaunchedEffect(true) {
-        if (viewModel.isUserSignedIn()) {
-            onNavigateToHome()
-        } else {
-            onNavigateToLogin()
-        }
-    }
-
     SplashContent(modifier, animationPhase, scale)
 }

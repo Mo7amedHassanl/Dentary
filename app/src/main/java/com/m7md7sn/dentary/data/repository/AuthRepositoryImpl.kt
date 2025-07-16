@@ -25,4 +25,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun signOut(): Result<Unit> {
         return authDataSource.signOut()
     }
+
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+        return authDataSource.sendPasswordResetEmail(email)
+    }
 }

@@ -42,7 +42,16 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightGray
 
 @Composable
-fun PasswordResetContent(modifier: Modifier = Modifier) {
+fun PasswordResetContent(
+    email: String,
+    onEmailValueChange: (String) -> Unit,
+    onSendPasswordResetClick: () -> Unit,
+    onLoginClick: () -> Unit,
+    isLoading: Boolean,
+    isEmailError: Boolean,
+    emailErrorMessage: String?,
+    modifier: Modifier = Modifier
+) {
     val focusManager = LocalFocusManager.current
     Column(
         modifier = modifier
@@ -86,15 +95,16 @@ fun PasswordResetContent(modifier: Modifier = Modifier) {
         }
         Spacer(modifier = Modifier.height(42.dp))
         CommonTextField(
-            value = "",
-            onValueChange = {},
+            value = email,
+            onValueChange = onEmailValueChange,
             label = stringResource(id = R.string.email),
-            isError = false,
-            errorMessage = null,
+            isError = isEmailError,
+            errorMessage = emailErrorMessage,
             trailingIcon = painterResource(id = R.drawable.ic_email),
             keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
+                    onSendPasswordResetClick()
                 }
             ),
             keyboardOptions = KeyboardOptions(
@@ -106,7 +116,35 @@ fun PasswordResetContent(modifier: Modifier = Modifier) {
         Spacer(modifier = Modifier.height(42.dp))
         CommonButton(
             text = stringResource(R.string.send),
-            onClick = {}
+            onClick = onSendPasswordResetClick,
+            isLoading = isLoading,
         )
+        Spacer(modifier = Modifier.height(42.dp))
+        Text(
+            text = stringResource(R.string.have_account),
+            style = TextStyle(
+                fontSize = 13.sp,
+                lineHeight = 20.sp,
+                fontFamily = AlexandriaRegular,
+                fontWeight = FontWeight.Normal,
+                color = Color(0xFFA2A2A2),
+                textAlign = TextAlign.Center,
+            )
+        )
+        TextButton(
+            onClick = onLoginClick,
+        ) {
+            Text(
+                text = stringResource(R.string.login),
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    lineHeight = 20.sp,
+                    fontFamily = AlexandriaBold,
+                    fontWeight = FontWeight.Bold,
+                    color = DentaryBlue,
+                    textAlign = TextAlign.Center,
+                )
+            )
+        }
     }
 }

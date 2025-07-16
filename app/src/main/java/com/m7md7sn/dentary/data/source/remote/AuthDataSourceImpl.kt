@@ -68,4 +68,13 @@ class AuthDataSourceImpl @Inject constructor(
             Result.Error(e.localizedMessage ?: "")
         }
     }
+
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+        return try {
+            auth.resetPasswordForEmail(email)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.localizedMessage ?: "")
+        }
+    }
 }
