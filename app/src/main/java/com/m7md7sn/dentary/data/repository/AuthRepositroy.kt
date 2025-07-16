@@ -5,7 +5,7 @@ import com.m7md7sn.dentary.data.model.SignUpCredentials
 import io.github.jan.supabase.auth.user.UserInfo
 
 interface AuthRepository {
-    suspend fun login(credentials: LoginCredentials): Result<UserInfo>
-    suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo>
-    suspend fun signOut(): Result<Unit>
+    suspend fun login(credentials: LoginCredentials): com.m7md7sn.dentary.utils.Result<UserInfo>
+    suspend fun signUp(credentials: SignUpCredentials): com.m7md7sn.dentary.utils.Result<UserInfo>
+    suspend fun signOut(): com.m7md7sn.dentary.utils.Result<Unit>
 }

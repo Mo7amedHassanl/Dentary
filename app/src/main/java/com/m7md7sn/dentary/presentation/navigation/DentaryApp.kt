@@ -47,7 +47,7 @@ fun DentaryNavHost(
                     onForgetPasswordClick = {
                         navController.navigate(Screen.PasswordReset.route)
                     },
-                    onLoginClick = {
+                    onLoginSuccess = {
                         navController.navigate(Screen.Home.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }
                         }

@@ -29,7 +29,8 @@ fun CommonButton(
     text: String = "text",
     onClick: () -> Unit = {},
     modifier: Modifier = Modifier,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
+    enabled: Boolean = true
 ) {
     Button(
         modifier = modifier
@@ -40,7 +41,7 @@ fun CommonButton(
             containerColor = DentaryBlue,
             contentColor = Color.White
         ),
-        enabled = !isLoading
+        enabled = enabled
     ) {
         if (isLoading) {
             CircularProgressIndicator(color = Color.White)

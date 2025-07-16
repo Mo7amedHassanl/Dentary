@@ -5,6 +5,7 @@ import com.m7md7sn.dentary.data.model.SignUpCredentials
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
+import com.m7md7sn.dentary.utils.Result
 import kotlinx.serialization.json.buildJsonObject
 import org.slf4j.MDC.put
 import javax.inject.Inject
@@ -14,18 +15,18 @@ class AuthDataSourceImpl @Inject constructor(
 ) : AuthDataSource {
     override suspend fun login(credentials: LoginCredentials): Result<UserInfo> {
         return try {
-            auth.signUpWith(Email) {
+            auth.signInWith(Email) {
                 email = credentials.email
                 password = credentials.password
             }
             val userInfo = auth.currentUserOrNull()
             if (userInfo != null) {
-                Result.success(userInfo)
+                Result.Success(userInfo)
             } else {
-                Result.failure(Exception("User not found"))
+                Result.Error("User not found")
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(e.message ?: "")
         }
     }
 
@@ -42,21 +43,21 @@ class AuthDataSourceImpl @Inject constructor(
                 }
             }
             if (user != null) {
-                Result.success(user)
+                Result.Success(user)
             } else {
-                Result.failure(Exception("User not found"))
+                Result.Error("User not found")
             }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(e.localizedMessage ?: "")
         }
     }
 
     override suspend fun signOut(): Result<Unit> {
         return try {
             auth.signOut()
-            Result.success(Unit)
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.Error(e.localizedMessage ?: "")
         }
     }
 }

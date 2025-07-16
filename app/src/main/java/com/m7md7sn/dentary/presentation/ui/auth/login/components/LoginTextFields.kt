@@ -6,16 +6,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.common.components.CommonTextField
@@ -32,7 +38,9 @@ fun LoginTextFields(
     passwordError: String? = null,
     isEmailError: Boolean = false,
     isPasswordError: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isPasswordVisible: Boolean = false,
+    onTogglePasswordVisibility: () -> Unit = { }
 ) {
     CommonTextField(
         value = email,
@@ -55,7 +63,9 @@ fun LoginTextFields(
         value = password,
         onValueChange = onPasswordChange,
         label = stringResource(id = R.string.password),
-        trailingIcon = painterResource(id = R.drawable.ic_lock),
+        trailingIcon = rememberVectorPainter(
+            image = if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+        ),
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus()
@@ -69,5 +79,7 @@ fun LoginTextFields(
         isError = isPasswordError,
         errorMessage = passwordError,
         modifier = modifier.fillMaxWidth(),
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        onTrailingIconClick = onTogglePasswordVisibility
     )
 }

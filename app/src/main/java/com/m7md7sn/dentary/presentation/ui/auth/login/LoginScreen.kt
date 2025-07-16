@@ -3,26 +3,34 @@ package com.m7md7sn.dentary.presentation.ui.auth.login
 import android.graphics.Color
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.m7md7sn.dentary.data.model.LoginCredentials
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
-import com.m7md7sn.dentary.presentation.ui.auth.AuthViewModel
 import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginContent
 import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginHeader
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
+import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import kotlinx.coroutines.launch
+import com.m7md7sn.dentary.utils.Result
 
 @Composable
 fun LoginScreen(
@@ -30,14 +38,34 @@ fun LoginScreen(
     onCreateNewAccountClick: () -> Unit,
     onLoginSuccess: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: LoginViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
-    // Handle successful authentication
-    LaunchedEffect(uiState.isAuthenticated) {
-        if (uiState.isAuthenticated) {
-            onLoginSuccess()
+    LaunchedEffect(uiState.loginResult) {
+        when (uiState.loginResult) {
+            is Result.Success -> {
+                onLoginSuccess()
+                viewModel.resetLoginResult()
+            }
+
+            is Result.Error -> {
+                viewModel.resetLoginResult()
+            }
+
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.snackbarMessage.collect { event ->
+            event.getContentIfNotHandled()?.let { message ->
+                scope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
         }
     }
 
@@ -45,24 +73,39 @@ fun LoginScreen(
         color = BackgroundColor,
         modifier = modifier.fillMaxSize()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState()),
-        ) {
-            LoginHeader(
-                modifier = Modifier.weight(1f)
-            )
-            LoginContent(
-                modifier = Modifier.weight(1f),
-                onCreateNewAccountClick = onCreateNewAccountClick,
-                onForgetPasswordClick = onForgetPasswordClick,
-                onLoginClick = { credentials ->
-                    viewModel.login(credentials)
-                },
-                uiState = uiState
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState(), enabled = true),
+            ) {
+                LoginHeader(
+                    modifier = Modifier.weight(1f)
+                )
+                LoginContent(
+                    modifier = Modifier.weight(1f),
+                    onCreateNewAccountClick = onCreateNewAccountClick,
+                    onForgetPasswordClick = onForgetPasswordClick,
+                    email = uiState.email,
+                    onEmailValueChange = viewModel::onEmailChange,
+                    password = uiState.password,
+                    onPasswordValueChange = viewModel::onPasswordChange,
+                    onLoginClick = viewModel::login,
+                    isLoading = uiState.isLoading,
+                    isEmailError = uiState.emailError != null,
+                    emailErrorMessage = uiState.emailError,
+                    isPasswordError = uiState.passwordError != null,
+                    passwordErrorMessage = uiState.passwordError,
+                    isPasswordVisible = uiState.isPasswordVisible,
+                    onTogglePasswordVisibility = viewModel::togglePasswordVisibility,
+                )
+            }
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.align(Alignment.BottomCenter),
             )
         }
+
     }
 }
 

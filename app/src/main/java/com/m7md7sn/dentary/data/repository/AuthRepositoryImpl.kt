@@ -5,6 +5,7 @@ import com.m7md7sn.dentary.data.model.SignUpCredentials
 import com.m7md7sn.dentary.data.source.remote.AuthDataSource
 import io.github.jan.supabase.auth.user.UserInfo
 import javax.inject.Inject
+import com.m7md7sn.dentary.utils.Result
 
 class AuthRepositoryImpl @Inject constructor(
     private val authDataSource: AuthDataSource
