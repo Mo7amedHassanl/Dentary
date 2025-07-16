@@ -59,7 +59,7 @@ fun DentaryNavHost(
                     onLoginClick = {
                         navController.navigate(Screen.Login.route)
                     },
-                    onRegisterClick = {
+                    onSignupSuccess = {
                         navController.navigate(Screen.EmailVerification.route) {
                             popUpTo(Screen.Register.route) { inclusive = true }
                         }

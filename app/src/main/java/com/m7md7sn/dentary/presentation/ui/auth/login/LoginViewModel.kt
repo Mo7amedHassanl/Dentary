@@ -19,6 +19,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+data class ValidationResult(
+    val isValid: Boolean,
+    val emailError: String? = null,
+    val passwordError: String? = null
+)
+
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authRepository: AuthRepository
@@ -31,14 +37,13 @@ class LoginViewModel @Inject constructor(
 
     fun login() {
         val currentUiState = _uiState.value
+        val validationResult = validateLoginInputs(currentUiState.email, currentUiState.password)
 
-        if (currentUiState.email.isBlank()) {
-            _uiState.value = currentUiState.copy(emailError = "Email cannot be empty")
-            return
-        }
-
-        if (currentUiState.password.isBlank()) {
-            _uiState.value = currentUiState.copy(passwordError = "Password cannot be empty")
+        if (!validationResult.isValid) {
+            _uiState.value = currentUiState.copy(
+                emailError = validationResult.emailError,
+                passwordError = validationResult.passwordError
+            )
             return
         }
 
@@ -72,5 +77,25 @@ class LoginViewModel @Inject constructor(
 
     fun resetLoginResult() {
         _uiState.value = _uiState.value.copy(loginResult = null)
+    }
+
+    private fun validateLoginInputs(email: String, password: String): ValidationResult {
+        val emailError = when {
+            email.isBlank() -> "Email cannot be empty"
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
+            else -> null
+        }
+
+        val passwordError = when {
+            password.isBlank() -> "Password cannot be empty"
+            password.length < 6 -> "Password must be at least 6 characters"
+            else -> null
+        }
+
+        return ValidationResult(
+            isValid = emailError == null && passwordError == null,
+            emailError = emailError,
+            passwordError = passwordError
+        )
     }
 }
