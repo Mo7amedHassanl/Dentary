@@ -19,11 +19,13 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 @Composable
 fun ForgetPasswordButton(
     onClick: () -> Unit,
+    enabled: Boolean = true,
     modifier: Modifier = Modifier
 ) {
     TextButton(
         modifier = modifier.fillMaxWidth(),
-        onClick = onClick
+        onClick = onClick,
+        enabled = enabled
     ) {
         Text(
             text = stringResource(R.string.forget_password),
@@ -32,10 +34,9 @@ fun ForgetPasswordButton(
                 lineHeight = 20.sp,
                 fontFamily = AlexandriaRegular,
                 fontWeight = FontWeight.Normal,
-                color = Color(0xFFA2A2A2),
-                textAlign = TextAlign.Start,
-            ),
-            modifier = Modifier.fillMaxWidth()
+                color = if (enabled) Color(0xFFA2A2A2) else Color(0xFFD3D3D3),
+                textAlign = TextAlign.Center,
+            )
         )
     }
 }

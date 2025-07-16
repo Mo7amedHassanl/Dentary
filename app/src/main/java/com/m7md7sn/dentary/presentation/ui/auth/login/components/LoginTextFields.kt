@@ -10,6 +10,7 @@ import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -21,17 +22,18 @@ import com.m7md7sn.dentary.presentation.common.components.CommonTextField
 
 @Composable
 fun LoginTextFields(
+    focusManager: FocusManager,
     email: String,
     onEmailChange: (String) -> Unit,
     password: String,
     onPasswordChange: (String) -> Unit,
+    onDone: () -> Unit,
     emailError: String? = null,
     passwordError: String? = null,
     isEmailError: Boolean = false,
     isPasswordError: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val focusManager = LocalFocusManager.current
     CommonTextField(
         value = email,
         onValueChange = onEmailChange,
@@ -55,7 +57,10 @@ fun LoginTextFields(
         label = stringResource(id = R.string.password),
         trailingIcon = painterResource(id = R.drawable.ic_lock),
         keyboardActions = KeyboardActions(
-            onDone = { focusManager.clearFocus() }
+            onDone = {
+                focusManager.clearFocus()
+                onDone
+            }
         ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,

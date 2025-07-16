@@ -13,6 +13,7 @@ import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificat
 import com.m7md7sn.dentary.presentation.ui.auth.login.LoginScreen
 import com.m7md7sn.dentary.presentation.ui.auth.passwordreset.PasswordResetScreen
 import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
+import com.m7md7sn.dentary.presentation.ui.home.HomeScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 
 @Composable
@@ -46,6 +47,11 @@ fun DentaryNavHost(
                     onForgetPasswordClick = {
                         navController.navigate(Screen.PasswordReset.route)
                     },
+                    onLoginClick = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    },
                 )
             }
             composable(route = Screen.Register.route) {
@@ -65,6 +71,9 @@ fun DentaryNavHost(
             }
             composable(route = Screen.PasswordReset.route) {
                 PasswordResetScreen()
+            }
+            composable(route = Screen.Home.route) {
+               HomeScreen()
             }
         }
     }
