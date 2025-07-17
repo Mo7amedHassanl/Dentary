@@ -87,7 +87,6 @@ class LoginViewModel @Inject constructor(
 
         val passwordError = when {
             password.isBlank() -> "Password cannot be empty"
-            password.length < 6 -> "Password must be at least 6 characters"
             else -> null
         }
 

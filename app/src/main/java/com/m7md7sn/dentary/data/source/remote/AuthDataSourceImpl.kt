@@ -10,6 +10,8 @@ import io.github.jan.supabase.auth.OtpType
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import javax.inject.Inject
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.TimeoutCancellationException
 
 class AuthDataSourceImpl @Inject constructor(
     private val auth: Auth
@@ -17,11 +19,18 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun getCurrentUser(): UserInfo? {
         return try {
-            auth.retrieveUserForCurrentSession(updateSession = true)
+            // Add timeout to prevent hanging requests
+            withTimeout(10000) { // 10 second timeout
+                auth.retrieveUserForCurrentSession(updateSession = true)
+            }
+        } catch (timeoutException: TimeoutCancellationException) {
+            null
         } catch (e: Exception) {
             try {
-                auth.refreshCurrentSession()
-                auth.currentUserOrNull()
+                withTimeout(5000) { // 5 second timeout for refresh
+                    auth.refreshCurrentSession()
+                    auth.currentUserOrNull()
+                }
             } catch (refreshException: Exception) {
                 null
             }
@@ -117,7 +126,11 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun resendEmailVerification(email: String): Result<Unit> {
         return try {
-            auth.resetPasswordForEmail(email)
+            // This should resend signup verification, not password reset
+            auth.resendEmail(
+                type = OtpType.Email.SIGNUP,
+                email = email
+            )
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.message ?: "Failed to resend verification email")
@@ -157,6 +170,24 @@ class AuthDataSourceImpl @Inject constructor(
         } catch (e: Exception) {
             println("Error resetting password: ${e.message}")
             Result.Error(e.message ?: "Failed to reset password")
+        }
+    }
+
+    override suspend fun refreshSession(): Result<UserInfo> {
+        return try {
+            withTimeout(10000) {
+                auth.refreshCurrentSession()
+                val userInfo = auth.currentUserOrNull()
+                if (userInfo != null) {
+                    Result.Success(userInfo)
+                } else {
+                    Result.Error("Session refresh failed - please log in again")
+                }
+            }
+        } catch (timeoutException: TimeoutCancellationException) {
+            Result.Error("Session refresh timed out")
+        } catch (e: Exception) {
+            Result.Error("Session expired - please log in again")
         }
     }
 }

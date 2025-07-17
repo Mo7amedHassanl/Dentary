@@ -17,4 +17,5 @@ interface AuthDataSource {
     suspend fun isSessionValid(): Boolean
     suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo>
     suspend fun resendEmailVerification(email: String): Result<Unit>
+    suspend fun refreshSession(): Result<UserInfo>
 }
