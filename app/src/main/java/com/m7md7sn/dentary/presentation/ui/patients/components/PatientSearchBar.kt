@@ -49,8 +49,7 @@ fun PatientSearchBar(
         onActiveChange = {},
         modifier = modifier
             .fillMaxWidth()
-            .height(55.dp)
-            .padding(horizontal = 28.dp),
+            .height(55.dp),
         placeholder = {
             Text(
                 text = stringResource(R.string.search_patient),

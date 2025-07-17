@@ -1,13 +1,40 @@
 package com.m7md7sn.dentary.presentation.ui.home
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
+import com.m7md7sn.dentary.presentation.ui.home.compoenents.HomeContent
+import com.m7md7sn.dentary.presentation.ui.patients.components.PatientsContent
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
 
+    Surface(
+        color = BackgroundColor,
+        modifier = modifier.fillMaxSize()
+    ) {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(vertical = 8.dp, horizontal = 28.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                HomeContent()
+            }
+        }
+    }
 }
 
 @Preview

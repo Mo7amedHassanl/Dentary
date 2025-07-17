@@ -12,7 +12,7 @@ val Pink40 = Color(0xFF7D5260)
 
 val DentaryBlue = Color(0xFF073FB8)
 val DentaryLightBlue = Color(0xFF10A6F9)
-val DentaryDarkBlue = Color(0xFF073FB8)
+val DentaryDarkBlue = Color(0xFF03277A)
 val DentaryLightGray = Color(0xFFF0F2F8)
 val DentaryBlueGray = Color(0xFFD8DEEF)
 val DentaryGray = Color(0xFFAFAFB0)

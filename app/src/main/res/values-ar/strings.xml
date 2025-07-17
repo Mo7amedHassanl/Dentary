@@ -40,4 +40,9 @@
     <string name="cancel">الغاء</string>
     <string name="patients">المرضى</string>
     <string name="search_patient">البحث عن مريض</string>
+    <string name="see_all">مشاهدة الكل</string>
+    <string name="recent_added_patients">المرضى الذين ضفتهم مؤخراً</string>
+    <string name="appointments">المواعيد</string>
+    <string name="today">اليوم</string>
+    <string name="upcoming">قادم</string>
 </resources>

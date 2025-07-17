@@ -35,8 +35,13 @@
     <string name="email_optional">Email Address (Optional)</string>
     <string name="gender_male">Male</string>
     <string name="gender_female">Female</string>
-    <string name="save_patient">حفظ المريض</string>
-    <string name="cancel">الغاء</string>
-    <string name="patients">المرضى</string>
-    <string name="search_patient">البحث عن مريض</string>
+    <string name="save_patient">Save Patient</string>
+    <string name="cancel">Cancel</string>
+    <string name="patients">Patients</string>
+    <string name="search_patient">Search Patient</string>
+    <string name="see_all">See All</string>
+    <string name="recent_added_patients">Recently Added Patients</string>
+    <string name="appointments">Appointments</string>
+    <string name="today">Today</string>
+    <string name="upcoming">Upcoming</string>
 </resources>
