@@ -134,8 +134,15 @@ fun EmailVerificationContent(
                     color = DentaryBlue
                 )
             } else if (!canResend) {
+                val minutes = resendCountdown / 60
+                val seconds = resendCountdown % 60
+                val timeText = if (resendCountdown >= 60) {
+                    String.format("%d:%02d", minutes, seconds)
+                } else {
+                    "${seconds}s"
+                }
                 Text(
-                    text = "${stringResource(R.string.resend)} (${resendCountdown}s)",
+                    text = "${stringResource(R.string.resend)} ($timeText)",
                     style = TextStyle(
                         fontSize = 14.sp,
                         lineHeight = 20.sp,
