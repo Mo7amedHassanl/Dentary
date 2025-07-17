@@ -123,4 +123,40 @@ class AuthDataSourceImpl @Inject constructor(
             Result.Error(e.message ?: "Failed to resend verification email")
         }
     }
+
+    override suspend fun verifyPasswordResetOTP(email: String, token: String): Result<Unit> {
+        return try {
+            // Sign out any existing session to ensure clean state
+            try {
+                auth.signOut()
+            } catch (e: Exception) {
+                // Ignore if already signed out
+            }
+
+            auth.verifyEmailOtp(
+                type = io.github.jan.supabase.auth.OtpType.Email.RECOVERY,
+                email = email,
+                token = token
+            )
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to verify password reset OTP")
+        }
+    }
+
+    override suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit> {
+        return try {
+            auth.updateUser {
+                password = newPassword
+            }
+
+            // Sign out the user after password reset to ensure they need to log in again
+            auth.signOut()
+
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            println("Error resetting password: ${e.message}")
+            Result.Error(e.message ?: "Failed to reset password")
+        }
+    }
 }

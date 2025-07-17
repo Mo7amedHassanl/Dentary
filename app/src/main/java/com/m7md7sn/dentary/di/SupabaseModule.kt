@@ -12,20 +12,65 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
+import io.ktor.client.engine.okhttp.OkHttp
+import okhttp3.OkHttpClient
+import java.security.cert.X509Certificate
+import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.X509TrustManager
 
 @Module
 @InstallIn(SingletonComponent::class)
 object SupabaseModule {
+
+    @Provides
+    @Singleton
+    fun provideOkHttpClient(): OkHttpClient {
+        return try {
+            // Create a trust manager that accepts all certificates (for development only)
+            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
+                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
+                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
+                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
+            })
+
+            val sslContext = SSLContext.getInstance("SSL")
+            sslContext.init(null, trustAllCerts, java.security.SecureRandom())
+
+            OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
+                .hostnameVerifier { _, _ -> true } // Accept all hostnames (for development)
+                .build()
+        } catch (e: Exception) {
+            // Fallback to default client if SSL configuration fails
+            OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .build()
+        }
+    }
+
     @Provides
     @Singleton
     fun provideSupabaseClient(
-        @ApplicationContext context: Context
+        @ApplicationContext context: Context,
+        okHttpClient: OkHttpClient
     ): SupabaseClient {
         return createSupabaseClient(
             supabaseUrl = BuildConfig.SUPABASE_URL,
             supabaseKey = BuildConfig.SUPABASE_ANON_KEY
         ) {
+            // Configure HTTP engine with custom OkHttp client
+            httpEngine = OkHttp.create {
+                preconfigured = okHttpClient
+            }
+
             install(Auth) {
                 sessionManager = SharedPreferencesSessionManager(context)
                 autoSaveToStorage = true

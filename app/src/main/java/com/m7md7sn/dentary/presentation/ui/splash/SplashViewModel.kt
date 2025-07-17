@@ -27,7 +27,7 @@ class SplashViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            delay(1500)
+            delay(500)
 
             try {
                 val isValid = authRepository.isSessionValid()

@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun PasswordResetScreen(
-    onPasswordResetSent: () -> Unit,
+    onPasswordResetSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: PasswordResetViewModel = hiltViewModel()
@@ -43,8 +43,8 @@ fun PasswordResetScreen(
             event.getContentIfNotHandled()?.let { message ->
                 scope.launch {
                     snackbarHostState.showSnackbar(message)
-                    if (message == "Password reset email sent!") {
-                        onPasswordResetSent()
+                    if (message == "Password reset successfully!") {
+                        onPasswordResetSuccess()
                     }
                 }
             }
@@ -54,6 +54,18 @@ fun PasswordResetScreen(
     LaunchedEffect(uiState.passwordResetResult) {
         if (uiState.passwordResetResult != null) {
             viewModel.resetPasswordResetResult()
+        }
+    }
+
+    LaunchedEffect(uiState.otpVerificationResult) {
+        if (uiState.otpVerificationResult != null) {
+            viewModel.resetOtpVerificationResult()
+        }
+    }
+
+    LaunchedEffect(uiState.passwordChangeResult) {
+        if (uiState.passwordChangeResult != null) {
+            viewModel.resetPasswordChangeResult()
         }
     }
 
@@ -69,13 +81,29 @@ fun PasswordResetScreen(
             ) {
                 RegisterHeader()
                 PasswordResetContent(
+                    currentStep = uiState.currentStep,
                     email = uiState.email,
                     onEmailValueChange = viewModel::onEmailChange,
                     onSendPasswordResetClick = viewModel::sendPasswordResetEmail,
+                    onResendPasswordResetClick = viewModel::resendPasswordResetEmail,
+                    otpCode = uiState.otpCode,
+                    onOTPCodeChange = viewModel::onOTPCodeChange,
+                    onVerifyOTPClick = viewModel::verifyOTP,
+                    newPassword = uiState.newPassword,
+                    onNewPasswordChange = viewModel::onNewPasswordChange,
+                    confirmPassword = uiState.confirmPassword,
+                    onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
+                    onResetPasswordClick = viewModel::resetPassword,
                     onLoginClick = onNavigateToLogin,
                     isLoading = uiState.isLoading,
+                    isResending = uiState.isResending,
                     isEmailError = uiState.emailError != null,
-                    emailErrorMessage = uiState.emailError
+                    emailErrorMessage = uiState.emailError,
+                    otpError = uiState.otpError ?: "",
+                    passwordError = uiState.passwordError,
+                    confirmPasswordError = uiState.confirmPasswordError,
+                    canResend = uiState.canResend,
+                    resendCountdown = uiState.resendCountdown
                 )
             }
 

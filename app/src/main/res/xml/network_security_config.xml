@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="true">supabase.co</domain>
+        <domain includeSubdomains="true">supabase.io</domain>
+        <!-- Add your specific Supabase project URL here -->
+        <!-- Example: <domain includeSubdomains="true">your-project.supabase.co</domain> -->
+        <trust-anchors>
+            <!-- Trust system certificates -->
+            <certificates src="system"/>
+            <!-- Trust user added certificates -->
+            <certificates src="user"/>
+        </trust-anchors>
+    </domain-config>
+
+    <!-- For development/debug builds, you might want to allow all certificates -->
+    <debug-overrides>
+        <trust-anchors>
+            <certificates src="system"/>
+            <certificates src="user"/>
+        </trust-anchors>
+    </debug-overrides>
+</network-security-config>
+

@@ -95,7 +95,7 @@ fun DentaryNavHost(
                             popUpTo(Screen.PasswordReset.route) { inclusive = true }
                         }
                     },
-                    onPasswordResetSent = {
+                    onPasswordResetSuccess = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.PasswordReset.route) { inclusive = true }
                         }

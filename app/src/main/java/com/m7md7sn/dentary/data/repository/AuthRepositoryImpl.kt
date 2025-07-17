@@ -30,6 +30,14 @@ class AuthRepositoryImpl @Inject constructor(
         return authDataSource.sendPasswordResetEmail(email)
     }
 
+    override suspend fun verifyPasswordResetOTP(email: String, token: String): Result<Unit> {
+        return authDataSource.verifyPasswordResetOTP(email, token)
+    }
+
+    override suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit> {
+        return authDataSource.resetPasswordWithToken(email, token, newPassword)
+    }
+
     override suspend fun isSessionValid(): Boolean {
         return authDataSource.isSessionValid()
     }

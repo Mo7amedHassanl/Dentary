@@ -10,6 +10,8 @@ interface AuthRepository {
     suspend fun signUp(credentials: SignUpCredentials): com.m7md7sn.dentary.utils.Result<UserInfo>
     suspend fun signOut(): com.m7md7sn.dentary.utils.Result<Unit>
     suspend fun sendPasswordResetEmail(email: String): com.m7md7sn.dentary.utils.Result<Unit>
+    suspend fun verifyPasswordResetOTP(email: String, token: String): com.m7md7sn.dentary.utils.Result<Unit>
+    suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): com.m7md7sn.dentary.utils.Result<Unit>
     suspend fun isSessionValid(): Boolean
     suspend fun verifyEmailOTP(email: String, token: String): com.m7md7sn.dentary.utils.Result<UserInfo>
     suspend fun resendEmailVerification(email: String): com.m7md7sn.dentary.utils.Result<Unit>
