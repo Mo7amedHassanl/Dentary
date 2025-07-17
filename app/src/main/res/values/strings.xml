@@ -37,4 +37,6 @@
     <string name="gender_female">Female</string>
     <string name="save_patient">حفظ المريض</string>
     <string name="cancel">الغاء</string>
+    <string name="patients">المرضى</string>
+    <string name="search_patient">البحث عن مريض</string>
 </resources>

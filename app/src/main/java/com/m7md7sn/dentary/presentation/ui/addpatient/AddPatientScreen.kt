@@ -43,7 +43,7 @@ fun AddPatientScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState, enabled = true)
-                    .padding(vertical = 18.dp),
+                    .padding(vertical = 8.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 AddPatientContent(
