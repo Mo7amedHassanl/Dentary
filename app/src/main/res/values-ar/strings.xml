@@ -29,4 +29,13 @@
     <string name="reset_password">تغيير كلمة السر</string>
     <string name="reset_password_message">ادخل البريد الإلكتروني وسيتم ارسال رابط\n لتغيير كلمة السر</string>
     <string name="send">إرسال</string>
+    <string name="add_patient">إضافة مريض</string>
+    <string name="full_name">الاسم كامل</string>
+    <string name="age">العمر</string>
+    <string name="phone_number">رقم الهاتف</string>
+    <string name="email_optional">البريد الإلكتروني ( اختياري )</string>
+    <string name="gender_male">ذكر</string>
+    <string name="gender_female">أنثى</string>
+    <string name="save_patient">حفظ المريض</string>
+    <string name="cancel">الغاء</string>
 </resources>
