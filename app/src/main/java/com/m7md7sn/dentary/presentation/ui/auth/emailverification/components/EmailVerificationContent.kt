@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -23,11 +24,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.common.components.CommonButton
+import com.m7md7sn.dentary.presentation.common.components.CommonTextField
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
@@ -35,7 +38,20 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightGray
 
 @Composable
-fun EmailVerificationContent(modifier: Modifier = Modifier) {
+fun EmailVerificationContent(
+    email: String = "",
+    otpCode: String = "",
+    otpError: String = "",
+    onOTPCodeChange: (String) -> Unit = {},
+    onConfirmClick: () -> Unit = {},
+    onResendClick: () -> Unit = {},
+    isLoading: Boolean = false,
+    isResending: Boolean = false,
+    canResend: Boolean = true,
+    resendCountdown: Int = 0,
+    onBackClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -68,30 +84,33 @@ fun EmailVerificationContent(modifier: Modifier = Modifier) {
                 color = DentaryBlue
             )
         )
-        Spacer(modifier = Modifier.height(38.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    color = DentaryLightGray,
-                    shape = RoundedCornerShape(25.dp)
-                )
-                .padding(34.dp),
-            contentAlignment = Alignment.Center
-        ) {
+
+        // Add email display
+        if (email.isNotEmpty()) {
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = stringResource(R.string.email_verification_message),
-                modifier = Modifier.width(256.dp),
+                text = email,
                 style = TextStyle(
-                    fontSize = 15.sp,
+                    fontSize = 16.sp,
                     fontFamily = AlexandriaBold,
                     fontWeight = FontWeight.Bold,
-                    lineHeight = 30.sp,
-                    color = DentaryBlue
-                ),
-                textAlign = TextAlign.Center
+                    color = DentaryBlue,
+                    textAlign = TextAlign.Center,
+                )
             )
         }
+
+        Spacer(modifier = Modifier.height(38.dp))
+        CommonTextField(
+            value = otpCode,
+            onValueChange = onOTPCodeChange,
+            label = stringResource(R.string.verification_code),
+            errorMessage = if (otpError.isNotEmpty()) otpError else null,
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Number
+            ),
+            modifier = Modifier.fillMaxWidth()
+        )
         Spacer(modifier = Modifier.height(38.dp))
         Text(
             text = stringResource(R.string.did_not_receive_email),
@@ -105,24 +124,50 @@ fun EmailVerificationContent(modifier: Modifier = Modifier) {
             )
         )
         TextButton(
-            onClick = { },
+            onClick = onResendClick,
+            enabled = canResend && !isResending
         ) {
-            Text(
-                text = stringResource(R.string.resend),
-                style = TextStyle(
-                    fontSize = 14.sp,
-                    lineHeight = 20.sp,
-                    fontFamily = AlexandriaBold,
-                    fontWeight = FontWeight.Bold,
-                    color = DentaryBlue,
-                    textAlign = TextAlign.Center,
+            if (isResending) {
+                androidx.compose.material3.CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    strokeWidth = 2.dp,
+                    color = DentaryBlue
                 )
-            )
+            } else if (!canResend) {
+                Text(
+                    text = "${stringResource(R.string.resend)} (${resendCountdown}s)",
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        fontFamily = AlexandriaBold,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFA2A2A2),
+                        textAlign = TextAlign.Center,
+                    )
+                )
+            } else {
+                Text(
+                    text = stringResource(R.string.resend),
+                    style = TextStyle(
+                        fontSize = 14.sp,
+                        lineHeight = 20.sp,
+                        fontFamily = AlexandriaBold,
+                        fontWeight = FontWeight.Bold,
+                        color = DentaryBlue,
+                        textAlign = TextAlign.Center,
+                    )
+                )
+            }
         }
         Spacer(modifier = Modifier.height(42.dp))
         CommonButton(
             text = stringResource(R.string.confirm_email),
-            onClick = {}
+            onClick = {
+                println("EmailVerificationContent: Confirm button clicked!")
+                onConfirmClick()
+            },
+            enabled = !isLoading && otpCode.isNotEmpty(),
+            isLoading = isLoading
         )
         Spacer(modifier = Modifier.height(42.dp))
         Text(

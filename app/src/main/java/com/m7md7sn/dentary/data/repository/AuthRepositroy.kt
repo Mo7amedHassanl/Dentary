@@ -11,4 +11,6 @@ interface AuthRepository {
     suspend fun signOut(): com.m7md7sn.dentary.utils.Result<Unit>
     suspend fun sendPasswordResetEmail(email: String): com.m7md7sn.dentary.utils.Result<Unit>
     suspend fun isSessionValid(): Boolean
+    suspend fun verifyEmailOTP(email: String, token: String): com.m7md7sn.dentary.utils.Result<UserInfo>
+    suspend fun resendEmailVerification(email: String): com.m7md7sn.dentary.utils.Result<Unit>
 }

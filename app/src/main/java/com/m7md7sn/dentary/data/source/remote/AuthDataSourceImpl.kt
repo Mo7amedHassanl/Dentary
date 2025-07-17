@@ -6,6 +6,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
 import com.m7md7sn.dentary.utils.Result
+import io.github.jan.supabase.auth.OtpType
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import javax.inject.Inject
@@ -13,9 +14,9 @@ import javax.inject.Inject
 class AuthDataSourceImpl @Inject constructor(
     private val auth: Auth
 ) : AuthDataSource {
+
     override suspend fun getCurrentUser(): UserInfo? {
         return try {
-            // First try to get current user (this should trigger session loading)
             auth.retrieveUserForCurrentSession(updateSession = true)
         } catch (e: Exception) {
             try {
@@ -34,7 +35,6 @@ class AuthDataSourceImpl @Inject constructor(
                 password = credentials.password
             }
 
-            // Verify the user is properly authenticated
             val userInfo = auth.currentUserOrNull()
             if (userInfo != null) {
                 Result.Success(userInfo)
@@ -94,6 +94,33 @@ class AuthDataSourceImpl @Inject constructor(
             user != null && auth.currentSessionOrNull() != null
         } catch (e: Exception) {
             false
+        }
+    }
+
+    override suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo> {
+        return try {
+            auth.verifyEmailOtp(
+                type = OtpType.Email.SIGNUP,
+                email = email,
+                token = token
+            )
+            val userInfo = auth.currentUserOrNull()
+            if (userInfo != null) {
+                Result.Success(userInfo)
+            } else {
+                Result.Error("Email verification failed")
+            }
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Email verification failed")
+        }
+    }
+
+    override suspend fun resendEmailVerification(email: String): Result<Unit> {
+        return try {
+            auth.resetPasswordForEmail(email)
+            Result.Success(Unit)
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to resend verification email")
         }
     }
 }

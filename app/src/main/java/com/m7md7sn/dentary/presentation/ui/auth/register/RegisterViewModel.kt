@@ -67,13 +67,27 @@ class RegisterViewModel @Inject constructor(
                     phoneNumber = _uiState.value.clinicPhone
                 )
             )
-            _uiState.value = _uiState.value.copy(
-                isLoading = false,
-                signupResult = result,
-            )
 
-            if (result is Result.Error) {
-                _snackbarMessage.emit(Event(result.message))
+            when (result) {
+                is Result.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        signupResult = result,
+                        needsEmailVerification = true
+                    )
+                    _snackbarMessage.emit(Event("Registration successful! Please check your email for verification code."))
+                }
+                is Result.Error -> {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        signupResult = result,
+                        needsEmailVerification = false
+                    )
+                    _snackbarMessage.emit(Event(result.message))
+                }
+                is Result.Loading -> {
+                    // Already handled above
+                }
             }
         }
     }

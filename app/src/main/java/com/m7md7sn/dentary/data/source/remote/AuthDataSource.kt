@@ -13,4 +13,6 @@ interface AuthDataSource {
     suspend fun signOut(): Result<Unit>
     suspend fun sendPasswordResetEmail(email: String): Result<Unit>
     suspend fun isSessionValid(): Boolean
+    suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo>
+    suspend fun resendEmailVerification(email: String): Result<Unit>
 }

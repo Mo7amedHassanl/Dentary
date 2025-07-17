@@ -45,4 +45,5 @@
     <string name="appointments">المواعيد</string>
     <string name="today">اليوم</string>
     <string name="upcoming">قادم</string>
+    <string name="verification_code">Verification Code</string>
 </resources>

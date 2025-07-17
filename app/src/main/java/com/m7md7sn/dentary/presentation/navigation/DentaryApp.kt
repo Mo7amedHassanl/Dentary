@@ -5,8 +5,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificationScreen
@@ -64,15 +66,27 @@ fun DentaryNavHost(
                     onLoginClick = {
                         navController.navigate(Screen.Login.route)
                     },
-                    onSignupSuccess = {
-                        navController.navigate(Screen.EmailVerification.route) {
+                    onNavigateToEmailVerification = { email ->
+                        navController.navigate(Screen.EmailVerification.createRoute(email)) {
                             popUpTo(Screen.Register.route) { inclusive = true }
                         }
                     },
                 )
             }
-            composable(route = Screen.EmailVerification.route) {
-                EmailVerificationScreen()
+            composable(
+                route = Screen.EmailVerification.route,
+                arguments = listOf(navArgument("email") { type = NavType.StringType })
+            ) {
+                EmailVerificationScreen(
+                    onVerificationSuccess = {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.EmailVerification.route) { inclusive = true }
+                        }
+                    },
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
             composable(route = Screen.PasswordReset.route) {
                 PasswordResetScreen(

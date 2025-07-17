@@ -24,5 +24,7 @@ data class RegisterUiState(
     val isConfirmPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
 
-    val signupResult: Result<UserInfo>? = null
+    val signupResult: Result<UserInfo>? = null,
+
+    val needsEmailVerification: Boolean = false
 )

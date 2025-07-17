@@ -33,4 +33,12 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun isSessionValid(): Boolean {
         return authDataSource.isSessionValid()
     }
+
+    override suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo> {
+        return authDataSource.verifyEmailOTP(email, token)
+    }
+
+    override suspend fun resendEmailVerification(email: String): Result<Unit> {
+        return authDataSource.resendEmailVerification(email)
+    }
 }

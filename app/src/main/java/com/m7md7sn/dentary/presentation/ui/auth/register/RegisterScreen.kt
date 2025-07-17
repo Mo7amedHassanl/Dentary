@@ -30,7 +30,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun RegisterScreen(
-    onSignupSuccess: () -> Unit = {},
+    onNavigateToEmailVerification: (String) -> Unit = {},
     onLoginClick: () -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: RegisterViewModel = hiltViewModel()
@@ -50,13 +50,16 @@ fun RegisterScreen(
         }
     }
 
+    LaunchedEffect(uiState.needsEmailVerification) {
+        if (uiState.needsEmailVerification) {
+            println("RegisterScreen: Navigating to email verification with email: '${uiState.email}'")
+            onNavigateToEmailVerification(uiState.email)
+            viewModel.resetSignupResult()
+        }
+    }
+
     LaunchedEffect(uiState.signupResult) {
         when (uiState.signupResult) {
-            is Result.Success -> {
-                onSignupSuccess()
-                viewModel.resetSignupResult()
-            }
-
             is Result.Error -> {
                 val errorMessage = (uiState.signupResult as Result.Error).message
                 scope.launch { snackbarHostState.showSnackbar(errorMessage) }
