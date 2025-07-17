@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 @HiltViewModel
@@ -16,34 +17,58 @@ class SplashViewModel @Inject constructor(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SplashUiState())
-    val uiState: StateFlow<SplashUiState> =
-        _uiState.asStateFlow()
-
-    suspend fun isUserSignedIn(): Boolean {
-        var isSignedIn = false
-        viewModelScope.launch {
-            isSignedIn = authRepository.getCurrentUser() != null
-            _uiState.update { it.copy(isUserSignedIn = isSignedIn) }
-        }
-        return isSignedIn
-    }
-
-    suspend fun checkAuthAndConnectivityState(): NavigationState {
-        val isSignedIn = isUserSignedIn()
-
-        return when {
-            isSignedIn -> NavigationState.NavigateToHome
-            else -> NavigationState.NavigateToLogin
-        }
-    }
+    val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
 
     init {
+        checkAuthenticationState()
+    }
+
+    private fun checkAuthenticationState() {
         viewModelScope.launch {
-            _uiState.update { currentState ->
-                currentState.copy(
-                    isUserSignedIn = isUserSignedIn(),
-                )
+            _uiState.update { it.copy(isLoading = true) }
+
+            delay(1500)
+
+            try {
+                val isValid = authRepository.isSessionValid()
+                val user = authRepository.getCurrentUser()
+
+                val navigationState = when {
+                    isValid && user != null -> {
+                        _uiState.update {
+                            it.copy(
+                                isUserSignedIn = true,
+                                isLoading = false
+                            )
+                        }
+                        NavigationState.NavigateToHome
+                    }
+                    else -> {
+                        _uiState.update {
+                            it.copy(
+                                isUserSignedIn = false,
+                                isLoading = false
+                            )
+                        }
+                        NavigationState.NavigateToLogin
+                    }
+                }
+
+                _uiState.update { it.copy(navigationState = navigationState) }
+
+            } catch (e: Exception) {
+                _uiState.update {
+                    it.copy(
+                        isUserSignedIn = false,
+                        isLoading = false,
+                        navigationState = NavigationState.NavigateToLogin
+                    )
+                }
             }
         }
+    }
+
+    fun resetNavigationState() {
+        _uiState.update { it.copy(navigationState = null) }
     }
 }

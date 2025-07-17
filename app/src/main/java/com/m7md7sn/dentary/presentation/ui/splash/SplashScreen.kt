@@ -60,9 +60,22 @@ fun SplashScreen(
         )
         animationPhase = 1
         delay(800)
-        when (viewModel.checkAuthAndConnectivityState()) {
-            NavigationState.NavigateToHome -> onNavigateToHome()
-            NavigationState.NavigateToLogin -> onNavigateToLogin()
+    }
+
+    // Handle navigation based on UI state
+    LaunchedEffect(uiState.navigationState) {
+        when (uiState.navigationState) {
+            NavigationState.NavigateToHome -> {
+                onNavigateToHome()
+                viewModel.resetNavigationState()
+            }
+            NavigationState.NavigateToLogin -> {
+                onNavigateToLogin()
+                viewModel.resetNavigationState()
+            }
+            null -> {
+                // Still loading or initial state
+            }
         }
     }
 

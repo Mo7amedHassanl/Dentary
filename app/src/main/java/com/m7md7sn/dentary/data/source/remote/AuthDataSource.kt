@@ -12,4 +12,5 @@ interface AuthDataSource {
     suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo>
     suspend fun signOut(): Result<Unit>
     suspend fun sendPasswordResetEmail(email: String): Result<Unit>
+    suspend fun isSessionValid(): Boolean
 }

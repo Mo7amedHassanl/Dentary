@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.model.LoginCredentials
 import com.m7md7sn.dentary.data.repository.AuthRepository
-import com.m7md7sn.dentary.presentation.ui.auth.AuthUiState
 import com.m7md7sn.dentary.utils.Event
 import com.m7md7sn.dentary.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
