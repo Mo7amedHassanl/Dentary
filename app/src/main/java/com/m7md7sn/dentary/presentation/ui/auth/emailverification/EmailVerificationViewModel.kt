@@ -134,10 +134,10 @@ class EmailVerificationViewModel @Inject constructor(
     }
 
     private fun startResendCountdown() {
-        _uiState.value = _uiState.value.copy(canResend = false, resendCountdown = 60)
+        _uiState.value = _uiState.value.copy(canResend = false, resendCountdown = 180)
 
         viewModelScope.launch {
-            repeat(60) {
+            repeat(180) {
                 delay(1000)
                 val currentCountdown = _uiState.value.resendCountdown - 1
                 _uiState.value = _uiState.value.copy(resendCountdown = currentCountdown)
