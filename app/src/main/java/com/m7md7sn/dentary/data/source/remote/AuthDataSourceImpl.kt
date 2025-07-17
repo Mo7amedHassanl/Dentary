@@ -147,7 +147,7 @@ class AuthDataSourceImpl @Inject constructor(
             }
 
             auth.verifyEmailOtp(
-                type = io.github.jan.supabase.auth.OtpType.Email.RECOVERY,
+                type = OtpType.Email.RECOVERY,
                 email = email,
                 token = token
             )

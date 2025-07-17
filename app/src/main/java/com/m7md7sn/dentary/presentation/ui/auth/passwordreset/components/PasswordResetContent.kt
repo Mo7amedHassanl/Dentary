@@ -69,7 +69,6 @@ fun PasswordResetContent(
     canResend: Boolean = true,
     resendCountdown: Int = 0
 ) {
-    val focusManager = LocalFocusManager.current
     Column(
         modifier = modifier
             .fillMaxSize()

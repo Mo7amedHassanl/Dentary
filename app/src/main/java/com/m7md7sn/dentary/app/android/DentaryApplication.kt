@@ -7,8 +7,4 @@ import dagger.hilt.android.HiltAndroidApp
 
 @HiltAndroidApp
 class DentaryApplication: Application() {
-    override fun onCreate() {
-        super.onCreate()
-
-    }
 }
