@@ -169,7 +169,7 @@ fun AddPatientTextField(
             focusedBorderColor = DentaryBlue,
             unfocusedBorderColor = DentaryBlueGray,
         ),
-        label = {
+        placeholder = {
             Text(
                 text = placeholder,
                 style = TextStyle(
@@ -201,6 +201,12 @@ fun AddPatientTextField(
         visualTransformation = visualTransformation,
         enabled = enabled,
         shape = CircleShape,
-
+        textStyle = TextStyle(
+            textAlign = TextAlign.Center,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Medium,
+            color = if (isError) Color.Red else DentaryBlue,
+            fontFamily = AlexandriaMedium
+        ),
     )
 }

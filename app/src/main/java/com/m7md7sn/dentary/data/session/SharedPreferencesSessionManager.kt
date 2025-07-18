@@ -14,7 +14,9 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.decodeFromString
+import kotlin.time.ExperimentalTime
 
+@OptIn(ExperimentalTime::class)
 class SharedPreferencesSessionManager(
     private val context: Context
 ) : SessionManager {

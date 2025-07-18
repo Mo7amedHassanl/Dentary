@@ -23,59 +23,30 @@ import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkGray
 import com.m7md7sn.dentary.presentation.ui.patients.components.PatientList
 
 @Composable
-fun RecentPatientsList(modifier: Modifier = Modifier) {
+fun RecentPatientsList(
+    modifier: Modifier = Modifier,
+    patients: List<Patient> = emptyList(),
+    onPatientSeeAllClick: () -> Unit = {}
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        RecentPatientsTitle()
+        RecentPatientsTitle(onPatientSeeAllClick = onPatientSeeAllClick)
         Spacer(Modifier.height(12.dp))
         PatientList(
-            patients = listOf(
-                Patient(
-                    id = "1",
-                    name = "علي حسن علي",
-                    phoneNumber = "0123456789",
-                    age = 15,
-                    email = "hell",
-                    lastVisitDate = "11-12-2025",
-                ),
-                Patient(
-                    id = "2",
-                    name = "محمد أحمد محمد",
-                    phoneNumber = "0987654321",
-                    age = 30,
-                    email = "",
-                    lastVisitDate = "10-11-2025",
-                ),
-                Patient(
-                    id = "1",
-                    name = "علي حسن علي",
-                    phoneNumber = "0123456789",
-                    age = 15,
-                    email = "hell",
-                    lastVisitDate = "11-12-2025",
-                ),
-                Patient(
-                    id = "2",
-                    name = "محمد أحمد محمد",
-                    phoneNumber = "0987654321",
-                    age = 30,
-                    email = "",
-                    lastVisitDate = "10-11-2025",
-                )
-            )
+            patients = patients,
         )
     }
 }
 
 @Composable
 fun RecentPatientsTitle(
+    onPatientSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -100,7 +71,7 @@ fun RecentPatientsTitle(
         )
         Spacer(Modifier.weight(1f))
         TextButton(
-            onClick = {},
+            onClick = onPatientSeeAllClick,
         ) {
             Text(
                 text = stringResource(R.string.see_all),

@@ -16,4 +16,5 @@ sealed class Screen (
     object Profile : Screen("profile")
     object Settings : Screen("settings")
     object Chats : Screen("chats")
+    object AddPatient: Screen("add_patient")
 }

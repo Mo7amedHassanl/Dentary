@@ -46,4 +46,5 @@
     <string name="today">اليوم</string>
     <string name="upcoming">قادم</string>
     <string name="verification_code">Verification Code</string>
+    <string name="welcome">مرحبا بك د. </string>
 </resources>

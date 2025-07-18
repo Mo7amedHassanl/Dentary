@@ -12,6 +12,9 @@ import io.github.jan.supabase.SupabaseClient
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.realtime.Realtime
 import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.OkHttpClient
 import java.security.cert.X509Certificate
@@ -76,6 +79,11 @@ object SupabaseModule {
                 autoSaveToStorage = true
                 autoLoadFromStorage = true
             }
+
+            install(Postgrest){
+
+            }
+            install(Realtime)
         }
     }
 
@@ -85,5 +93,13 @@ object SupabaseModule {
         supabaseClient: SupabaseClient
     ): Auth {
         return supabaseClient.auth
+    }
+
+    @Provides
+    @Singleton
+    fun providePostgrest(
+        supabaseClient: SupabaseClient
+    ): Postgrest {
+        return supabaseClient.postgrest
     }
 }

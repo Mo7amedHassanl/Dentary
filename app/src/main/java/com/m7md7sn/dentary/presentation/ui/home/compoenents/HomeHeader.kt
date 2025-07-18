@@ -16,30 +16,26 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
-import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaExtraBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
-import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkGray
-import com.m7md7sn.dentary.presentation.theme.DentaryGray
-import com.m7md7sn.dentary.presentation.ui.patients.components.PatientActionButtons
-import com.m7md7sn.dentary.presentation.ui.patients.components.PatientImage
-import com.m7md7sn.dentary.presentation.ui.patients.components.PatientInfo
 
-@Preview
 @Composable
-fun HomeHeader(modifier: Modifier = Modifier) {
+fun HomeHeader(
+    name: String,
+    clinicName: String,
+    modifier: Modifier = Modifier
+) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -49,7 +45,7 @@ fun HomeHeader(modifier: Modifier = Modifier) {
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Text(
-                text = "مرحباً بك د. علي",
+                text = stringResource(R.string.welcome) + name,
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontFamily = AlexandriaMedium,
@@ -60,7 +56,7 @@ fun HomeHeader(modifier: Modifier = Modifier) {
                 textAlign = TextAlign.Start
             )
             Text(
-                text = "عيادة الصفا للأسنان",
+                text = clinicName,
                 style = TextStyle(
                     fontSize = 18.sp,
                     fontFamily = AlexandriaExtraBold,

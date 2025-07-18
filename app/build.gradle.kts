@@ -73,11 +73,11 @@ dependencies {
     implementation(libs.androidx.ui.text.google.fonts)
 
     //Supabase
-    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.0"))
+    implementation(platform("io.github.jan-tennert.supabase:bom:3.2.1"))
     implementation("io.github.jan-tennert.supabase:auth-kt")
     implementation("io.ktor:ktor-client-okhttp:3.2.1")
-    //    implementation("io.github.jan-tennert.supabase:postgrest-kt")
-//    implementation("io.github.jan-tennert.supabase:realtime-kt")
+    implementation("io.github.jan-tennert.supabase:postgrest-kt")
+    implementation("io.github.jan-tennert.supabase:realtime-kt")
 
     testImplementation(libs.junit)
 

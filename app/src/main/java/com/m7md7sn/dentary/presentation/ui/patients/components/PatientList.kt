@@ -139,7 +139,7 @@ fun PatientItem(
                 PatientImage()
                 PatientInfo(
                     name = patient.name,
-                    phoneNumber = patient.phoneNumber,
+                    phoneNumber = patient.phoneNumber ?: "",
                     lastUpdate = patient.lastVisitDate ?: "",
                 )
             }
