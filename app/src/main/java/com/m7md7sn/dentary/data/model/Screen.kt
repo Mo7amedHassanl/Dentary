@@ -12,5 +12,8 @@ sealed class Screen (
         fun createRoute(email: String) = "email_verification/$email"
     }
     object Patients : Screen("patients")
+    object Appointments : Screen("appointments")
     object Profile : Screen("profile")
+    object Settings : Screen("settings")
+    object Chats : Screen("chats")
 }

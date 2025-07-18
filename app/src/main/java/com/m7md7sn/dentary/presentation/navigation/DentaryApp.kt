@@ -3,12 +3,15 @@ package com.m7md7sn.dentary.presentation.navigation
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.m7md7sn.dentary.data.model.BottomNavScreen
 import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificationScreen
@@ -23,9 +26,51 @@ fun DentaryNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentRoute = navBackStackEntry?.destination?.route
+
+    val showBottomBar = when (currentRoute) {
+        Screen.Home.route, Screen.Profile.route, Screen.Settings.route, Screen.Appointments.route, Screen.Chats.route -> true
+        else -> false
+    }
+    val showTopBar = when (currentRoute) {
+        Screen.Splash.route, Screen.Login.route, Screen.Register.route, Screen.EmailVerification.route, Screen.PasswordReset.route -> false
+        else -> true
+    }
+
+    val topBarShowBackButton: Boolean = when (currentRoute) {
+        Screen.Home.route, Screen.Profile.route, Screen.Settings.route, Screen.Appointments.route, Screen.Chats.route -> false
+        else -> navController.previousBackStackEntry != null
+    }
+
     Scaffold(
         modifier = modifier,
-        containerColor = BackgroundColor
+        containerColor = BackgroundColor,
+        bottomBar = {
+            if (showBottomBar) {
+                DentelBottomBar(
+                    currentRoute = currentRoute,
+                    onTabSelected = { screen ->
+                        if (currentRoute != screen.route) {
+                            navController.navigate(screen.route) {
+                                popUpTo(Screen.Home.route) { inclusive = false }
+                                launchSingleTop = true
+                            }
+                        }
+                    }
+                )
+            }
+        },
+        topBar = {
+            if (showTopBar) {
+                DentaryTopBar(
+                    navController = navController,
+                    showBackButton = topBarShowBackButton,
+                    onBackClick = { navController.popBackStack() },
+                    onNavDrawerClicked = {}
+                )
+            }
+        },
     ) { innerPadding ->
         NavHost(
             navController = navController,
@@ -104,6 +149,18 @@ fun DentaryNavHost(
             }
             composable(route = Screen.Home.route) {
                HomeScreen()
+            }
+            composable(route = Screen.Profile.route) {
+                // Profile screen content
+            }
+            composable(route = Screen.Appointments.route) {
+                // Appointments screen content
+            }
+            composable(route = Screen.Chats.route) {
+                // Chats screen content
+            }
+            composable(route = Screen.Settings.route) {
+                // Settings screen content
             }
         }
     }
