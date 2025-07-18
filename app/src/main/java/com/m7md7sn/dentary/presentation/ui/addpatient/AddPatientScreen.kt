@@ -10,6 +10,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,17 +23,43 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
 import com.m7md7sn.dentary.presentation.ui.addpatient.components.AddPatientContent
+import kotlinx.coroutines.launch
 
 @Composable
 fun AddPatientScreen(
     modifier: Modifier = Modifier,
-    viewModel: AddPatientViewModel = hiltViewModel()
+    viewModel: AddPatientViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit = {}
 ) {
     val uiState = viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
+
+    // Handle snackbar messages
+    LaunchedEffect(viewModel.snackbarMessage) {
+        viewModel.snackbarMessage.collect { event ->
+            event.getContentIfNotHandled()?.let { message ->
+                scope.launch {
+                    snackbarHostState.showSnackbar(message)
+                }
+            }
+        }
+    }
+
+    // Handle navigation events
+    LaunchedEffect(viewModel.navigationEvent) {
+        viewModel.navigationEvent.collect { event ->
+            event.getContentIfNotHandled()?.let { navigationEvent ->
+                when (navigationEvent) {
+                    is NavigationEvent.GoBack -> {
+                        onNavigateBack()
+                    }
+                }
+            }
+        }
+    }
 
     Surface(
         color = BackgroundColor,
@@ -63,6 +90,15 @@ fun AddPatientScreen(
                     onEmailChange = viewModel::onEmailChange,
                     isEmailError = uiState.value.isEmailError,
                     emailErrorMessage = uiState.value.emailErrorMessage,
+                    gender = uiState.value.gender,
+                    onGenderChange = viewModel::onGenderChange,
+                    address = uiState.value.address,
+                    onAddressChange = viewModel::onAddressChange,
+                    isAddressError = uiState.value.isAddressError,
+                    addressErrorMessage = uiState.value.addressErrorMessage,
+                    isLoading = uiState.value.isLoading,
+                    onSaveClick = viewModel::addPatient,
+                    onCancelClick = viewModel::onCancelClick,
                     focusManager = focusManager
                 )
             }

@@ -1,6 +1,7 @@
 package com.m7md7sn.dentary.data.source.remote
 
 import com.m7md7sn.dentary.data.model.Patient
+import com.m7md7sn.dentary.data.model.PatientInsert
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -58,11 +59,20 @@ class PatientDataSourceImpl @Inject constructor(
             val currentUserId = auth.currentUserOrNull()?.id
                 ?: return Result.Error("User not authenticated")
 
-            val patientWithUserId = patient.copy(userId = currentUserId)
+            // Create PatientInsert object without ID for insertion
+            val patientInsert = PatientInsert(
+                userId = currentUserId,
+                name = patient.name,
+                phoneNumber = patient.phoneNumber,
+                email = patient.email,
+                age = patient.age,
+                address = patient.address,
+                medicalHistory = patient.medicalHistory
+            )
 
             val createdPatient = postgrest
                 .from("patients")
-                .insert(patientWithUserId) {
+                .insert(patientInsert) {
                     select()
                 }
                 .decodeSingle<Patient>()

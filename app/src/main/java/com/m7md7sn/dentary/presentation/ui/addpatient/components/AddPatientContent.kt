@@ -27,6 +27,15 @@ fun AddPatientContent(
     onEmailChange: (String) -> Unit,
     isEmailError: Boolean,
     emailErrorMessage: String? = null,
+    gender: String,
+    onGenderChange: (String) -> Unit,
+    address: String,
+    onAddressChange: (String) -> Unit,
+    isAddressError: Boolean,
+    addressErrorMessage: String? = null,
+    isLoading: Boolean,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit,
     focusManager: FocusManager,
     modifier: Modifier = Modifier
 ) {
@@ -55,17 +64,28 @@ fun AddPatientContent(
             onEmailChange = onEmailChange,
             isEmailError = isEmailError,
             emailErrorMessage = emailErrorMessage,
+            address = address,
+            onAddressChange = onAddressChange,
+            isAddressError = isAddressError,
+            addressErrorMessage = addressErrorMessage,
             focusManager = focusManager
         )
         Spacer(modifier = Modifier.height(20.dp))
         GenderRadioButtons(
-            selectedGender = Gender.MALE,
-            onGenderSelected = {
-
+            selectedGender = when (gender) {
+                "MALE" -> Gender.MALE
+                "FEMALE" -> Gender.FEMALE
+                else -> null
+            },
+            onGenderSelected = { selectedGender ->
+                onGenderChange(selectedGender?.name ?: "")
             }
         )
         Spacer(modifier = Modifier.height(38.dp))
-        AddPatientActionButtons()
-
+        AddPatientActionButtons(
+            isLoading = isLoading,
+            onSaveClick = onSaveClick,
+            onCancelClick = onCancelClick
+        )
     }
 }

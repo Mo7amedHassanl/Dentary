@@ -211,7 +211,11 @@ fun DentaryNavHost(
                 // Settings screen content
             }
             composable(route = Screen.AddPatient.route) {
-                AddPatientScreen()
+                AddPatientScreen(
+                    onNavigateBack = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }

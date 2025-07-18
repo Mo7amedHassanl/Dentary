@@ -4,11 +4,9 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Patient(
-    @SerialName("id")
-    val id: String,
+data class PatientInsert(
     @SerialName("user_id")
-    val userId: String? = null,
+    val userId: String,
     @SerialName("name")
     val name: String,
     @SerialName("phone_number")
@@ -20,11 +18,5 @@ data class Patient(
     @SerialName("address")
     val address: String? = null,
     @SerialName("medical_history")
-    val medicalHistory: String? = null,
-    @SerialName("last_visit_date")
-    val lastVisitDate: String? = null,
-    @SerialName("created_at")
-    val createdAt: String? = null,
-    @SerialName("updated_at")
-    val updatedAt: String? = null
+    val medicalHistory: String? = null
 )

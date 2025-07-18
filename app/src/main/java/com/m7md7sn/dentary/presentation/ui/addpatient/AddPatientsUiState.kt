@@ -6,6 +6,9 @@ data class AddPatientsUiState(
     val phoneNumber: String = "",
     val email: String = "",
     val gender: String = "",
+    val address: String = "",
+    val isLoading: Boolean = false,
+    val isSuccess: Boolean = false,
     val isFullNameError: Boolean = false,
     val fullNameErrorMessage: String? = null,
     val isAgeError: Boolean = false,
@@ -14,4 +17,6 @@ data class AddPatientsUiState(
     val phoneNumberErrorMessage: String? = null,
     val isEmailError: Boolean = false,
     val emailErrorMessage: String? = null,
+    val isAddressError: Boolean = false,
+    val addressErrorMessage: String? = null,
 )

@@ -27,7 +27,12 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 
 @Composable
-fun AddPatientActionButtons(modifier: Modifier = Modifier) {
+fun AddPatientActionButtons(
+    isLoading: Boolean = false,
+    onSaveClick: () -> Unit,
+    onCancelClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -35,14 +40,16 @@ fun AddPatientActionButtons(modifier: Modifier = Modifier) {
         AddPatientActionButton(
             text = stringResource(R.string.save_patient),
             hasBorder = false,
-            onClick = { /* Handle save patient action */ },
+            onClick = onSaveClick,
+            enabled = !isLoading,
         )
 
         AddPatientActionButton(
             text = stringResource(R.string.cancel),
             hasBorder = true,
-            onClick = { /* Handle save patient action */ },
+            onClick = onCancelClick,
             backgroundColor = Color.White,
+            enabled = !isLoading,
         )
     }
 }
@@ -56,7 +63,8 @@ fun AddPatientActionButton(
     backgroundColor: Color = DentaryDarkBlue,
     fontSize: TextUnit = 15.sp,
     fontFamily: FontFamily = AlexandriaBold,
-    fontWeight: FontWeight = FontWeight.Bold
+    fontWeight: FontWeight = FontWeight.Bold,
+    enabled: Boolean = true
 ) {
     Box(
         modifier = modifier
@@ -68,7 +76,7 @@ fun AddPatientActionButton(
                 color = if (!hasBorder) Color.Transparent else DentaryDarkBlue,
                 shape = CircleShape
             )
-            .clickable { onClick() },
+            .clickable(enabled = enabled) { onClick() },
         contentAlignment = Alignment.Center
     ) {
         Text(

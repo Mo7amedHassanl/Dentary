@@ -54,6 +54,10 @@ fun AddPatientForm(
     onEmailChange: (String) -> Unit,
     isEmailError: Boolean,
     emailErrorMessage: String? = null,
+    address: String,
+    onAddressChange: (String) -> Unit,
+    isAddressError: Boolean,
+    addressErrorMessage: String? = null,
     focusManager: FocusManager,
     modifier: Modifier = Modifier
 ) {
@@ -123,7 +127,7 @@ fun AddPatientForm(
             onValueChange = onEmailChange,
             placeholder = stringResource(R.string.email_optional),
             keyboardActions = KeyboardActions(
-                onDone = {
+                onNext = {
                     focusManager.clearFocus()
                 }
             ),
