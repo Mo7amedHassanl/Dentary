@@ -47,4 +47,7 @@
     <string name="upcoming">قادم</string>
     <string name="verification_code">Verification Code</string>
     <string name="welcome">مرحبا بك د. </string>
+    <string name="profile">الصفحة الشخصية</string>
+    <string name="total_patients">اجمالي المرضى لديك</string>
+    <string name="patient">مريض</string>
 </resources>

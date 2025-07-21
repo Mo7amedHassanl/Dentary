@@ -32,6 +32,8 @@ import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
 import com.m7md7sn.dentary.presentation.ui.home.HomeScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 import com.m7md7sn.dentary.presentation.ui.patients.PatientsScreen
+import com.m7md7sn.dentary.presentation.ui.profile.ProfileScreen
+import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 
 @Composable
 fun DentaryNavHost(
@@ -199,7 +201,7 @@ fun DentaryNavHost(
                 )
             }
             composable(route = Screen.Profile.route) {
-                // Profile screen content
+                ProfileScreen()
             }
             composable(route = Screen.Appointments.route) {
                 // Appointments screen content
@@ -208,7 +210,7 @@ fun DentaryNavHost(
                 // Chats screen content
             }
             composable(route = Screen.Settings.route) {
-                // Settings screen content
+                SettingsScreen()
             }
             composable(route = Screen.AddPatient.route) {
                 AddPatientScreen(

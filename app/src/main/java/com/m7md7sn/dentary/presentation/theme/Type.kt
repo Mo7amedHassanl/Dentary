@@ -54,6 +54,16 @@ val AlexandriaBold = FontFamily(
     )
 )
 
+
+val AlexandriaSemiBold = FontFamily(
+    Font(
+        googleFont = Alexandria,
+        fontProvider = googleFontProvider,
+        weight = FontWeight.SemiBold,
+        style = FontStyle.Normal
+    )
+)
+
 val AlexandriaExtraBold = FontFamily(
     Font(
         googleFont = Alexandria,
