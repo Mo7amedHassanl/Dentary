@@ -31,12 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
-import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.AlexandriaSemiBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
-import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.RegisterSectionTitle
+import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
 
 @Composable
 fun ProfileUserInformation(modifier: Modifier = Modifier) {
@@ -57,7 +56,7 @@ fun ProfileUserInformation(modifier: Modifier = Modifier) {
 
 @Composable
 private fun ClinicInformation() {
-    RegisterSectionTitle(
+    SectionTitle(
         title = R.string.clinic_information,
         titleIcon = R.drawable.ic_clinic,
     )

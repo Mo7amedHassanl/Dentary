@@ -1,4 +1,4 @@
-package com.m7md7sn.dentary.presentation.ui.addpatient.components
+package com.m7md7sn.dentary.presentation.ui.settings.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,18 +17,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 
 @Composable
-fun AddPatientActionButtons(
+fun SettingsActionButtons(
     isLoading: Boolean = false,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -38,14 +36,14 @@ fun AddPatientActionButtons(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        AddPatientActionButton(
-            text = stringResource(R.string.save_patient),
+        SettingsActionButton(
+            text = stringResource(R.string.confirm),
             hasBorder = false,
             onClick = onSaveClick,
             enabled = !isLoading,
         )
 
-        AddPatientActionButton(
+        SettingsActionButton(
             text = stringResource(R.string.cancel),
             hasBorder = true,
             onClick = onCancelClick,
@@ -56,7 +54,7 @@ fun AddPatientActionButtons(
 }
 
 @Composable
-fun AddPatientActionButton(
+fun SettingsActionButton(
     text: String,
     hasBorder: Boolean,
     onClick: () -> Unit,
@@ -69,12 +67,12 @@ fun AddPatientActionButton(
 ) {
     Box(
         modifier = modifier
-            .size(width = 148.dp, height = 58.dp)
+            .size(width = 132.dp, height = 52.dp)
             .clip(CircleShape)
             .background(backgroundColor)
             .border(
                 width = if (!hasBorder) 0.dp else 1.dp,
-                color = if (!hasBorder) Color.Transparent else DentaryBlue,
+                color = if (!hasBorder) Color.Transparent else DentaryDarkBlue,
                 shape = CircleShape
             )
             .clickable(enabled = enabled) { onClick() },
@@ -85,7 +83,7 @@ fun AddPatientActionButton(
             fontSize = fontSize,
             fontFamily = fontFamily,
             fontWeight = fontWeight,
-            color = if (hasBorder) DentaryBlue else Color.White,
+            color = if (hasBorder) DentaryDarkBlue else Color.White,
             lineHeight = fontSize
         )
     }

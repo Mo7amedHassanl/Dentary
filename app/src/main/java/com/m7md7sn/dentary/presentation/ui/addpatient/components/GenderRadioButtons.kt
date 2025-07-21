@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
+import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 
@@ -41,10 +42,10 @@ fun GenderRadioButton(
     width: Dp = 110.dp,
     height: Dp = 41.dp,
     shape: Shape = CircleShape,
-    selectedBackgroundColor: Color = DentaryDarkBlue,
+    selectedBackgroundColor: Color = DentaryBlue,
     unselectedBackgroundColor: Color = Color.White,
     selectedTextColor: Color = Color.White,
-    unselectedTextColor: Color = DentaryDarkBlue,
+    unselectedTextColor: Color = DentaryBlue,
     borderColor: Color = DentaryBlueGray,
     borderWidth: Dp = 1.dp,
     fontSize: TextUnit = 15.sp,

@@ -63,4 +63,6 @@
     <string name="help_support">الدعم والمساعدة</string>
     <string name="faq">الاسئلة الشائعة</string>
     <string name="call_support">الاتصال بالدعم</string>
+    <string name="doctor_info">معلومات الطبيب</string>
+    <string name="confirm">تأكيد</string>
 </resources>

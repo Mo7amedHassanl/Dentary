@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
 
 @Composable
 fun AccountSettings(modifier: Modifier = Modifier) {
@@ -38,6 +39,65 @@ fun AccountSettings(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(8.dp))
         SettingsItem(
             text = stringResource(R.string.change_password),
+        )
+    }
+}
+
+@Composable
+fun DoctorAndClinicInfoSettings(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.Start,
+    ) {
+        SectionTitle(
+            title = R.string.doctor_info,
+            titleIcon = R.drawable.ic_doctor,
+        )
+        Spacer(Modifier.height(20.dp))
+        SettingsTextField(
+            value = "علي حسن علي محمد",
+            icon = R.drawable.ic_user
+        )
+        Spacer(Modifier.height(10.dp))
+        SettingsTextField(
+            placeholder = "التخصص",
+            icon = R.drawable.ic_specialization
+        )
+        Spacer(Modifier.height(10.dp))
+        SettingsTextField(
+            placeholder = "Johnsondoe@nomail.com",
+            icon = R.drawable.ic_email
+        )
+        Spacer(Modifier.height(22.dp))
+        SectionTitle(
+            title = R.string.clinic_information,
+            titleIcon = R.drawable.ic_clinic,
+        )
+        Spacer(Modifier.height(20.dp))
+        SettingsTextField(
+            value = "مركز دنتاري لطب الأسنان",
+            icon = R.drawable.ic_clinic_name,
+        )
+        Spacer(Modifier.height(10.dp))
+        SettingsTextField(
+            placeholder = "0123456789",
+            icon = R.drawable.ic_phone,
+        )
+        Spacer(Modifier.height(10.dp))
+        SettingsTextField(
+            placeholder = "المنطقة",
+            icon = R.drawable.ic_location,
+        )
+        Spacer(Modifier.height(10.dp))
+        SettingsTextField(
+            placeholder = "شعار العيادة",
+            icon = R.drawable.ic_clinic_logo,
+            modifier = Modifier.height(66.dp)
+        )
+        Spacer(Modifier.height(22.dp))
+        SettingsActionButtons(
+            onSaveClick = { /* Handle save action */ },
+            onCancelClick = { /* Handle cancel action */ }
         )
     }
 }

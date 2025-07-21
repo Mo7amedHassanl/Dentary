@@ -62,4 +62,6 @@
     <string name="help_support">Help &amp; Support</string>
     <string name="faq">Frequently Asked Questions</string>
     <string name="call_support">Contact Support</string>
+    <string name="doctor_info">معلومات الطبيب</string>
+    <string name="confirm">تأكيد</string>
 </resources>
