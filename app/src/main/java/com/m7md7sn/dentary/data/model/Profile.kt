@@ -8,6 +8,7 @@ data class Profile(
     val fullName: String? = null,
     val clinicName: String? = null,
     val phoneNumber: String? = null,
+    val clinicAddress: String? = null,
     val createdAt: String? = null,
     val updatedAt: String? = null
 )
@@ -17,12 +18,14 @@ data class CreateProfileRequest(
     val id: String,
     val fullName: String,
     val clinicName: String,
-    val phoneNumber: String
+    val phoneNumber: String,
+    val clinicAddress: String
 )
 
 @Serializable
 data class UpdateProfileRequest(
     val fullName: String? = null,
     val clinicName: String? = null,
-    val phoneNumber: String? = null
+    val phoneNumber: String? = null,
+    val clinicAddress: String? = null
 )

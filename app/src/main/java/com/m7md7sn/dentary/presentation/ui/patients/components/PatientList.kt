@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,56 +48,7 @@ import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
 @Composable
 fun PatientList(
     modifier: Modifier = Modifier,
-    patients: List<Patient> = listOf(
-        Patient(
-            id = "1",
-            name = "علي حسن علي",
-            phoneNumber = "0123456789",
-            age = 15,
-            email = "hell",
-            lastVisitDate = "11-12-2025",
-        ),
-        Patient(
-            id = "1",
-            name = "علي حسن علي",
-            phoneNumber = "0123456789",
-            age = 15,
-            email = "hell",
-            lastVisitDate = "11-12-2025",
-        ),
-        Patient(
-            id = "1",
-            name = "علي حسن علي",
-            phoneNumber = "0123456789",
-            age = 15,
-            email = "hell",
-            lastVisitDate = "11-12-2025",
-        ),
-        Patient(
-            id = "1",
-            name = "علي حسن علي",
-            phoneNumber = "0123456789",
-            age = 15,
-            email = "hell",
-            lastVisitDate = "11-12-2025",
-        ),
-        Patient(
-            id = "1",
-            name = "علي حسن علي",
-            phoneNumber = "0123456789",
-            age = 15,
-            email = "hell",
-            lastVisitDate = "11-12-2025",
-        ),
-        Patient(
-            id = "1",
-            name = "علي حسن علي",
-            phoneNumber = "0123456789",
-            age = 15,
-            email = "hell",
-            lastVisitDate = "11-12-2025",
-        )
-    ),
+    patients: List<Patient> = emptyList(),
 ) {
     LazyColumn(
         modifier = modifier
@@ -135,6 +87,7 @@ fun PatientItem(
         ) {
             Row(
                 horizontalArrangement = Arrangement.spacedBy(18.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 PatientImage()
                 PatientInfo(
@@ -197,19 +150,28 @@ fun PatientInfo(
     lastUpdate: String = " 2023-10-01",
     modifier: Modifier = Modifier
 ) {
+    val displayName = remember(name) {
+        val nameParts = name.trim().split(" ")
+        when {
+            nameParts.size >= 2 -> "${nameParts[0]} ${nameParts[1]}"
+            nameParts.size == 1 -> nameParts[0]
+            else -> name // fallback to original name if empty
+        }
+    }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
     ) {
         Text(
-            text = name,
+            text = displayName,
             style = TextStyle(
                 fontSize = 13.sp,
                 fontFamily = AlexandriaBold,
                 lineHeight = 30.sp,
                 color = Color(0xFF03277A)
             ),
-            textAlign = TextAlign.Start
+            textAlign = TextAlign.Start,
         )
         Text(
             text = phoneNumber,

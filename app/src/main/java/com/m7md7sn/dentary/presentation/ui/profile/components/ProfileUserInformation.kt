@@ -36,43 +36,63 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaSemiBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
+import com.m7md7sn.dentary.presentation.ui.profile.ProfileUiState
 
 @Composable
-fun ProfileUserInformation(modifier: Modifier = Modifier) {
+fun ProfileUserInformation(
+    uiState: ProfileUiState,
+    onEditProfileClick: () -> Unit,
+    onSeeAllPatientsClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        EditProfileButton()
+        EditProfileButton(onClick = onEditProfileClick)
         ProfilePicture(modifier)
         Spacer(Modifier.height(12.dp))
-        DoctorInformation()
+        DoctorInformation(
+            fullName = uiState.profile?.fullName ?: "غير محدد",
+            email = uiState.userEmail ?: "غير محدد"
+        )
         Spacer(Modifier.height(24.dp))
-        ClinicInformation()
+        ClinicInformation(
+            clinicName = uiState.profile?.clinicName ?: "غير محدد",
+            phoneNumber = uiState.profile?.phoneNumber ?: "غير محدد",
+            clinicAddress = uiState.profile?.clinicAddress ?: "غير محدد"
+        )
         Spacer(Modifier.height(10.dp))
-        TotalPatientsCard()
+        TotalPatientsCard(
+            totalPatients = uiState.totalPatients,
+            onSeeAllClick = onSeeAllPatientsClick
+        )
     }
 }
 
 @Composable
-private fun ClinicInformation() {
+private fun ClinicInformation(
+    clinicName: String,
+    phoneNumber: String,
+    clinicAddress: String,
+) {
     SectionTitle(
         title = R.string.clinic_information,
         titleIcon = R.drawable.ic_clinic,
     )
     Spacer(Modifier.height(16.dp))
     ProfileInfoField(
-        text = "مركز دنتاري لطب الأسنان",
+        text = clinicName,
         icon = R.drawable.ic_clinic_name,
     )
     Spacer(Modifier.height(10.dp))
     ProfileInfoField(
-        text = "0123456789",
+        text = phoneNumber,
         icon = R.drawable.ic_phone,
     )
     Spacer(Modifier.height(10.dp))
     ProfileInfoField(
-        text = "الرياض - حي النرجس",
+        text = clinicAddress,
         icon = R.drawable.ic_location,
     )
     Spacer(Modifier.height(10.dp))
@@ -84,9 +104,12 @@ private fun ClinicInformation() {
 }
 
 @Composable
-private fun DoctorInformation() {
+private fun DoctorInformation(
+    fullName: String,
+    email: String,
+) {
     Text(
-        text = "د. علي حسن علي",
+        text = fullName,
         style = TextStyle(
             fontSize = 22.sp,
             fontFamily = AlexandriaBlack,
@@ -106,7 +129,7 @@ private fun DoctorInformation() {
     )
     Spacer(Modifier.height(18.dp))
     ProfileInfoField(
-        text = "Johnsondoe@nomail.com",
+        text = email,
         icon = R.drawable.ic_email,
     )
 }
@@ -179,9 +202,9 @@ fun ProfilePicture(modifier: Modifier) {
 }
 
 @Composable
-fun ColumnScope.EditProfileButton() {
+fun ColumnScope.EditProfileButton(onClick: () -> Unit) {
     IconButton(
-        onClick = { /* Handle image click */ },
+        onClick = onClick,
         modifier = Modifier
             .size(22.dp)
             .background(DentaryLightBlue, RoundedCornerShape(4.dp))

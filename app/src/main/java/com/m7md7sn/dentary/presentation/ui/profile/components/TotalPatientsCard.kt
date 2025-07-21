@@ -1,7 +1,5 @@
 package com.m7md7sn.dentary.presentation.ui.profile.components
 
-import androidx.annotation.DrawableRes
-import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -11,7 +9,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -34,7 +31,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -51,6 +47,8 @@ import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
 
 @Composable
 fun TotalPatientsCard(
+    totalPatients: Int,
+    onSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Card(
@@ -94,7 +92,7 @@ fun TotalPatientsCard(
                 )
                 Spacer(Modifier.weight(1f))
                 TextButton(
-                    onClick = { },
+                    onClick = onSeeAllClick,
                 ) {
                     Text(
                         text = stringResource(R.string.see_all),
@@ -114,7 +112,7 @@ fun TotalPatientsCard(
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "108",
+                    text = totalPatients.toString(),
                     style = TextStyle(
                         fontSize = 42.sp,
                         fontFamily = AlexandriaBold,
