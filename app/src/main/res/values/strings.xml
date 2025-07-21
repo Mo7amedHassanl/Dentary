@@ -46,7 +46,20 @@
     <string name="upcoming">Upcoming</string>
     <string name="verification_code">Verification Code</string>
     <string name="welcome">Welcome, Dr. </string>
-    <string name="profile">الصفحة الشخصية</string>
-    <string name="total_patients">اجمالي المرضى لديك</string>
-    <string name="patient">مريض</string>
+    <string name="profile">Profile</string>
+    <string name="total_patients">Total Patients</string>
+    <string name="patient">Patient</string>
+    <string name="settings">Settings</string>
+    <string name="account_settings">Account Settings</string>
+    <string name="edit_doctor_clinic_info">Edit Doctor and Clinic Information</string>
+    <string name="change_password">Change Password</string>
+    <string name="notifications_settings">Notification Settings</string>
+    <string name="enable_reminders">Enable Appointment Reminders</string>
+    <string name="ringnotes_customization">Sound Customization</string>
+    <string name="app_settings">App Settings</string>
+    <string name="language">Language</string>
+    <string name="data_back_up">Data Backup</string>
+    <string name="help_support">Help &amp; Support</string>
+    <string name="faq">Frequently Asked Questions</string>
+    <string name="call_support">Contact Support</string>
 </resources>
