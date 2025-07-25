@@ -64,4 +64,7 @@
     <string name="call_support">Contact Support</string>
     <string name="doctor_info">معلومات الطبيب</string>
     <string name="confirm">تأكيد</string>
+    <string name="current_password">كلمة المرور الحالية</string>
+    <string name="new_password">كلمة المرور الجديدة</string>
+    <string name="confirm_new_password">تأكيد كلمة المرور الجديدة</string>
 </resources>

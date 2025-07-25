@@ -1,6 +1,7 @@
 package com.m7md7sn.dentary.presentation.ui.settings.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.shape.CircleShape
@@ -47,7 +48,7 @@ fun SettingsTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
-            .height(44.dp)
+            .height(52.dp)
             .fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = DentaryBlue,
@@ -70,7 +71,7 @@ fun SettingsTextField(
                     color = if (isError) Color.Red else DentaryBlueGray,
                     fontFamily = AlexandriaRegular
                 ),
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxSize(),
                 textAlign = TextAlign.Center
             )
         },
@@ -106,5 +107,79 @@ fun SettingsTextField(
                 contentDescription = null,
             )
         }
+    )
+}
+
+@Preview
+@Composable
+fun SettingsTextFieldNoIcon(
+    value: String = "",
+    onValueChange: (String) -> Unit = {},
+    placeholder: String = "البريد الإلكتروني",
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    isError: Boolean = false,
+    errorMessage: String? = null,
+    modifier: Modifier = Modifier,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    enabled: Boolean = true
+) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier
+            .height(52.dp)
+            .fillMaxWidth(),
+        colors = OutlinedTextFieldDefaults.colors(
+            cursorColor = DentaryBlue,
+            focusedTextColor = DentaryBlue,
+            unfocusedTextColor = DentaryBlueGray,
+            disabledTextColor = DentaryBlueGray,
+            disabledContainerColor = Color.White,
+            focusedContainerColor = Color.White,
+            unfocusedContainerColor = Color.White,
+            disabledBorderColor = DentaryBlueGray,
+            focusedBorderColor = DentaryBlue,
+            unfocusedBorderColor = DentaryBlueGray,
+        ),
+        placeholder = {
+            Text(
+                text = placeholder,
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = if (isError) Color.Red else DentaryBlueGray,
+                    fontFamily = AlexandriaRegular
+                ),
+                modifier = Modifier.fillMaxSize(),
+                textAlign = TextAlign.Center
+            )
+        },
+        keyboardActions = keyboardActions,
+        keyboardOptions = keyboardOptions,
+        isError = isError,
+        supportingText = if (isError && !errorMessage.isNullOrBlank()) {
+            {
+                Text(
+                    text = errorMessage,
+                    style = TextStyle(
+                        fontFamily = AlexandriaRegular,
+                        fontWeight = FontWeight.Normal,
+                        color = Color.Red,
+                        fontSize = 14.sp
+                    )
+                )
+            }
+        } else null,
+        visualTransformation = visualTransformation,
+        enabled = enabled,
+        shape = CircleShape,
+        textStyle = TextStyle(
+            textAlign = TextAlign.Center,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal,
+            color = if (isError) Color.Red else DentaryBlue,
+            fontFamily = AlexandriaRegular
+        ),
     )
 }
