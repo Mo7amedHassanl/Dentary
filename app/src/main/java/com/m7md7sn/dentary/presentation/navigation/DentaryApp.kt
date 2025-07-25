@@ -3,7 +3,6 @@ package com.m7md7sn.dentary.presentation.navigation
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
@@ -11,16 +10,17 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
-import com.m7md7sn.dentary.data.model.BottomNavScreen
 import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
@@ -34,6 +34,7 @@ import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 import com.m7md7sn.dentary.presentation.ui.patients.PatientsScreen
 import com.m7md7sn.dentary.presentation.ui.profile.ProfileScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
+import com.m7md7sn.dentary.presentation.ui.settings.SettingsViewModel
 
 @Composable
 fun DentaryNavHost(
@@ -42,6 +43,9 @@ fun DentaryNavHost(
 ) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
+
+    val settingsViewModel: SettingsViewModel = hiltViewModel()
+    val settingsUiState by settingsViewModel.uiState.collectAsState()
 
     val showBottomBar = when (currentRoute) {
         Screen.Home.route, Screen.Profile.route, Screen.Settings.route, Screen.Appointments.route, Screen.Chats.route -> true
@@ -53,7 +57,8 @@ fun DentaryNavHost(
     }
 
     val topBarShowBackButton: Boolean = when (currentRoute) {
-        Screen.Home.route, Screen.Profile.route, Screen.Settings.route, Screen.Appointments.route, Screen.Chats.route -> false
+        Screen.Home.route, Screen.Profile.route, Screen.Appointments.route, Screen.Chats.route -> false
+        Screen.Settings.route -> settingsUiState.currentScreen != SettingsScreen.Main
         else -> navController.previousBackStackEntry != null
     }
 
@@ -82,12 +87,21 @@ fun DentaryNavHost(
         },
         topBar = {
             if (showTopBar) {
-                DentaryTopBar(
-                    navController = navController,
-                    showBackButton = topBarShowBackButton,
-                    onBackClick = { navController.popBackStack() },
-                    onNavDrawerClicked = {}
-                )
+                if (currentRoute == Screen.Settings.route) {
+                    DentaryTopBar(
+                        navController = navController,
+                        showBackButton = settingsUiState.currentScreen != SettingsScreen.Main,
+                        onBackClick = { settingsViewModel.navigateBack() },
+                        onNavDrawerClicked = {}
+                    )
+                } else {
+                    DentaryTopBar(
+                        navController = navController,
+                        showBackButton = topBarShowBackButton,
+                        onBackClick = { navController.popBackStack() },
+                        onNavDrawerClicked = {}
+                    )
+                }
             }
         },
         floatingActionButton = {
@@ -187,11 +201,11 @@ fun DentaryNavHost(
                 )
             }
             composable(route = Screen.Home.route) {
-               HomeScreen(
-                   onNavigateToPatients = {
-                       navController.navigate(Screen.Patients.route)
-                   }
-               )
+                HomeScreen(
+                    onNavigateToPatients = {
+                        navController.navigate(Screen.Patients.route)
+                    }
+                )
             }
             composable(route = Screen.Patients.route) {
                 PatientsScreen(
@@ -210,7 +224,14 @@ fun DentaryNavHost(
                 // Chats screen content
             }
             composable(route = Screen.Settings.route) {
-                SettingsScreen()
+                SettingsScreen(
+                    viewModel = settingsViewModel,
+                    onNavigateToLogin = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(0) { inclusive = true }
+                        }
+                    }
+                )
             }
             composable(route = Screen.AddPatient.route) {
                 AddPatientScreen(

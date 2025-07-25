@@ -23,9 +23,13 @@ import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
+import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 
 @Composable
-fun AccountSettings(modifier: Modifier = Modifier) {
+fun AccountSettings(
+    modifier: Modifier = Modifier,
+    onNavigateToScreen: (SettingsScreen) -> Unit
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start,
@@ -42,10 +46,16 @@ fun AccountSettings(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(16.dp))
         SettingsItem(
             text = stringResource(R.string.edit_doctor_clinic_info),
+            onClick = {
+                onNavigateToScreen(SettingsScreen.EditDoctorAndClinicInfo)
+            }
         )
         Spacer(Modifier.height(8.dp))
         SettingsItem(
             text = stringResource(R.string.change_password),
+            onClick = {
+                onNavigateToScreen(SettingsScreen.ChangePassword)
+            }
         )
     }
 }
@@ -53,7 +63,8 @@ fun AccountSettings(modifier: Modifier = Modifier) {
 @Composable
 fun DoctorAndClinicInfoSettings(
     focusManager: FocusManager,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier,
@@ -180,7 +191,8 @@ fun DoctorAndClinicInfoSettings(
 @Composable
 fun PasswordChangeSettings(
     focusManager: FocusManager,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier,

@@ -25,9 +25,13 @@ import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
+import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 
 @Composable
-fun NotificationsSettings(modifier: Modifier = Modifier) {
+fun NotificationsSettings(
+    modifier: Modifier = Modifier,
+    onNavigateToScreen: (SettingsScreen) -> Unit
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start,
@@ -48,6 +52,9 @@ fun NotificationsSettings(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(8.dp))
         SettingsItem(
             text = stringResource(R.string.ringnotes_customization),
+            onClick = {
+                onNavigateToScreen(SettingsScreen.RingtoneCustomization)
+            }
         )
     }
 }
@@ -55,15 +62,16 @@ fun NotificationsSettings(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun RingtoneCustomizationSettings(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onBackClick: () -> Unit = {}
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start,
     ) {
         SectionTitle(
-            title = R.string.change_password,
-            titleIcon = R.drawable.ic_lock,
+            title = R.string.ringnotes_customization,
+            titleIcon = R.drawable.ic_bill,
         )
         Spacer(Modifier.height(20.dp))
         Column(

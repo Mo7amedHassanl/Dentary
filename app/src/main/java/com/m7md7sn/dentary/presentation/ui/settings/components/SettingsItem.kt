@@ -2,6 +2,7 @@ package com.m7md7sn.dentary.presentation.ui.settings.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -39,16 +40,20 @@ import com.m7md7sn.dentary.presentation.theme.DentaryLightGray
 @Composable
 fun SettingsItem(
     text: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .height(44.dp),
+            .height(44.dp)
+            .clickable(true){
+                onClick()
+            },
         shape = CircleShape,
         colors = CardDefaults.cardColors(
             containerColor = Color.White
-        )
+        ),
     ) {
         Row(
             modifier = modifier
@@ -67,8 +72,7 @@ fun SettingsItem(
                 ),
             )
             IconButton(
-                onClick = { /* Handle click */ },
-
+                onClick = onClick,
             ) {
                 Icon(
                     imageVector = Icons.Filled.ArrowForwardIos,

@@ -53,9 +53,15 @@ fun SettingsRadioButton(
         modifier = modifier
             .fillMaxWidth()
             .height(44.dp)
+            .border(
+                width = 1.dp,
+                color = if (selected) DentaryBlue else DentaryBlueGray,
+                shape = CircleShape
+            )
             .background(Color.White, CircleShape)
-            .padding(horizontal = 22.dp),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = 22.dp)
+        ,
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),

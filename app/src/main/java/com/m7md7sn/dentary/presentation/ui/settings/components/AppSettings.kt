@@ -15,9 +15,13 @@ import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 
 @Composable
-fun AppSettings(modifier: Modifier = Modifier) {
+fun AppSettings(
+    modifier: Modifier = Modifier,
+    onNavigateToScreen: (SettingsScreen) -> Unit
+) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.Start,
@@ -34,10 +38,16 @@ fun AppSettings(modifier: Modifier = Modifier) {
         Spacer(Modifier.height(16.dp))
         SettingsItem(
             text = stringResource(R.string.language),
+            onClick = {
+                onNavigateToScreen(SettingsScreen.Language)
+            }
         )
         Spacer(Modifier.height(8.dp))
         SettingsItem(
             text = stringResource(R.string.data_back_up),
+            onClick = {
+                onNavigateToScreen(SettingsScreen.DataBackup)
+            }
         )
     }
 }

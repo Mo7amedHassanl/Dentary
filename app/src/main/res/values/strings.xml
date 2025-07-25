@@ -62,9 +62,12 @@
     <string name="help_support">Help &amp; Support</string>
     <string name="faq">Frequently Asked Questions</string>
     <string name="call_support">Contact Support</string>
-    <string name="doctor_info">معلومات الطبيب</string>
-    <string name="confirm">تأكيد</string>
-    <string name="current_password">كلمة المرور الحالية</string>
-    <string name="new_password">كلمة المرور الجديدة</string>
-    <string name="confirm_new_password">تأكيد كلمة المرور الجديدة</string>
+    <string name="doctor_info">Doctor Information</string>
+    <string name="confirm">Confirm</string>
+    <string name="current_password">Current Password</string>
+    <string name="new_password">New Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
+    <string name="logout">Logout</string>
+    <string name="logout_confirmation_title">Confirm Logout</string>
+    <string name="logout_confirmation_message">Are you sure you want to logout? You will need to login again to access your account.</string>
 </resources>
