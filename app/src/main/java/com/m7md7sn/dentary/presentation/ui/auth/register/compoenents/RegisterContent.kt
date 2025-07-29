@@ -3,7 +3,6 @@ package com.m7md7sn.dentary.presentation.ui.auth.register.compoenents
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -90,7 +89,7 @@ fun RegisterContent(
                 color = DentaryBlue
             )
         )
-        RegisterSectionTitle(
+        SectionTitle(
             title = R.string.register_information,
             titleIcon = R.drawable.ic_lock_round,
         )
@@ -119,7 +118,7 @@ fun RegisterContent(
             onToggleConfirmPasswordVisibility = onToggleConfirmPasswordVisibility,
         )
         Spacer(Modifier.height(24.dp))
-        RegisterSectionTitle(
+        SectionTitle(
             title = R.string.clinic_information,
             titleIcon = R.drawable.ic_clinic,
         )
@@ -176,7 +175,7 @@ fun RegisterContent(
 }
 
 @Composable
-fun RegisterSectionTitle(
+fun SectionTitle(
     @StringRes title: Int,
     @DrawableRes titleIcon: Int,
     modifier: Modifier = Modifier
