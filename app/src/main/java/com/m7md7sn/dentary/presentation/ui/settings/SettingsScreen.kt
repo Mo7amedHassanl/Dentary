@@ -71,12 +71,36 @@ fun SettingsScreen(
                     }
                     is SettingsScreen.EditDoctorAndClinicInfo -> {
                         DoctorAndClinicInfoSettings(
-                            focusManager = focusManager
+                            focusManager = focusManager,
+                            uiState = uiState,
+                            onFullNameChange = viewModel::onFullNameChange,
+                            onSpecializationChange = viewModel::onSpecializationChange,
+                            onEmailChange = viewModel::onEmailChange,
+                            onClinicNameChange = viewModel::onClinicNameChange,
+                            onPhoneNumberChange = viewModel::onPhoneNumberChange,
+                            onClinicAddressChange = viewModel::onClinicAddressChange,
+                            onClinicLogoChange = viewModel::onClinicLogoChange,
+                            onSaveClick = viewModel::saveProfile,
+                            onBackClick = { viewModel.navigateBack() },
+                            fetchProfile = viewModel::fetchProfile,
+                            snackbarHostState = snackbarHostState,
+                            snackbarMessageFlow = viewModel.snackbarMessage
                         )
                     }
                     is SettingsScreen.ChangePassword -> {
                         PasswordChangeSettings(
-                            focusManager = focusManager
+                            focusManager = focusManager,
+                            uiState = uiState,
+                            onCurrentPasswordChange = viewModel::onCurrentPasswordChange,
+                            onNewPasswordChange = viewModel::onNewPasswordChange,
+                            onConfirmNewPasswordChange = viewModel::onConfirmNewPasswordChange,
+                            validateNewPassword = viewModel::validateNewPassword,
+                            changePassword = viewModel::changePassword,
+                            clearPasswordFields = viewModel::clearPasswordFields,
+                            clearPasswordChangeState = viewModel::clearPasswordChangeState,
+                            onBackClick = { viewModel.navigateBack() },
+                            snackbarHostState = snackbarHostState,
+                            snackbarMessageFlow = viewModel.snackbarMessage
                         )
                     }
                     is SettingsScreen.RingtoneCustomization -> {

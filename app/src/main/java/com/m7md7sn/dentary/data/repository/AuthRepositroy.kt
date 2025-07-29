@@ -15,4 +15,5 @@ interface AuthRepository {
     suspend fun isSessionValid(): Boolean
     suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo>
     suspend fun resendEmailVerification(email: String): Result<Unit>
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit>
 }

@@ -49,4 +49,8 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun resendEmailVerification(email: String): Result<Unit> {
         return authDataSource.resendEmailVerification(email)
     }
+
+    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        return authDataSource.changePassword(currentPassword, newPassword)
+    }
 }

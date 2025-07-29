@@ -190,4 +190,32 @@ class AuthDataSourceImpl @Inject constructor(
             Result.Error("Session expired - please log in again")
         }
     }
+
+    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+        return try {
+            val user = auth.currentUserOrNull()
+            val email = user?.email
+            if (email.isNullOrEmpty()) {
+                return Result.Error("User email not found")
+            }
+            // Step 1: Verify current password by logging in
+            try {
+                auth.signInWith(Email) {
+                    this.email = email
+                    this.password = currentPassword
+                }
+            } catch (e: Exception) {
+                return Result.Error("Current password is incorrect")
+            }
+            // Step 2: Update password
+            try {
+                auth.updateUser { password = newPassword }
+                Result.Success(Unit)
+            } catch (e: Exception) {
+                Result.Error(e.message ?: "Failed to update password")
+            }
+        } catch (e: Exception) {
+            Result.Error(e.message ?: "Failed to change password")
+        }
+    }
 }

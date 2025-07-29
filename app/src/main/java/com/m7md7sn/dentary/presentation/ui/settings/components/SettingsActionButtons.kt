@@ -31,7 +31,8 @@ fun SettingsActionButtons(
     isLoading: Boolean = false,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -41,7 +42,7 @@ fun SettingsActionButtons(
             text = stringResource(R.string.confirm),
             hasBorder = false,
             onClick = onSaveClick,
-            enabled = !isLoading,
+            enabled = enabled && !isLoading,
         )
 
         SettingsActionButton(

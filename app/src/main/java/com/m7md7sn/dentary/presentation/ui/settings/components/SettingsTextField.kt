@@ -48,7 +48,6 @@ fun SettingsTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
-            .height(52.dp)
             .fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = DentaryBlue,
@@ -71,7 +70,6 @@ fun SettingsTextField(
                     color = if (isError) Color.Red else DentaryBlueGray,
                     fontFamily = AlexandriaRegular
                 ),
-                modifier = Modifier.fillMaxSize(),
                 textAlign = TextAlign.Center
             )
         },
@@ -128,7 +126,6 @@ fun SettingsTextFieldNoIcon(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
-            .height(52.dp)
             .fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = DentaryBlue,
