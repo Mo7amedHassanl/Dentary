@@ -1,6 +1,8 @@
 package com.m7md7sn.dentary.data.repository
 
+import android.net.Uri
 import com.m7md7sn.dentary.data.model.Patient
+import com.m7md7sn.dentary.data.model.MedicalProcedureStats
 import com.m7md7sn.dentary.data.source.remote.PatientDataSource
 import com.m7md7sn.dentary.utils.Result
 import javax.inject.Inject
@@ -31,5 +33,13 @@ class PatientRepositoryImpl @Inject constructor(
 
     override suspend fun searchPatients(query: String): Result<List<Patient>> {
         return patientDataSource.searchPatients(query)
+    }
+
+    override suspend fun getMedicalProcedureStats(): Result<List<MedicalProcedureStats>> {
+        return patientDataSource.getMedicalProcedureStats()
+    }
+
+    override suspend fun uploadPatientImage(imageUri: Uri, oldImageUrl: String?): Result<String> {
+        return patientDataSource.uploadPatientImage(imageUri, oldImageUrl)
     }
 }

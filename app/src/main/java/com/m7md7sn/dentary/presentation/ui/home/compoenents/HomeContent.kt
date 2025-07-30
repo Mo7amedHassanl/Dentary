@@ -16,6 +16,7 @@ import com.m7md7sn.dentary.presentation.ui.patients.components.PatientSearchBar
 fun HomeContent(
     name: String,
     clinicName: String,
+    profilePictureUrl: String?,
     recentPatientsList: List<Patient>,
     onPatientSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -28,6 +29,7 @@ fun HomeContent(
             HomeHeader(
                 name = name,
                 clinicName = clinicName,
+                profilePictureUrl = profilePictureUrl,
             )
             Spacer(Modifier.height(8.dp))
         }

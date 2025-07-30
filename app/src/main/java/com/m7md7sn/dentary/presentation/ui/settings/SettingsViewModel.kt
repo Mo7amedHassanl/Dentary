@@ -151,7 +151,7 @@ class SettingsViewModel @Inject constructor(
                         phoneNumber = profile.phoneNumber ?: "",
                         clinicAddress = profile.clinicAddress ?: "",
                         email = email,
-                        specialization = "",
+                        specialization = profile.specialization ?: "",
                         clinicLogo = ""
                     )
                 }
@@ -195,7 +195,8 @@ class SettingsViewModel @Inject constructor(
                 fullName = uiState.value.fullName,
                 clinicName = uiState.value.clinicName,
                 phoneNumber = uiState.value.phoneNumber,
-                clinicAddress = uiState.value.clinicAddress
+                clinicAddress = uiState.value.clinicAddress,
+                specialization = uiState.value.specialization
             )
             when (val result = profileRepository.updateProfile(req)) {
                 is Result.Success -> {

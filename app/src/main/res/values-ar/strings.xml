@@ -71,4 +71,5 @@
     <string name="logout">تسجيل الخروج</string>
     <string name="logout_confirmation_title">تأكيد تسجيل الخروج</string>
     <string name="logout_confirmation_message">هل أنت متأكد من أنك تريد تسجيل الخروج؟ ستحتاج إلى تسجيل الدخول مرة أخرى للوصول إلى حسابك.</string>
+    <string name="medical_procedure">نوع الإجراء الطبي</string>
 </resources>

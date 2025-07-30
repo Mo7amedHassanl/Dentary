@@ -40,6 +40,7 @@ fun HomeScreen(
                 HomeContent(
                     name = uiState.userName,
                     clinicName = uiState.clinicName,
+                    profilePictureUrl = uiState.profilePictureUrl,
                     recentPatientsList = uiState.recentPatients,
                     onPatientSeeAllClick = {
                         viewModel.onSeeAllPatientsClick(onNavigateToPatients)

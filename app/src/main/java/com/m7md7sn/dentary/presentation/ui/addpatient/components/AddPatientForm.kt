@@ -59,6 +59,8 @@ fun AddPatientForm(
     onAddressChange: (String) -> Unit,
     isAddressError: Boolean,
     addressErrorMessage: String? = null,
+    medicalProcedure: String,
+    onMedicalProcedureChange: (String) -> Unit,
     focusManager: FocusManager,
     modifier: Modifier = Modifier
 ) {
@@ -140,6 +142,10 @@ fun AddPatientForm(
             isError = isEmailError,
             errorMessage = emailErrorMessage,
         )
+        MedicalProcedureDropdown(
+            value = medicalProcedure,
+            onValueChange = onMedicalProcedureChange
+        )
     }
 }
 
@@ -161,7 +167,6 @@ fun AddPatientTextField(
         value = value,
         onValueChange = onValueChange,
         modifier = modifier
-            .height(58.dp)
             .fillMaxWidth(),
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = DentaryBlue,

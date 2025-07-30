@@ -1,9 +1,7 @@
 package com.m7md7sn.dentary.presentation.ui.settings.components
-
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.CircularProgressIndicator
@@ -11,10 +9,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
@@ -24,7 +18,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
@@ -37,7 +30,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import com.m7md7sn.dentary.utils.Event
-import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.foundation.layout.fillMaxWidth
 
 @Composable
 fun AccountSettings(
@@ -80,7 +73,6 @@ fun DoctorAndClinicInfoSettings(
     uiState: SettingsUiState,
     onFullNameChange: (String) -> Unit,
     onSpecializationChange: (String) -> Unit,
-    onEmailChange: (String) -> Unit,
     onClinicNameChange: (String) -> Unit,
     onPhoneNumberChange: (String) -> Unit,
     onClinicAddressChange: (String) -> Unit,
@@ -89,10 +81,8 @@ fun DoctorAndClinicInfoSettings(
     onBackClick: () -> Unit = {},
     fetchProfile: () -> Unit,
     snackbarHostState: SnackbarHostState,
-    snackbarMessageFlow: kotlinx.coroutines.flow.SharedFlow<com.m7md7sn.dentary.utils.Event<String>>,
+    snackbarMessageFlow: SharedFlow<Event<String>>,
 ) {
-    val scope = rememberCoroutineScope()
-    val focusManagerLocal = LocalFocusManager.current
     LaunchedEffect(Unit) { fetchProfile() }
     LaunchedEffect(Unit) {
         snackbarMessageFlow.collect { event ->
@@ -133,20 +123,10 @@ fun DoctorAndClinicInfoSettings(
             )
         )
         Spacer(Modifier.height(10.dp))
-        SettingsTextField(
+        SettingsSpecializationDropdown(
             value = uiState.specialization,
             onValueChange = onSpecializationChange,
-            placeholder = "التخصص",
-            icon = R.drawable.ic_specialization,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Text
-            ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(FocusDirection.Down)
-                }
-            )
+            modifier = Modifier.fillMaxWidth()
         )
         Spacer(Modifier.height(10.dp))
         SettingsTextField(

@@ -16,11 +16,13 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import com.m7md7sn.dentary.data.repository.PatientImageManager
 
 @HiltViewModel
 class AddPatientViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val patientImageManager: PatientImageManager
 ): ViewModel() {
     private val _uiState = MutableStateFlow(AddPatientsUiState())
     val uiState: StateFlow<AddPatientsUiState> = _uiState.asStateFlow()
@@ -60,6 +62,44 @@ class AddPatientViewModel @Inject constructor(
         clearFieldError("address")
     }
 
+    fun onMedicalProcedureChange(medicalProcedure: String) {
+        _uiState.value = _uiState.value.copy(medicalProcedure = medicalProcedure)
+    }
+
+    fun uploadPatientImage(imageUri: android.net.Uri) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            
+            try {
+                // Get the current patient image URL to delete it
+                val currentPatientImageUrl = _uiState.value.patientImageUrl
+                
+                val result = patientRepository.uploadPatientImage(imageUri, currentPatientImageUrl)
+                
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            patientImageUrl = result.data
+                        )
+                        _snackbarMessage.emit(Event("Patient image uploaded successfully"))
+                    }
+                    is Result.Error -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _snackbarMessage.emit(Event("Failed to upload patient image: ${result.message}"))
+                    }
+                    else -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _snackbarMessage.emit(Event("Unknown error occurred"))
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                _snackbarMessage.emit(Event("Error uploading patient image: ${e.message}"))
+            }
+        }
+    }
+
     fun onCancelClick() {
         viewModelScope.launch {
             _navigationEvent.emit(Event(NavigationEvent.GoBack))
@@ -93,7 +133,9 @@ class AddPatientViewModel @Inject constructor(
                     email = _uiState.value.email.trim().takeIf { it.isNotEmpty() },
                     age = _uiState.value.age.toIntOrNull(),
                     address = _uiState.value.address.trim().takeIf { it.isNotEmpty() },
-                    medicalHistory = null
+                    medicalHistory = null,
+                    medicalProcedure = _uiState.value.medicalProcedure.trim().takeIf { it.isNotEmpty() },
+                    image = _uiState.value.patientImageUrl // Include image URL
                 )
 
                 when (val result = patientRepository.createPatient(patient)) {

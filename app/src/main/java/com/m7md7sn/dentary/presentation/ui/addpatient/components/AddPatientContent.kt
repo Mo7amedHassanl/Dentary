@@ -33,6 +33,10 @@ fun AddPatientContent(
     onAddressChange: (String) -> Unit,
     isAddressError: Boolean,
     addressErrorMessage: String? = null,
+    medicalProcedure: String,
+    onMedicalProcedureChange: (String) -> Unit,
+    patientImageUrl: String?,
+    onUpdatePatientImage: (android.net.Uri) -> Unit,
     isLoading: Boolean,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -44,9 +48,23 @@ fun AddPatientContent(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         AddPatientTitle()
-        Spacer(modifier = Modifier.height(60.dp))
-        AddPatientImage()
+        Spacer(modifier = Modifier.height(40.dp))
+        AddPatientImage(
+            patientImageUrl = patientImageUrl,
+            onUpdatePatientImage = onUpdatePatientImage
+        )
         Spacer(modifier = Modifier.height(28.dp))
+        GenderRadioButtons(
+            selectedGender = when (gender) {
+                "MALE" -> Gender.MALE
+                "FEMALE" -> Gender.FEMALE
+                else -> null
+            },
+            onGenderSelected = { selectedGender ->
+                onGenderChange(selectedGender?.name ?: "")
+            }
+        )
+        Spacer(modifier = Modifier.height(20.dp))
         AddPatientForm(
             fullName = fullName,
             onFullNameChange = onFullNameChange,
@@ -68,18 +86,9 @@ fun AddPatientContent(
             onAddressChange = onAddressChange,
             isAddressError = isAddressError,
             addressErrorMessage = addressErrorMessage,
+            medicalProcedure = medicalProcedure,
+            onMedicalProcedureChange = onMedicalProcedureChange,
             focusManager = focusManager
-        )
-        Spacer(modifier = Modifier.height(20.dp))
-        GenderRadioButtons(
-            selectedGender = when (gender) {
-                "MALE" -> Gender.MALE
-                "FEMALE" -> Gender.FEMALE
-                else -> null
-            },
-            onGenderSelected = { selectedGender ->
-                onGenderChange(selectedGender?.name ?: "")
-            }
         )
         Spacer(modifier = Modifier.height(38.dp))
         AddPatientActionButtons(

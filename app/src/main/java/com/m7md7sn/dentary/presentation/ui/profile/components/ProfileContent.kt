@@ -11,6 +11,7 @@ fun ProfileContent(
     uiState: ProfileUiState,
     onEditProfileClick: () -> Unit,
     onSeeAllPatientsClick: () -> Unit,
+    onUpdateProfilePicture: (android.net.Uri) -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -22,7 +23,8 @@ fun ProfileContent(
         ProfileUserInformation(
             uiState = uiState,
             onEditProfileClick = onEditProfileClick,
-            onSeeAllPatientsClick = onSeeAllPatientsClick
+            onSeeAllPatientsClick = onSeeAllPatientsClick,
+            onUpdateProfilePicture = onUpdateProfilePicture
         )
     }
 }

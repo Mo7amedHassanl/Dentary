@@ -75,7 +75,6 @@ fun SettingsScreen(
                             uiState = uiState,
                             onFullNameChange = viewModel::onFullNameChange,
                             onSpecializationChange = viewModel::onSpecializationChange,
-                            onEmailChange = viewModel::onEmailChange,
                             onClinicNameChange = viewModel::onClinicNameChange,
                             onPhoneNumberChange = viewModel::onPhoneNumberChange,
                             onClinicAddressChange = viewModel::onClinicAddressChange,

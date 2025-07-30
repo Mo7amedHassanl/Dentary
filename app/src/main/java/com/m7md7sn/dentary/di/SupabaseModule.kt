@@ -15,6 +15,8 @@ import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
 import io.github.jan.supabase.realtime.Realtime
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import io.ktor.client.engine.okhttp.OkHttp
 import okhttp3.OkHttpClient
 import java.security.cert.X509Certificate
@@ -84,6 +86,7 @@ object SupabaseModule {
 
             }
             install(Realtime)
+            install(Storage)
         }
     }
 
@@ -101,5 +104,13 @@ object SupabaseModule {
         supabaseClient: SupabaseClient
     ): Postgrest {
         return supabaseClient.postgrest
+    }
+
+    @Provides
+    @Singleton
+    fun provideStorage(
+        supabaseClient: SupabaseClient
+    ): Storage {
+        return supabaseClient.storage
     }
 }

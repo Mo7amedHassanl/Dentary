@@ -54,6 +54,14 @@ class ProfileViewModel @Inject constructor(
                     else -> 0
                 }
 
+                // Load medical procedure statistics
+                val statsResult = patientRepository.getMedicalProcedureStats()
+                val medicalProcedureStats = when (statsResult) {
+                    is Result.Success -> statsResult.data
+                    is Result.Error -> emptyList()
+                    else -> emptyList()
+                }
+
                 when (profileResult) {
                     is Result.Success -> {
                         _uiState.value = _uiState.value.copy(
@@ -61,6 +69,7 @@ class ProfileViewModel @Inject constructor(
                             profile = profileResult.data,
                             userEmail = userEmail,
                             totalPatients = totalPatients,
+                            medicalProcedureStats = medicalProcedureStats,
                             isError = false,
                             error = null
                         )
@@ -71,7 +80,8 @@ class ProfileViewModel @Inject constructor(
                             isError = true,
                             error = profileResult.message ?: "Unknown error occurred",
                             userEmail = userEmail,
-                            totalPatients = totalPatients
+                            totalPatients = totalPatients,
+                            medicalProcedureStats = medicalProcedureStats
                         )
                         _snackbarMessage.emit(Event("Failed to load profile data"))
                     }
@@ -81,7 +91,8 @@ class ProfileViewModel @Inject constructor(
                             isError = true,
                             error = "Unknown error occurred",
                             userEmail = userEmail,
-                            totalPatients = totalPatients
+                            totalPatients = totalPatients,
+                            medicalProcedureStats = medicalProcedureStats
                         )
                     }
                 }
@@ -107,10 +118,41 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
-    fun onSeeAllPatientsClick() {
-        // TODO: Navigate to patients screen
+    fun onSeeAllPatientsClick(navigateToPatients: () -> Unit) {
+        navigateToPatients()
+    }
+
+    fun updateProfilePicture(imageUri: android.net.Uri) {
         viewModelScope.launch {
-            _snackbarMessage.emit(Event("Navigate to patients screen"))
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            
+            try {
+                // Get the current profile picture URL to delete it
+                val currentProfilePictureUrl = _uiState.value.profile?.profilePicture
+                
+                val result = profileRepository.updateProfilePicture(imageUri, currentProfilePictureUrl)
+                
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            profile = result.data
+                        )
+                        _snackbarMessage.emit(Event("Profile picture updated successfully"))
+                    }
+                    is Result.Error -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _snackbarMessage.emit(Event("Failed to update profile picture: ${result.message}"))
+                    }
+                    else -> {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _snackbarMessage.emit(Event("Unknown error occurred"))
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+                _snackbarMessage.emit(Event("Error updating profile picture: ${e.message}"))
+            }
         }
     }
 }

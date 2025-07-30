@@ -215,7 +215,11 @@ fun DentaryNavHost(
                 )
             }
             composable(route = Screen.Profile.route) {
-                ProfileScreen()
+                ProfileScreen(
+                    onNavigateToPatients = {
+                        navController.navigate(Screen.Patients.route)
+                    }
+                )
             }
             composable(route = Screen.Appointments.route) {
                 // Appointments screen content

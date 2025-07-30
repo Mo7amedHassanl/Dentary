@@ -7,6 +7,8 @@ data class AddPatientsUiState(
     val email: String = "",
     val gender: String = "",
     val address: String = "",
+    val medicalProcedure: String = "",
+    val patientImageUrl: String? = null,
     val isLoading: Boolean = false,
     val isSuccess: Boolean = false,
     val isFullNameError: Boolean = false,

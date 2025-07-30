@@ -30,7 +30,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ProfileScreen(
     modifier: Modifier = Modifier,
-    viewModel: ProfileViewModel = hiltViewModel()
+    viewModel: ProfileViewModel = hiltViewModel(),
+    onNavigateToPatients: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -64,7 +65,10 @@ fun ProfileScreen(
                 ProfileContent(
                     uiState = uiState,
                     onEditProfileClick = viewModel::onEditProfileClick,
-                    onSeeAllPatientsClick = viewModel::onSeeAllPatientsClick,
+                    onSeeAllPatientsClick = {
+                        viewModel.onSeeAllPatientsClick(onNavigateToPatients)
+                    },
+                    onUpdateProfilePicture = viewModel::updateProfilePicture,
                     onRefresh = viewModel::refreshProfile
                 )
             }

@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -43,11 +44,13 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkGray
 import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.data.model.MedicalProcedureStats
 
 
 @Composable
 fun TotalPatientsCard(
     totalPatients: Int,
+    medicalProcedureStats: List<MedicalProcedureStats>,
     onSeeAllClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -141,7 +144,7 @@ fun TotalPatientsCard(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp),
             ) {
-                items(6) {
+                items(medicalProcedureStats) { stat ->
                     Row(
                         modifier = Modifier
                             .width(146.dp)
@@ -158,7 +161,7 @@ fun TotalPatientsCard(
                             contentAlignment = Alignment.Center,
                         ) {
                             Text(
-                                text = "حشو عادي",
+                                text = stat.procedure,
                                 style = TextStyle(
                                     fontSize = 10.sp,
                                     fontFamily = AlexandriaSemiBold,
@@ -168,7 +171,7 @@ fun TotalPatientsCard(
                             )
                         }
                         Text(
-                            text = "120",
+                            text = stat.count.toString(),
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 fontFamily = AlexandriaBold,

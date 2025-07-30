@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.data.repository.PatientRepository
+import com.m7md7sn.dentary.data.repository.ProfileRepository
 import com.m7md7sn.dentary.data.model.Patient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +17,8 @@ import com.m7md7sn.dentary.utils.Result
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val patientRepository: PatientRepository
+    private val patientRepository: PatientRepository,
+    private val profileRepository: ProfileRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
@@ -45,6 +47,9 @@ class HomeViewModel @Inject constructor(
                     )
                 }
 
+                // Load profile data including profile picture
+                loadProfileData()
+
                 // Load recent patients (limit to 4)
                 loadRecentPatients()
 
@@ -55,6 +60,23 @@ class HomeViewModel @Inject constructor(
                     errorMessage = e.message,
                     isLoading = false
                 )
+            }
+        }
+    }
+
+    private suspend fun loadProfileData() {
+        when (val result = profileRepository.getProfile()) {
+            is Result.Success -> {
+                _uiState.value = _uiState.value.copy(
+                    profilePictureUrl = result.data.profilePicture
+                )
+            }
+            is Result.Error -> {
+                // Keep existing profile picture URL if loading fails
+                println("Failed to load profile data: ${result.message}")
+            }
+            is Result.Loading -> {
+                // Keep existing state
             }
         }
     }

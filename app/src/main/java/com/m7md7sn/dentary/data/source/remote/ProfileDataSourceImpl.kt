@@ -32,6 +32,8 @@ class ProfileDataSourceImpl @Inject constructor(
                 clinicName = userMetadata?.get("clinic_name")?.jsonPrimitive?.content,
                 phoneNumber = userMetadata?.get("phone_number")?.jsonPrimitive?.content,
                 clinicAddress = userMetadata?.get("address")?.jsonPrimitive?.content,
+                specialization = userMetadata?.get("specialization")?.jsonPrimitive?.content,
+                profilePicture = userMetadata?.get("profile_picture")?.jsonPrimitive?.content,
                 createdAt = currentUser.createdAt.toString(),
                 updatedAt = currentUser.lastSignInAt.toString()
             )
@@ -51,6 +53,8 @@ class ProfileDataSourceImpl @Inject constructor(
                 put("clinic_name", JsonPrimitive(request.clinicName))
                 put("phone_number", JsonPrimitive(request.phoneNumber))
                 put("address", JsonPrimitive(request.clinicAddress))
+                request.specialization?.let { put("specialization", JsonPrimitive(it)) }
+                request.profilePicture?.let { put("profile_picture", JsonPrimitive(it)) }
             }
 
             auth.updateUser {
@@ -75,6 +79,8 @@ class ProfileDataSourceImpl @Inject constructor(
                 request.clinicName?.let { put("clinic_name", JsonPrimitive(it)) }
                 request.phoneNumber?.let { put("phone_number", JsonPrimitive(it)) }
                 request.clinicAddress?.let { put("address", JsonPrimitive(it)) }
+                request.specialization?.let { put("specialization", JsonPrimitive(it)) }
+                request.profilePicture?.let { put("profile_picture", JsonPrimitive(it)) }
             }
 
             auth.updateUser {
