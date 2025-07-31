@@ -5,20 +5,16 @@ import android.content.SharedPreferences
 import io.github.jan.supabase.auth.SessionManager
 import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
-import io.github.jan.supabase.auth.user.UserInfo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.datetime.Instant
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class SharedPreferencesSessionManager(
-    private val context: Context
+    context: Context
 ) : SessionManager {
 
     private val sharedPreferences: SharedPreferences =

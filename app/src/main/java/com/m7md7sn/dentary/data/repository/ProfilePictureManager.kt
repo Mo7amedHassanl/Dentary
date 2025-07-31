@@ -4,15 +4,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.storage.Storage
-import io.github.jan.supabase.storage.storage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileOutputStream
 import java.util.UUID
 import javax.inject.Inject
 import dagger.hilt.android.qualifiers.ApplicationContext

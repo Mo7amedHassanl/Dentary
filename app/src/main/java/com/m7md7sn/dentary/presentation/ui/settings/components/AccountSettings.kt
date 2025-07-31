@@ -31,6 +31,9 @@ import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import com.m7md7sn.dentary.utils.Event
 import androidx.compose.foundation.layout.fillMaxWidth
+import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsItem
+import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsTextField
+import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsTextFieldNoIcon
 
 @Composable
 fun AccountSettings(

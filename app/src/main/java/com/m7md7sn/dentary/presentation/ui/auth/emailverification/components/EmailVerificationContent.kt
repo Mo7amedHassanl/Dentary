@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -35,7 +34,6 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightGray
 
 @Composable
 fun EmailVerificationContent(

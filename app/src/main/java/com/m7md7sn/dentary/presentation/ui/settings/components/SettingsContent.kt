@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
+import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsItem
 
 @Composable
 fun SettingsContent(

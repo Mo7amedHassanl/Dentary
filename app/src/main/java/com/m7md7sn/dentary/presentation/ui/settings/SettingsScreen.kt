@@ -1,7 +1,6 @@
 package com.m7md7sn.dentary.presentation.ui.settings
 
 import android.app.Activity
-import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

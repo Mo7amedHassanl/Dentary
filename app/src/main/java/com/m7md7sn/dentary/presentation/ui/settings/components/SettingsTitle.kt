@@ -18,7 +18,6 @@ import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
 
 @Composable
 fun SettingsTitle(modifier: Modifier = Modifier) {

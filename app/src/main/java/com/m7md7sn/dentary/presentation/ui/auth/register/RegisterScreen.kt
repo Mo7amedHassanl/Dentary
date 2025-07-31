@@ -1,6 +1,5 @@
 package com.m7md7sn.dentary.presentation.ui.auth.register
 
-import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import com.m7md7sn.dentary.utils.Result
 import androidx.compose.foundation.layout.Column
@@ -22,8 +21,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
-import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginContent
-import com.m7md7sn.dentary.presentation.ui.auth.login.components.LoginHeader
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.RegisterContent
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.RegisterHeader
 import kotlinx.coroutines.launch

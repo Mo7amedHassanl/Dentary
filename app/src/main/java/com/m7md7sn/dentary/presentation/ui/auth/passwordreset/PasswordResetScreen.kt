@@ -16,11 +16,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
-import com.m7md7sn.dentary.presentation.theme.DentaryTheme
-import com.m7md7sn.dentary.presentation.ui.auth.emailverification.components.EmailVerificationContent
 import com.m7md7sn.dentary.presentation.ui.auth.passwordreset.components.PasswordResetContent
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.RegisterHeader
 import com.m7md7sn.dentary.utils.Event

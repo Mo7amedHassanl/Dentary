@@ -7,14 +7,12 @@ import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Event
 import com.m7md7sn.dentary.utils.Result
 import dagger.hilt.android.lifecycle.HiltViewModel
-import io.github.jan.supabase.auth.user.UserInfo
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

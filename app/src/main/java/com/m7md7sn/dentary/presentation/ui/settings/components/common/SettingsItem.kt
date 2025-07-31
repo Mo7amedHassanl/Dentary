@@ -1,10 +1,7 @@
-package com.m7md7sn.dentary.presentation.ui.settings.components
+package com.m7md7sn.dentary.presentation.ui.settings.components.common
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -19,21 +16,18 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
-import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
-import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryGray
 import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightGray
 
@@ -118,7 +112,7 @@ fun SettingsSwitchItem(
             Switch(
                 checked = true,
                 onCheckedChange = {},
-                colors = androidx.compose.material3.SwitchDefaults.colors(
+                colors = SwitchDefaults.colors(
                     checkedThumbColor = DentaryLightGray,
                     uncheckedThumbColor = DentaryDarkBlue,
                     checkedTrackColor = DentaryLightBlue,

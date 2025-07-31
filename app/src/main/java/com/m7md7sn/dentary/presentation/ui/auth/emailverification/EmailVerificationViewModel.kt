@@ -1,6 +1,5 @@
 package com.m7md7sn.dentary.presentation.ui.auth.emailverification
 
-import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificationUiState
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

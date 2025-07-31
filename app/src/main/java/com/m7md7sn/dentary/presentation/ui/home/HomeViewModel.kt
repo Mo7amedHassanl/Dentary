@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.data.repository.PatientRepository
 import com.m7md7sn.dentary.data.repository.ProfileRepository
-import com.m7md7sn.dentary.data.model.Patient
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

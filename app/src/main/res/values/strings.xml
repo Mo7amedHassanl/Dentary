@@ -75,4 +75,7 @@
     <string name="arabic">العربية</string>
     <string name="contact_support">Contact Support</string>
     <string name="inquiry">Your Inquiry</string>
+    <string name="personal_info">المعلومات الشخصية</string>
+    <string name="gender">الجنس</string>
+    <string name="address">العنوان</string>
 </resources>

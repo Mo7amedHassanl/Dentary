@@ -26,7 +26,6 @@ import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
-import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 
 enum class Gender(val displayNameRes: Int) {
     MALE(R.string.gender_male),
