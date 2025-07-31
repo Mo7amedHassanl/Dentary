@@ -62,7 +62,6 @@ fun TotalPatientsCard(
         colors = CardDefaults.cardColors(
             containerColor = DentaryLightBlue
         ),
-        onClick = {},
     ) {
         Column(
             modifier = Modifier

@@ -1,5 +1,6 @@
 package com.m7md7sn.dentary.presentation.ui.settings.components
 
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material3.AlertDialog
@@ -14,6 +15,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
@@ -72,7 +74,8 @@ fun LogoutConfirmationDialog(
                 onClick = onDismiss,
                 colors = ButtonDefaults.outlinedButtonColors(
                     contentColor = DentaryBlue
-                )
+                ),
+                modifier = Modifier.padding(horizontal = 8.dp)
             ) {
                 Text(
                     text = stringResource(R.string.cancel),

@@ -1,5 +1,7 @@
 package com.m7md7sn.dentary.presentation.ui.settings
 
+import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -10,11 +12,13 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -24,8 +28,11 @@ import com.m7md7sn.dentary.presentation.theme.DentaryTheme
 import com.m7md7sn.dentary.presentation.ui.settings.components.DoctorAndClinicInfoSettings
 import com.m7md7sn.dentary.presentation.ui.settings.components.LogoutConfirmationDialog
 import com.m7md7sn.dentary.presentation.ui.settings.components.PasswordChangeSettings
+import com.m7md7sn.dentary.presentation.ui.settings.components.AppLanguageSettings
 import com.m7md7sn.dentary.presentation.ui.settings.components.RingtoneCustomizationSettings
 import com.m7md7sn.dentary.presentation.ui.settings.components.SettingsContent
+import com.m7md7sn.dentary.presentation.ui.settings.components.SupportContent
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SettingsScreen(
@@ -37,6 +44,7 @@ fun SettingsScreen(
     val scrollState = rememberScrollState()
     val focusManager = LocalFocusManager.current
     val uiState by viewModel.uiState.collectAsState()
+    val context = LocalContext.current
 
     // Show logout confirmation dialog
     if (uiState.showLogoutConfirmDialog) {
@@ -44,6 +52,16 @@ fun SettingsScreen(
             onConfirm = { viewModel.confirmLogout(onNavigateToLogin) },
             onDismiss = { viewModel.hideLogoutConfirmDialog() }
         )
+    }
+
+    LaunchedEffect(key1 = Unit) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is SettingsViewModel.Event.RecreateActivity -> {
+                    (context as? Activity)?.recreate()
+                }
+            }
+        }
     }
 
     Surface(
@@ -69,6 +87,7 @@ fun SettingsScreen(
                             }
                         )
                     }
+
                     is SettingsScreen.EditDoctorAndClinicInfo -> {
                         DoctorAndClinicInfoSettings(
                             focusManager = focusManager,
@@ -86,6 +105,7 @@ fun SettingsScreen(
                             snackbarMessageFlow = viewModel.snackbarMessage
                         )
                     }
+
                     is SettingsScreen.ChangePassword -> {
                         PasswordChangeSettings(
                             focusManager = focusManager,
@@ -102,8 +122,34 @@ fun SettingsScreen(
                             snackbarMessageFlow = viewModel.snackbarMessage
                         )
                     }
+
                     is SettingsScreen.RingtoneCustomization -> {
                         RingtoneCustomizationSettings()
+                    }
+
+                    is SettingsScreen.Language -> {
+                        uiState.selectedLanguage?.let {
+                            AppLanguageSettings(
+                                selectedLanguage = it,
+                                onLanguageSelected = { lang -> viewModel.onLanguageSelected(lang) },
+                                onBackClick = { viewModel.navigateBack() },
+                                onSaveClicked = { viewModel.onLanguageSave() }
+                            )
+                        }
+                    }
+
+                    is SettingsScreen.ContactSupport -> {
+                        SupportContent(
+                            email = "",
+                            message = "",
+                            isEmailError = false,
+                            isMessageError = false,
+                            isLoading = false,
+                            onEmailChange = {  },
+                            onMessageChange = {  },
+                            onSendClick = {  },
+                            focusManager = focusManager
+                        )
                     }
                     // For screens that are not implemented yet, just show main content
                     else -> {

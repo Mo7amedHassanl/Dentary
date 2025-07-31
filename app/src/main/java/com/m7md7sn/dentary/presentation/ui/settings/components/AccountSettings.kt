@@ -230,7 +230,7 @@ fun PasswordChangeSettings(
     snackbarHostState: SnackbarHostState,
     snackbarMessageFlow: SharedFlow<Event<String>>,
 ) {
-    val scope = rememberCoroutineScope()
+    rememberCoroutineScope()
     LaunchedEffect(Unit) {
         snackbarMessageFlow.collect { event ->
             event.getContentIfNotHandled()?.let { message ->

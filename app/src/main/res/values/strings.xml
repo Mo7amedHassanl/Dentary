@@ -71,4 +71,8 @@
     <string name="logout_confirmation_title">Confirm Logout</string>
     <string name="logout_confirmation_message">Are you sure you want to logout? You will need to login again to access your account.</string>
     <string name="medical_procedure">نوع الإجراء الطبي</string>
+    <string name="english">English</string>
+    <string name="arabic">العربية</string>
+    <string name="contact_support">Contact Support</string>
+    <string name="inquiry">Your Inquiry</string>
 </resources>

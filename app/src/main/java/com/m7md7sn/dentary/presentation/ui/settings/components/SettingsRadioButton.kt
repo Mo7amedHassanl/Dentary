@@ -3,6 +3,7 @@ package com.m7md7sn.dentary.presentation.ui.settings.components
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -48,7 +49,7 @@ fun SettingsRadioButton(
     onClick: () -> Unit = {},
     text: String = "Sample Text",
     modifier: Modifier = Modifier,
-    ) {
+) {
     Box(
         modifier = modifier
             .fillMaxWidth()
@@ -60,7 +61,10 @@ fun SettingsRadioButton(
             )
             .background(Color.White, CircleShape)
             .padding(horizontal = 22.dp)
-        ,
+            .clickable(
+                enabled = true,
+                onClick = onClick
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Row(

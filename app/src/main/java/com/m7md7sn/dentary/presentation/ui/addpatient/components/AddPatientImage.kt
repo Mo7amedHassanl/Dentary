@@ -32,7 +32,7 @@ fun AddPatientImage(
     onUpdatePatientImage: (android.net.Uri) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val imagePicker = rememberImagePicker() { uri ->
+    val imagePicker = rememberImagePicker { uri ->
         uri?.let { onUpdatePatientImage(it) }
     }
     

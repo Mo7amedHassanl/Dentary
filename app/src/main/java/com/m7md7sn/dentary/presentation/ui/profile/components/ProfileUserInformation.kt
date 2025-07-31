@@ -241,7 +241,6 @@ fun ProfilePicture(
         }
         
         // Show add button only when no profile picture is set
-        if (profilePictureUrl == null) {
         IconButton(
                 onClick = { imagePicker() },
             modifier = Modifier
@@ -257,24 +256,6 @@ fun ProfilePicture(
                     tint = Color.White
                 )
             }
-        } else {
-            // Show edit button when profile picture exists
-            IconButton(
-                onClick = { imagePicker() },
-                modifier = Modifier
-                    .size(25.dp)
-                    .background(DentaryLightBlue, CircleShape)
-                    .align(Alignment.BottomEnd)
-                    .padding(3.dp)
-            ) {
-                Icon(
-                    painter = painterResource(R.drawable.ic_edit),
-                    contentDescription = "Edit Profile Picture",
-                    modifier = Modifier.fillMaxSize(),
-                tint = Color.White
-            )
-            }
-        }
     }
 }
 

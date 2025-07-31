@@ -1,5 +1,6 @@
 package com.m7md7sn.dentary.presentation.ui.settings
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
@@ -15,18 +16,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.m7md7sn.dentary.data.repository.ProfileRepository
 import com.m7md7sn.dentary.data.model.UpdateProfileRequest
+import com.m7md7sn.dentary.utils.LocaleUtils
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
+import java.util.Locale
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val application: Application
 ) : ViewModel() {
 
     private var _uiState = MutableStateFlow(SettingsUiState())
     val uiState: StateFlow<SettingsUiState> = _uiState.asStateFlow()
 
-    private val _snackbarMessage = MutableSharedFlow<Event<String>>()
-    val snackbarMessage: SharedFlow<Event<String>> = _snackbarMessage
+    private val _snackbarMessage = MutableSharedFlow<com.m7md7sn.dentary.utils.Event<String>>()
+    val snackbarMessage: SharedFlow<com.m7md7sn.dentary.utils.Event<String>> = _snackbarMessage
+
+    private val _eventChannel = Channel<SettingsViewModel.Event>()
+    val eventFlow = _eventChannel.receiveAsFlow()
 
     fun navigateToScreen(screen: SettingsScreen) {
         _uiState.value = uiState.value.copy(currentScreen = screen)
@@ -53,7 +63,7 @@ class SettingsViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(isLoading = true)
 
-            when (val result = authRepository.signOut()) {
+            when (authRepository.signOut()) {
                 is Result.Success -> {
                     _uiState.value = uiState.value.copy(isLoading = false)
                     onLogoutSuccess()
@@ -214,7 +224,34 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
+    fun onLanguageSelected(language: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(selectedLanguage = language) }
+        }
+    }
+
+    fun onLanguageSave() {
+        viewModelScope.launch {
+            val langCode = if (_uiState.value.selectedLanguage == "Arabic") "ar" else "en"
+            LocaleUtils.setLocale(application, langCode)
+            _eventChannel.send(SettingsViewModel.Event.RecreateActivity)
+        }
+    }
+
     init {
         _uiState.value = SettingsUiState(currentScreen = SettingsScreen.Main)
+
+        // Initialize with saved language preference or current locale if no preference
+        val savedLanguage = LocaleUtils.getSavedLanguage(application)
+        val currentLanguage = if (savedLanguage != null) {
+            if (savedLanguage == "ar") "Arabic" else "English"
+        } else {
+            LocaleUtils.getDisplayLanguage(Locale.getDefault())
+        }
+        _uiState.update { it.copy(selectedLanguage = currentLanguage) }
+    }
+
+    sealed class Event {
+        object RecreateActivity : Event()
     }
 }

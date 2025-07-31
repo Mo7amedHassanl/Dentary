@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -40,6 +41,7 @@ fun SettingsTextField(
     isError: Boolean = false,
     icon: Int = R.drawable.ic_email,
     errorMessage: String? = null,
+    shape: Shape = CircleShape,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     enabled: Boolean = true
@@ -91,7 +93,7 @@ fun SettingsTextField(
         } else null,
         visualTransformation = visualTransformation,
         enabled = enabled,
-        shape = CircleShape,
+        shape = shape,
         textStyle = TextStyle(
             textAlign = TextAlign.Center,
             fontSize = 14.sp,

@@ -23,6 +23,7 @@ data class SettingsUiState(
     val confirmNewPassword: String = "",
     val newPasswordError: String? = null,
     val confirmPasswordError: String? = null,
+
     // Doctor and clinic info fields
     val fullName: String = "",
     val specialization: String = "",
@@ -35,4 +36,6 @@ data class SettingsUiState(
     val profileError: String? = null,
     val profileUpdateSuccess: Boolean = false,
     val profileUpdateError: String? = null,
+
+    val selectedLanguage: String? = null
 )

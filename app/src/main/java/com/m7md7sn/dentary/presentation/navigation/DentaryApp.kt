@@ -218,6 +218,10 @@ fun DentaryNavHost(
                 ProfileScreen(
                     onNavigateToPatients = {
                         navController.navigate(Screen.Patients.route)
+                    },
+                    onNavigateToProfileEdit = {
+                        navController.navigate(Screen.Settings.route)
+                        settingsViewModel.navigateToScreen(SettingsScreen.EditDoctorAndClinicInfo)
                     }
                 )
             }

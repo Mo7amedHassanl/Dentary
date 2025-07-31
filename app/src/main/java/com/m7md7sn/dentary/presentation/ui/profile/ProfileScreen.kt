@@ -31,13 +31,14 @@ import kotlinx.coroutines.launch
 fun ProfileScreen(
     modifier: Modifier = Modifier,
     viewModel: ProfileViewModel = hiltViewModel(),
-    onNavigateToPatients: () -> Unit = {}
+    onNavigateToPatients: () -> Unit = {},
+    onNavigateToProfileEdit: () -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
-    val focusManager = LocalFocusManager.current
+    LocalFocusManager.current
 
     // Handle snackbar messages
     LaunchedEffect(viewModel) {
@@ -64,7 +65,9 @@ fun ProfileScreen(
             ) {
                 ProfileContent(
                     uiState = uiState,
-                    onEditProfileClick = viewModel::onEditProfileClick,
+                    onEditProfileClick = {
+                        onNavigateToProfileEdit()
+                    },
                     onSeeAllPatientsClick = {
                         viewModel.onSeeAllPatientsClick(onNavigateToPatients)
                     },
