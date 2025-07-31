@@ -43,7 +43,7 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaSemiBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkGray
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 import com.m7md7sn.dentary.data.model.MedicalProcedureStats
 
 
@@ -60,7 +60,7 @@ fun TotalPatientsCard(
             .wrapContentHeight(),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = DentaryLightBlue
+            containerColor = DentaryLighterBlue
         ),
     ) {
         Column(
@@ -130,7 +130,7 @@ fun TotalPatientsCard(
                         fontFamily = AlexandriaSemiBold,
                         fontWeight = FontWeight.SemiBold,
                         lineHeight = 18.sp,
-                        color = DentaryLightBlue
+                        color = DentaryLighterBlue
                     )
                 )
             }

@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightGray
 
 @Composable
@@ -115,7 +115,7 @@ fun SettingsSwitchItem(
                 colors = SwitchDefaults.colors(
                     checkedThumbColor = DentaryLightGray,
                     uncheckedThumbColor = DentaryDarkBlue,
-                    checkedTrackColor = DentaryLightBlue,
+                    checkedTrackColor = DentaryLighterBlue,
                     uncheckedTrackColor = DentaryLightGray.copy(alpha = 0.5f),
                     uncheckedBorderColor = DentaryLightGray
                 ),

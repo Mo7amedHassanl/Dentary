@@ -40,7 +40,7 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.AlexandriaSemiBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 import com.m7md7sn.dentary.utils.rememberImagePicker
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
 import com.m7md7sn.dentary.presentation.ui.profile.ProfileUiState
@@ -139,7 +139,7 @@ private fun DoctorInformation(
             fontSize = 15.sp,
             fontFamily = AlexandriaSemiBold,
             fontWeight = FontWeight.SemiBold,
-            color = DentaryLightBlue,
+            color = DentaryLighterBlue,
         )
     )
     Spacer(Modifier.height(18.dp))
@@ -227,7 +227,7 @@ fun ProfilePicture(
                 onClick = { imagePicker() },
             modifier = Modifier
                 .size(25.dp)
-                .background(DentaryLightBlue, CircleShape)
+                .background(DentaryLighterBlue, CircleShape)
                 .align(Alignment.BottomEnd)
                 .padding(0.dp)
         ) {
@@ -247,7 +247,7 @@ fun ColumnScope.EditProfileButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier
             .size(22.dp)
-            .background(DentaryLightBlue, RoundedCornerShape(4.dp))
+            .background(DentaryLighterBlue, RoundedCornerShape(4.dp))
             .align(Alignment.End)
             .padding(2.dp)
     ) {

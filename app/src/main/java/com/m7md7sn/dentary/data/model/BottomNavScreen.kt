@@ -3,7 +3,7 @@ package com.m7md7sn.dentary.data.model
 import androidx.compose.ui.graphics.Color
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 sealed class BottomNavScreen(
     val route: String,
@@ -14,7 +14,7 @@ sealed class BottomNavScreen(
     object Home : BottomNavScreen(
         route = Screen.Home.route,
         icon = R.drawable.ic_nav_home,
-        selectedColor = DentaryLightBlue,
+        selectedColor = DentaryLighterBlue,
         contentDescription = Screen.Home.route
     )
     object Profile : BottomNavScreen(

@@ -36,7 +36,7 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkGray
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 @Composable
 fun HomeAppointments(modifier: Modifier = Modifier) {
@@ -63,7 +63,7 @@ fun AppointmentCards(
             title = R.string.today,
             number = 5,
             icon = R.drawable.ic_today_appointments,
-            color = DentaryLightBlue,
+            color = DentaryLighterBlue,
         )
         AppointmentCard(
             title = R.string.upcoming,

@@ -12,6 +12,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -28,6 +29,8 @@ fun DentaryTopBar(
     navController: NavController,
     showBackButton: Boolean = false,
     onBackClick: () -> Unit = {},
+    containerColor: Color = BackgroundColor,
+    iconColor: Color = DentaryBlue,
     onNavDrawerClicked: () -> Unit = {},
 ) {
     TopAppBar(
@@ -41,7 +44,7 @@ fun DentaryTopBar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                         contentDescription = "Back",
-                        tint = DentaryBlue
+                        tint = iconColor
                     )
                 }
             } else if (navController.previousBackStackEntry != null) {
@@ -52,7 +55,7 @@ fun DentaryTopBar(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBackIos,
                         contentDescription = "Back",
-                        tint = DentaryBlue
+                        tint = iconColor
                     )
                 }
             }
@@ -62,14 +65,15 @@ fun DentaryTopBar(
                 onClick = { onNavDrawerClicked() },
                 modifier = Modifier.padding(end = 8.dp)
             ) {
-                Image(
+                Icon(
                     painter = painterResource(id = R.drawable.ic_nav_drawer),
                     contentDescription = "Notifications",
+                    tint = iconColor
                 )
             }
         },
         colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = BackgroundColor
+            containerColor = containerColor
         ),
         modifier = Modifier
 //            .padding(horizontal = 16.dp)

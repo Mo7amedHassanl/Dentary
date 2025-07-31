@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowForwardIos
-import androidx.compose.material.icons.automirrored.filled.ReadMore
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -29,78 +27,102 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
+import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaExtraBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.with
 
-@Preview
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun PatientInformationCard(
-    expanded: Boolean = true,
+    patient: Patient,
     modifier: Modifier = Modifier
 ) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(if (!expanded) 42.dp else 250.dp),
-        shape = RoundedCornerShape(21.dp),
-        onClick = {},
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = Color(0xFFE3E7F2)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 18.dp, vertical = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(14.dp)
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_user),
-                    contentDescription = null,
-                )
-                Spacer(Modifier.width(10.dp))
-                Text(
-                    text = stringResource(R.string.personal_info),
-                    style = TextStyle(
-                        fontSize = 14.sp,
-                        fontFamily = AlexandriaExtraBold,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = DentaryDarkBlue,
-                    )
-                )
-                Spacer(Modifier.weight(1f))
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
-                    contentDescription = null,
-                    tint = DentaryBlueGray,
-                    modifier = Modifier
-                        .height(12.dp)
-                        .rotate(
-                            if (expanded) 90f else 0f
-                        )
-                )
+    var isExpanded by remember { mutableStateOf(false) }
+    AnimatedContent(
+        targetState = isExpanded,
+        transitionSpec = {
+            if (targetState) {
+                expandVertically(expandFrom = Alignment.Top) with shrinkVertically(shrinkTowards = Alignment.Top)
+            } else {
+                expandVertically(expandFrom = Alignment.Top) with shrinkVertically(shrinkTowards = Alignment.Top)
             }
+        }
+    ) { expanded ->
+        Card(
+            modifier = modifier
+                .fillMaxWidth()
+                .height(if (!expanded) 42.dp else 250.dp),
+            shape = RoundedCornerShape(21.dp),
+            onClick = { isExpanded = !isExpanded },
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            ),
+            border = BorderStroke(
+                width = 1.dp,
+                color = Color(0xFFE3E7F2)
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 18.dp, vertical = 12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(14.dp)
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_user),
+                        contentDescription = null
+                    )
+                    Spacer(Modifier.width(10.dp))
+                    Text(
+                        text = stringResource(
+                            R.string.personal_info
+                        ),
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontFamily = AlexandriaExtraBold,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = DentaryDarkBlue,
+                        )
+                    )
+                    Spacer(Modifier.weight(1f))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForwardIos,
+                        contentDescription = null,
+                        tint = DentaryBlueGray,
+                        modifier = Modifier
+                            .height(12.dp)
+                            .rotate(
+                                if (expanded) 90f else 0f
+                            )
+                    )
+                }
 
-            if (expanded) {
-                ExpandedPatientInformation()
+                if (expanded) {
+                    ExpandedPatientInformation(patient = patient)
+
+                }
             }
         }
     }
@@ -108,6 +130,7 @@ fun PatientInformationCard(
 
 @Composable
 fun ExpandedPatientInformation(
+    patient: Patient,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -128,7 +151,7 @@ fun ExpandedPatientInformation(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.age) + ":",
+                    text = stringResource(id = R.string.age) + ":",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontFamily = AlexandriaBold,
@@ -137,7 +160,7 @@ fun ExpandedPatientInformation(
                     )
                 )
                 Text(
-                    text = "25 سنة",
+                    text = patient.age?.toString() ?: "-",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontFamily = AlexandriaRegular,
@@ -147,7 +170,7 @@ fun ExpandedPatientInformation(
                 )
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
-                    color = DentaryLightBlue
+                    color = DentaryLighterBlue
                 )
             }
             Column(
@@ -158,7 +181,7 @@ fun ExpandedPatientInformation(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.gender) + ":",
+                    text = stringResource(id = R.string.gender) + ":",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontFamily = AlexandriaBold,
@@ -167,7 +190,7 @@ fun ExpandedPatientInformation(
                     )
                 )
                 Text(
-                    text = "ذكر",
+                    text = patient.gender ?: "-",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontFamily = AlexandriaRegular,
@@ -194,7 +217,7 @@ fun ExpandedPatientInformation(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.email) + ":",
+                    text = stringResource(id = R.string.email) + ":",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontFamily = AlexandriaBold,
@@ -203,7 +226,7 @@ fun ExpandedPatientInformation(
                     )
                 )
                 Text(
-                    text = "ali.elsalt@gmail.com",
+                    text = patient.email ?: "-",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontFamily = AlexandriaRegular,
@@ -213,7 +236,7 @@ fun ExpandedPatientInformation(
                 )
                 HorizontalDivider(
                     modifier = Modifier.fillMaxWidth(),
-                    color = DentaryLightBlue
+                    color = DentaryLighterBlue
                 )
             }
             Column(
@@ -224,7 +247,7 @@ fun ExpandedPatientInformation(
                 verticalArrangement = Arrangement.spacedBy(10.dp)
             ) {
                 Text(
-                    text = stringResource(R.string.phone_number) + ":",
+                    text = stringResource(id = R.string.phone_number) + ":",
                     style = TextStyle(
                         fontSize = 12.sp,
                         fontFamily = AlexandriaBold,
@@ -233,7 +256,7 @@ fun ExpandedPatientInformation(
                     )
                 )
                 Text(
-                    text = "01149058149",
+                    text = patient.phoneNumber ?: "-",
                     style = TextStyle(
                         fontSize = 14.sp,
                         fontFamily = AlexandriaRegular,
@@ -247,7 +270,6 @@ fun ExpandedPatientInformation(
                 )
             }
         }
-
         Column(
             modifier = modifier
                 .fillMaxWidth()
@@ -256,7 +278,7 @@ fun ExpandedPatientInformation(
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             Text(
-                text = stringResource(R.string.address) + ":",
+                text = stringResource(id = R.string.address) + ":",
                 style = TextStyle(
                     fontSize = 12.sp,
                     fontFamily = AlexandriaBold,
@@ -265,7 +287,7 @@ fun ExpandedPatientInformation(
                 )
             )
             Text(
-                text = "بجوار مسجد التوحيد قرية أشمنت بني سويف",
+                text = patient.address ?: "-",
                 style = TextStyle(
                     fontSize = 14.sp,
                     fontFamily = AlexandriaRegular,

@@ -6,15 +6,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.presentation.ui.patient.components.PatientInformationCard
 
 @Composable
-fun PatientContent(modifier: Modifier = Modifier) {
+fun PatientContent(patient: Patient, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 30.dp, vertical = 16.dp)
     ) {
-        PatientInformationCard()
+        PatientInformationCard(patient = patient)
     }
 }

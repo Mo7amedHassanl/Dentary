@@ -22,7 +22,8 @@ import com.m7md7sn.dentary.presentation.ui.home.compoenents.HomeContent
 fun HomeScreen(
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
-    onNavigateToPatients: () -> Unit = {}
+    onNavigateToPatients: () -> Unit = {},
+    onNavigateToPatient: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -44,6 +45,9 @@ fun HomeScreen(
                     recentPatientsList = uiState.recentPatients,
                     onPatientSeeAllClick = {
                         viewModel.onSeeAllPatientsClick(onNavigateToPatients)
+                    },
+                    onPatientClick = { patient ->
+                        patient.id?.let { onNavigateToPatient(it) }
                     }
                 )
             }

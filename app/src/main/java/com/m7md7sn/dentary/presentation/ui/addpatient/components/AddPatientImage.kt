@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.m7md7sn.dentary.R
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 import com.m7md7sn.dentary.utils.rememberImagePicker
 
 @Composable
@@ -68,7 +68,7 @@ fun AddPatientImage(
             onClick = { imagePicker() },
             modifier = Modifier
                 .size(40.dp)
-                .background(DentaryLightBlue, CircleShape)
+                .background(DentaryLighterBlue, CircleShape)
                 .align(Alignment.BottomEnd)
                 .padding(0.dp)
         ) {

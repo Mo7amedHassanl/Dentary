@@ -17,4 +17,7 @@ sealed class Screen (
     object Settings : Screen("settings")
     object Chats : Screen("chats")
     object AddPatient: Screen("add_patient")
+    object Patient : Screen("patient/{patientId}") {
+        fun createRoute(patientId: String) = "patient/$patientId"
+    }
 }

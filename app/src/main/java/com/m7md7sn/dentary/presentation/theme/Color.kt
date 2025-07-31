@@ -11,11 +11,11 @@ val PurpleGrey40 = Color(0xFF625b71)
 val Pink40 = Color(0xFF7D5260)
 
 val DentaryBlue = Color(0xFF073FB8)
-val DentaryLightBlue = Color(0xFF10A6F9)
+val DentaryLighterBlue = Color(0xFF10A6F9)
+val DentaryLightBlue = Color(0xFF007CFF)
 val DentaryDarkBlue = Color(0xFF03277A)
 val DentaryLightGray = Color(0xFFF0F2F8)
 val DentaryBlueGray = Color(0xFFD8DEEF)
 val DentaryGray = Color(0xFFAFAFB0)
 val DentaryDarkGray = Color(0xFF697988)
 val BackgroundColor = Color(0xFFF5F7FD)
-

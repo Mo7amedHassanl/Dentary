@@ -20,7 +20,8 @@ import com.m7md7sn.dentary.presentation.ui.patients.components.PatientsContent
 fun PatientsScreen(
     modifier: Modifier = Modifier,
     viewModel: PatientsViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit = {}
+    onNavigateBack: () -> Unit = {},
+    onNavigateToPatient: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
 
@@ -40,7 +41,10 @@ fun PatientsScreen(
                 searchQuery = uiState.searchQuery,
                 onSearchQueryChange = viewModel::searchPatients,
                 onNavigateBack = onNavigateBack,
-                onRefresh = viewModel::refreshPatients
+                onRefresh = viewModel::refreshPatients,
+                onPatientClick = { patient ->
+                    patient.id?.let { onNavigateToPatient(it) }
+                }
             )
         }
     }

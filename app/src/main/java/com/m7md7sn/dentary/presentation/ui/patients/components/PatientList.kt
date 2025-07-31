@@ -41,13 +41,14 @@ import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 @Preview
 @Composable
 fun PatientList(
     modifier: Modifier = Modifier,
     patients: List<Patient> = emptyList(),
+    onPatientClick: (Patient) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
@@ -56,7 +57,8 @@ fun PatientList(
     ) {
         items(patients){
             PatientItem(
-                patient = it
+                patient = it,
+                onClick = { onPatientClick(it) }
             )
         }
     }
@@ -66,13 +68,14 @@ fun PatientList(
 fun PatientItem(
     patient: Patient,
     modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(bottom = 10.dp),
         shape = RoundedCornerShape(20.dp),
-        onClick = {},
+        onClick = onClick,
         border = BorderStroke(width = 1.dp, color = Color(0xFFE3E7F2)),
         colors = CardDefaults.cardColors(
             containerColor = Color.White
@@ -112,7 +115,7 @@ fun PatientActionButtons(
             onClick = { },
             modifier = Modifier
                 .size(40.dp)
-                .background(DentaryLightBlue, RoundedCornerShape(10.dp))
+                .background(DentaryLighterBlue, RoundedCornerShape(10.dp))
                 .padding(0.dp)
         ) {
             Icon(

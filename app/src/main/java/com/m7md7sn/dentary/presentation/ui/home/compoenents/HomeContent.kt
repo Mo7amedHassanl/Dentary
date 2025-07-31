@@ -19,6 +19,7 @@ fun HomeContent(
     profilePictureUrl: String?,
     recentPatientsList: List<Patient>,
     onPatientSeeAllClick: () -> Unit,
+    onPatientClick: (Patient) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -46,7 +47,7 @@ fun HomeContent(
         items(
             recentPatientsList
         ) { patient ->
-            PatientItem(patient = patient)
+            PatientItem(patient = patient, onClick = { onPatientClick(patient) })
         }
         item {
             Spacer(Modifier.height(16.dp))

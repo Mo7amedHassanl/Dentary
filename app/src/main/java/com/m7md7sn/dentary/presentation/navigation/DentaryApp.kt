@@ -24,6 +24,8 @@ import androidx.navigation.navArgument
 import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 import com.m7md7sn.dentary.presentation.ui.addpatient.AddPatientScreen
 import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificationScreen
 import com.m7md7sn.dentary.presentation.ui.auth.login.LoginScreen
@@ -35,6 +37,7 @@ import com.m7md7sn.dentary.presentation.ui.patients.PatientsScreen
 import com.m7md7sn.dentary.presentation.ui.profile.ProfileScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsViewModel
+import com.m7md7sn.dentary.presentation.ui.patient.PatientScreen
 
 @Composable
 fun DentaryNavHost(
@@ -92,14 +95,17 @@ fun DentaryNavHost(
                         navController = navController,
                         showBackButton = settingsUiState.currentScreen != SettingsScreen.Main,
                         onBackClick = { settingsViewModel.navigateBack() },
-                        onNavDrawerClicked = {}
+                        onNavDrawerClicked = {},
+                                iconColor = if (currentRoute == Screen.Patient.route) Color.White else DentaryBlue
                     )
                 } else {
                     DentaryTopBar(
                         navController = navController,
                         showBackButton = topBarShowBackButton,
                         onBackClick = { navController.popBackStack() },
-                        onNavDrawerClicked = {}
+                        onNavDrawerClicked = {},
+                        containerColor = if (currentRoute == Screen.Patient.route) DentaryLightBlue else BackgroundColor,
+                        iconColor = if (currentRoute == Screen.Patient.route) Color.White else DentaryBlue
                     )
                 }
             }
@@ -204,6 +210,9 @@ fun DentaryNavHost(
                 HomeScreen(
                     onNavigateToPatients = {
                         navController.navigate(Screen.Patients.route)
+                    },
+                    onNavigateToPatient = { patientId ->
+                        navController.navigate(Screen.Patient.createRoute(patientId))
                     }
                 )
             }
@@ -211,6 +220,9 @@ fun DentaryNavHost(
                 PatientsScreen(
                     onNavigateBack = {
                         navController.popBackStack()
+                    },
+                    onNavigateToPatient = { patientId ->
+                        navController.navigate(Screen.Patient.createRoute(patientId))
                     }
                 )
             }
@@ -247,6 +259,13 @@ fun DentaryNavHost(
                         navController.popBackStack()
                     }
                 )
+            }
+            composable(
+                route = Screen.Patient.route,
+                arguments = listOf(navArgument("patientId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
+                PatientScreen(patientId = patientId)
             }
         }
     }

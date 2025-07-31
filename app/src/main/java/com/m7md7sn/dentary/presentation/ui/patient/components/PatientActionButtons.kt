@@ -1,11 +1,9 @@
 package com.m7md7sn.dentary.presentation.ui.patient.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
@@ -20,7 +18,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.m7md7sn.dentary.R
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 data class PatientActionButtonData(
     val onClick: () -> Unit,
@@ -39,7 +37,7 @@ val patientActionButtonList = listOf(
     PatientActionButtonData(
         onClick = { },
         buttonColor = Color.White,
-        iconColor = DentaryLightBlue,
+        iconColor = DentaryLighterBlue,
         icon = R.drawable.ic_call
     ),
     PatientActionButtonData(

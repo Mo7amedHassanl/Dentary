@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
-import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 @Composable
 fun AddPatientTitle(modifier: Modifier = Modifier) {
@@ -37,7 +37,7 @@ fun AddPatientTitle(modifier: Modifier = Modifier) {
                 fontSize = 20.sp,
                 fontFamily = AlexandriaBold,
                 lineHeight = 24.sp,
-                color = DentaryLightBlue
+                color = DentaryLighterBlue
             ),
             textAlign = TextAlign.Center
         )

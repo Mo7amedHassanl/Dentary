@@ -21,7 +21,8 @@ fun PatientsContent(
     searchQuery: String = "",
     onSearchQueryChange: (String) -> Unit = {},
     onNavigateBack: () -> Unit = {},
-    onRefresh: () -> Unit = {}
+    onRefresh: () -> Unit = {},
+    onPatientClick: (Patient) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -55,7 +56,7 @@ fun PatientsContent(
             }
         } else {
             items(patients) { patient ->
-                PatientItem(patient = patient)
+                PatientItem(patient = patient, onClick = { onPatientClick(patient) })
             }
         }
     }
