@@ -35,4 +35,10 @@ class PatientViewModel @Inject constructor(
             }
         }
     }
+
+    fun togglePatientDetailsListVisibility() {
+        _uiState.value = _uiState.value.copy(
+            isPatientDetailsListVisible = !_uiState.value.isPatientDetailsListVisible
+        )
+    }
 }

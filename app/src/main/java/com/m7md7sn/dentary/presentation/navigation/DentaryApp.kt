@@ -2,6 +2,7 @@ package com.m7md7sn.dentary.presentation.navigation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material3.FabPosition
@@ -14,6 +15,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -120,11 +122,12 @@ fun DentaryNavHost(
                         containerColor = DentaryBlue,
                         contentColor = Color.White
                     ),
+                    modifier = Modifier.size(56.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.Add,
                         contentDescription = null,
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.padding(8.dp).fillMaxSize()
                     )
                 }
             }

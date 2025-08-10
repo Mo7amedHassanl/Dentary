@@ -78,4 +78,9 @@
     <string name="personal_info">Personal Information</string>
     <string name="gender">Gender</string>
     <string name="address">Address</string>
+    <string name="medical_history">التاريخ الطبي</string>
+    <string name="treatment_plan">خطة العلاج</string>
+    <string name="teeth_structure">مخطط الأسنان</string>
+    <string name="medical_note">ملاحظة طبية</string>
+    <string name="patient_pictures">صور الحالة</string>
 </resources>
