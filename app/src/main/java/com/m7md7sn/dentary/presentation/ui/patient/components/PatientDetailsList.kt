@@ -16,6 +16,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -25,58 +26,67 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.m7md7sn.dentary.R
+import com.m7md7sn.dentary.data.model.Screen
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 data class DetailsListItem(
     @DrawableRes val icon: Int,
     @StringRes val text: Int,
-    val onClick: () -> Unit
+    val onClick: (NavController, String) -> Unit
 )
 
 val patientDetailsListItems = listOf(
     DetailsListItem(
         icon = R.drawable.ic_medical_history,
         text = R.string.medical_history,
-        onClick = {}
+        onClick = { navController, patientId ->
+            navController.navigate(Screen.MedicalHistoryScreen.createRoute(patientId))
+        }
     ),
     DetailsListItem(
         icon = R.drawable.ic_treatment_plan,
         text = R.string.treatment_plan,
-        onClick = {}
+        onClick = { navController, patientId ->
+        }
     ),
     DetailsListItem(
         icon = R.drawable.ic_tooth_structure,
         text = R.string.teeth_structure,
-        onClick = {}
+        onClick = {navController, patientId ->}
     ),
     DetailsListItem(
         icon = R.drawable.ic_medical_note,
         text = R.string.medical_note,
-        onClick = {}
+        onClick = {navController, patientId ->}
     ),
     DetailsListItem(
         icon = R.drawable.ic_patient_pictures,
         text = R.string.patient_pictures,
-        onClick = {}
+        onClick = {navController, patientId ->}
     ),
 )
 
 @Composable
 fun PatientDetailsList(
     items: List<DetailsListItem> = patientDetailsListItems,
+    navController: NavController,
+    patientId: String,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
     ) {
-        LazyColumn(){
+        LazyColumn(
+            horizontalAlignment = CenterHorizontally,
+        ){
             items(items){ item ->
                 PatientDetailsListItem(
                     icon = item.icon,
                     text = item.text,
-                    onClick = item.onClick,
+                    onClick = { item.onClick(navController, patientId) },
                 )
             }
         }

@@ -34,6 +34,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.data.model.Screen
@@ -49,6 +50,7 @@ import com.m7md7sn.dentary.presentation.ui.profile.components.PatientContent
 @Composable
 fun PatientScreen(
     patientId: String,
+    navController: NavController,
     modifier: Modifier = Modifier,
     viewModel: PatientViewModel = hiltViewModel()
 ) {
@@ -166,7 +168,10 @@ fun PatientScreen(
                                 }
                                 if (uiState.isPatientDetailsListVisible) {
                                     Spacer(Modifier.height(8.dp))
-                                    PatientDetailsList()
+                                    PatientDetailsList(
+                                        navController = navController,
+                                        patientId = patientId,
+                                    )
                                 }
                             }
                         }
@@ -175,21 +180,5 @@ fun PatientScreen(
 
             }
         }
-    }
-}
-
-@Preview
-@Composable
-private fun PatientScreenPreviewEn() {
-    DentaryTheme {
-        PatientScreen("patient123")
-    }
-}
-
-@Preview(locale = "ar")
-@Composable
-private fun PatientScreenPreviewAr() {
-    DentaryTheme {
-        PatientScreen("patient123")
     }
 }

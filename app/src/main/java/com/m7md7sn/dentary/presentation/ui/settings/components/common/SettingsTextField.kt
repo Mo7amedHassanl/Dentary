@@ -117,6 +117,7 @@ fun SettingsTextFieldNoIcon(
     isError: Boolean = false,
     errorMessage: String? = null,
     modifier: Modifier = Modifier,
+    shape: Shape = CircleShape,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     enabled: Boolean = true
 ) {
@@ -168,7 +169,7 @@ fun SettingsTextFieldNoIcon(
         } else null,
         visualTransformation = visualTransformation,
         enabled = enabled,
-        shape = CircleShape,
+        shape = shape,
         textStyle = TextStyle(
             textAlign = TextAlign.Center,
             fontSize = 14.sp,

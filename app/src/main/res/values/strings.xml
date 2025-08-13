@@ -83,4 +83,9 @@
     <string name="teeth_structure">مخطط الأسنان</string>
     <string name="medical_note">ملاحظة طبية</string>
     <string name="patient_pictures">صور الحالة</string>
+    <string name="description">وصف</string>
+    <string name="enter_description">اكتب وصف التاريخ الطبي هنا</string>
+    <string name="attachments">ملحقات</string>
+    <string name="save">حفظ</string>
+    <string name="attachment_description">وصف الملحق</string>
 </resources>

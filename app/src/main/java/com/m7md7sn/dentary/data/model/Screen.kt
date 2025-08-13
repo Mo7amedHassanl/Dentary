@@ -20,4 +20,7 @@ sealed class Screen (
     object Patient : Screen("patient/{patientId}") {
         fun createRoute(patientId: String) = "patient/$patientId"
     }
+    object MedicalHistoryScreen : Screen("medical_history/{patientId}") {
+        fun createRoute(patientId: String) = "medical_history/$patientId"
+    }
 }

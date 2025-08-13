@@ -34,6 +34,7 @@ import com.m7md7sn.dentary.presentation.ui.auth.login.LoginScreen
 import com.m7md7sn.dentary.presentation.ui.auth.passwordreset.PasswordResetScreen
 import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
 import com.m7md7sn.dentary.presentation.ui.home.HomeScreen
+import com.m7md7sn.dentary.presentation.ui.medicalhistory.AddMedicalHistoryScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 import com.m7md7sn.dentary.presentation.ui.patients.PatientsScreen
 import com.m7md7sn.dentary.presentation.ui.profile.ProfileScreen
@@ -67,6 +68,8 @@ fun DentaryNavHost(
         else -> navController.previousBackStackEntry != null
     }
 
+    val isTopBarColorBlue = currentRoute == Screen.Patient.route || currentRoute == Screen.MedicalHistoryScreen.route
+
     val showFAB = when (currentRoute) {
         Screen.Home.route, Screen.Patients.route -> true
         else -> false
@@ -98,7 +101,7 @@ fun DentaryNavHost(
                         showBackButton = settingsUiState.currentScreen != SettingsScreen.Main,
                         onBackClick = { settingsViewModel.navigateBack() },
                         onNavDrawerClicked = {},
-                                iconColor = if (currentRoute == Screen.Patient.route) Color.White else DentaryBlue
+                        iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue
                     )
                 } else {
                     DentaryTopBar(
@@ -106,8 +109,8 @@ fun DentaryNavHost(
                         showBackButton = topBarShowBackButton,
                         onBackClick = { navController.popBackStack() },
                         onNavDrawerClicked = {},
-                        containerColor = if (currentRoute == Screen.Patient.route) DentaryLightBlue else BackgroundColor,
-                        iconColor = if (currentRoute == Screen.Patient.route) Color.White else DentaryBlue
+                        containerColor = if (isTopBarColorBlue) DentaryLightBlue else BackgroundColor,
+                        iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue
                     )
                 }
             }
@@ -120,6 +123,23 @@ fun DentaryNavHost(
                     },
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = DentaryBlue,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier.size(56.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Add,
+                        contentDescription = null,
+                        modifier = Modifier.padding(8.dp).fillMaxSize()
+                    )
+                }
+            } else if( currentRoute == Screen.MedicalHistoryScreen.route){
+                IconButton(
+                    onClick = {
+
+                    },
+                    colors = IconButtonDefaults.filledIconButtonColors(
+                        containerColor = Color(0xFF5F67EC),
                         contentColor = Color.White
                     ),
                     modifier = Modifier.size(56.dp)
@@ -268,7 +288,15 @@ fun DentaryNavHost(
                 arguments = listOf(navArgument("patientId") { type = NavType.StringType })
             ) { backStackEntry ->
                 val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
-                PatientScreen(patientId = patientId)
+                PatientScreen(patientId = patientId, navController = navController)
+            }
+
+            composable(
+                route = Screen.MedicalHistoryScreen.route,
+                arguments = listOf(navArgument("patientId") { type = NavType.StringType })
+            ) { backStackEntry ->
+                val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
+                AddMedicalHistoryScreen(patientId = patientId)
             }
         }
     }
