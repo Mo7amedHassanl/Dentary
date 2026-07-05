@@ -10,6 +10,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -33,6 +34,7 @@ import com.m7md7sn.dentary.presentation.ui.auth.emailverification.EmailVerificat
 import com.m7md7sn.dentary.presentation.ui.auth.login.LoginScreen
 import com.m7md7sn.dentary.presentation.ui.auth.passwordreset.PasswordResetScreen
 import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
+import com.m7md7sn.dentary.presentation.ui.auth.welcome.WelcomeScreen
 import com.m7md7sn.dentary.presentation.ui.home.HomeScreen
 import com.m7md7sn.dentary.presentation.ui.medicalhistory.AddMedicalHistoryScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
@@ -77,7 +79,7 @@ fun DentaryNavHost(
 
     Scaffold(
         modifier = modifier,
-        containerColor = BackgroundColor,
+        containerColor = Color.Transparent,
         bottomBar = {
             if (showBottomBar) {
                 DentelBottomBar(
@@ -154,149 +156,164 @@ fun DentaryNavHost(
         },
         floatingActionButtonPosition = FabPosition.End
     ) { innerPadding ->
-        NavHost(
-            navController = navController,
-            startDestination = Screen.Splash.route,
-            modifier = Modifier.padding(innerPadding)
+        Surface(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            color = BackgroundColor
         ) {
-            composable(route = Screen.Splash.route) {
-                SplashScreen(
-                    onNavigateToHome = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Splash.route) { inclusive = true }
-                        }
-                    },
-                    onNavigateToLogin = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.Splash.route) { inclusive = true }
-                        }
-                    },
-                )
-            }
-            composable(route = Screen.Login.route) {
-                LoginScreen(
-                    onCreateNewAccountClick = {
-                        navController.navigate(Screen.Register.route)
-                    },
-                    onForgetPasswordClick = {
-                        navController.navigate(Screen.PasswordReset.route)
-                    },
-                    onLoginSuccess = {
-                        navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.Login.route) { inclusive = true }
-                        }
-                    },
-                )
-            }
-            composable(route = Screen.Register.route) {
-                RegisterScreen(
-                    onLoginClick = {
-                        navController.navigate(Screen.Login.route)
-                    },
-                    onNavigateToEmailVerification = { email ->
-                        navController.navigate(Screen.EmailVerification.createRoute(email)) {
-                            popUpTo(Screen.Register.route) { inclusive = true }
-                        }
-                    },
-                )
-            }
-            composable(
-                route = Screen.EmailVerification.route,
-                arguments = listOf(navArgument("email") { type = NavType.StringType })
+            NavHost(
+                navController = navController,
+                startDestination = Screen.Splash.route,
             ) {
-                EmailVerificationScreen(
-                    onVerificationSuccess = {
+                composable(route = Screen.Splash.route) {
+                    SplashScreen(
+                        onNavigateToHome = {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Splash.route) { inclusive = true }
+                            }
+                        },
+                        onNavigateToLogin = {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.Splash.route) { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable(route = Screen.Login.route) {
+                    LoginScreen(
+                        onCreateNewAccountClick = {
+                            navController.navigate(Screen.Register.route)
+                        },
+                        onForgetPasswordClick = {
+                            navController.navigate(Screen.PasswordReset.route)
+                        },
+                        onLoginSuccess = {
                         navController.navigate(Screen.Home.route) {
-                            popUpTo(Screen.EmailVerification.route) { inclusive = true }
-                        }
-                    },
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-            composable(route = Screen.PasswordReset.route) {
-                PasswordResetScreen(
-                    onNavigateToLogin = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.PasswordReset.route) { inclusive = true }
-                        }
-                    },
-                    onPasswordResetSuccess = {
-                        navController.navigate(Screen.Login.route) {
-                            popUpTo(Screen.PasswordReset.route) { inclusive = true }
-                        }
-                    },
-                )
-            }
-            composable(route = Screen.Home.route) {
-                HomeScreen(
-                    onNavigateToPatients = {
-                        navController.navigate(Screen.Patients.route)
-                    },
-                    onNavigateToPatient = { patientId ->
-                        navController.navigate(Screen.Patient.createRoute(patientId))
-                    }
-                )
-            }
-            composable(route = Screen.Patients.route) {
-                PatientsScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    },
-                    onNavigateToPatient = { patientId ->
-                        navController.navigate(Screen.Patient.createRoute(patientId))
-                    }
-                )
-            }
-            composable(route = Screen.Profile.route) {
-                ProfileScreen(
-                    onNavigateToPatients = {
-                        navController.navigate(Screen.Patients.route)
-                    },
-                    onNavigateToProfileEdit = {
-                        navController.navigate(Screen.Settings.route)
-                        settingsViewModel.navigateToScreen(SettingsScreen.EditDoctorAndClinicInfo)
-                    }
-                )
-            }
-            composable(route = Screen.Appointments.route) {
-                // Appointments screen content
-            }
-            composable(route = Screen.Chats.route) {
-                // Chats screen content
-            }
-            composable(route = Screen.Settings.route) {
-                SettingsScreen(
-                    viewModel = settingsViewModel,
-                    onNavigateToLogin = {
-                        navController.navigate(Screen.Login.route) {
                             popUpTo(0) { inclusive = true }
                         }
-                    }
-                )
-            }
-            composable(route = Screen.AddPatient.route) {
-                AddPatientScreen(
-                    onNavigateBack = {
-                        navController.popBackStack()
-                    }
-                )
-            }
-            composable(
-                route = Screen.Patient.route,
-                arguments = listOf(navArgument("patientId") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
-                PatientScreen(patientId = patientId, navController = navController)
-            }
+                    },
+                    )
+                }
+                composable(route = Screen.Register.route) {
+                    RegisterScreen(
+                        onLoginClick = {
+                            navController.navigate(Screen.Login.route)
+                        },
+                        onNavigateToEmailVerification = { email ->
+                            navController.navigate(Screen.EmailVerification.createRoute(email)) {
+                                popUpTo(Screen.Register.route) { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable(
+                    route = Screen.EmailVerification.route,
+                    arguments = listOf(navArgument("email") { type = NavType.StringType })
+                ) {
+                    EmailVerificationScreen(
+                        onVerificationSuccess = {
+                            navController.navigate(Screen.Welcome.route) {
+                                popUpTo(Screen.EmailVerification.route) { inclusive = true }
+                            }
+                        },
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(route = Screen.Welcome.route) {
+                    WelcomeScreen(
+                        onGetStartedClick = {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+                composable(route = Screen.PasswordReset.route) {
+                    PasswordResetScreen(
+                        onNavigateToLogin = {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.PasswordReset.route) { inclusive = true }
+                            }
+                        },
+                        onPasswordResetSuccess = {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(Screen.PasswordReset.route) { inclusive = true }
+                            }
+                        },
+                    )
+                }
+                composable(route = Screen.Home.route) {
+                    HomeScreen(
+                        onNavigateToPatients = {
+                            navController.navigate(Screen.Patients.route)
+                        },
+                        onNavigateToPatient = { patientId ->
+                            navController.navigate(Screen.Patient.createRoute(patientId))
+                        }
+                    )
+                }
+                composable(route = Screen.Patients.route) {
+                    PatientsScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        },
+                        onNavigateToPatient = { patientId ->
+                            navController.navigate(Screen.Patient.createRoute(patientId))
+                        }
+                    )
+                }
+                composable(route = Screen.Profile.route) {
+                    ProfileScreen(
+                        onNavigateToPatients = {
+                            navController.navigate(Screen.Patients.route)
+                        },
+                        onNavigateToProfileEdit = {
+                            navController.navigate(Screen.Settings.route)
+                            settingsViewModel.navigateToScreen(SettingsScreen.EditDoctorAndClinicInfo)
+                        }
+                    )
+                }
+                composable(route = Screen.Appointments.route) {
+                    // Appointments screen content
+                }
+                composable(route = Screen.Chats.route) {
+                    // Chats screen content
+                }
+                composable(route = Screen.Settings.route) {
+                    SettingsScreen(
+                        viewModel = settingsViewModel,
+                        onNavigateToLogin = {
+                            navController.navigate(Screen.Login.route) {
+                                popUpTo(0) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+                composable(route = Screen.AddPatient.route) {
+                    AddPatientScreen(
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                }
+                composable(
+                    route = Screen.Patient.route,
+                    arguments = listOf(navArgument("patientId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
+                    PatientScreen(patientId = patientId, navController = navController)
+                }
 
-            composable(
-                route = Screen.MedicalHistoryScreen.route,
-                arguments = listOf(navArgument("patientId") { type = NavType.StringType })
-            ) { backStackEntry ->
-                val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
-                AddMedicalHistoryScreen(patientId = patientId)
+                composable(
+                    route = Screen.MedicalHistoryScreen.route,
+                    arguments = listOf(navArgument("patientId") { type = NavType.StringType })
+                ) { backStackEntry ->
+                    val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
+                    AddMedicalHistoryScreen(patientId = patientId)
+                }
             }
         }
     }

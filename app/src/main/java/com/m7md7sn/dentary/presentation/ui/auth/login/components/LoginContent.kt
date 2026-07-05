@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -84,13 +83,11 @@ fun LoginContent(
         CommonButton(
             text = stringResource(R.string.join),
             onClick = onLoginClick,
+            isLoading = isLoading,
             enabled = !isLoading
         )
-        if (isLoading) {
-            Spacer(Modifier.height(12.dp))
-            CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
-        }
         Spacer(Modifier.height(18.dp))
+
         Text(
             text = stringResource(R.string.have_no_account),
             style = TextStyle(

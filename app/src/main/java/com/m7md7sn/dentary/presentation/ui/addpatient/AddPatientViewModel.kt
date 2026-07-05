@@ -1,12 +1,15 @@
 package com.m7md7sn.dentary.presentation.ui.addpatient
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.data.repository.AuthRepository
+import com.m7md7sn.dentary.data.repository.PatientImageManager
 import com.m7md7sn.dentary.data.repository.PatientRepository
 import com.m7md7sn.dentary.utils.Event
 import com.m7md7sn.dentary.utils.Result
+import com.m7md7sn.dentary.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,14 +19,14 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.m7md7sn.dentary.data.repository.PatientImageManager
 
 @HiltViewModel
 class AddPatientViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
     private val authRepository: AuthRepository,
     private val patientImageManager: PatientImageManager
-): ViewModel() {
+) : ViewModel() {
+
     private val _uiState = MutableStateFlow(AddPatientsUiState())
     val uiState: StateFlow<AddPatientsUiState> = _uiState.asStateFlow()
 
@@ -33,69 +36,55 @@ class AddPatientViewModel @Inject constructor(
     private val _navigationEvent = MutableSharedFlow<Event<NavigationEvent>>()
     val navigationEvent: SharedFlow<Event<NavigationEvent>> = _navigationEvent.asSharedFlow()
 
-    fun onFullNameChange(fullName: String) {
-        _uiState.value = _uiState.value.copy(fullName = fullName)
-        clearFieldError("fullName")
+    fun onFullNameChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(fullName = newValue, isFullNameError = false, fullNameErrorMessage = null)
     }
 
-    fun onAgeChange(age: String) {
-        _uiState.value = _uiState.value.copy(age = age)
-        clearFieldError("age")
+    fun onAgeChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(age = newValue, isAgeError = false, ageErrorMessage = null)
     }
 
-    fun onPhoneNumberChange(phoneNumber: String) {
-        _uiState.value = _uiState.value.copy(phoneNumber = phoneNumber)
-        clearFieldError("phoneNumber")
+    fun onPhoneNumberChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(phoneNumber = newValue, isPhoneNumberError = false, phoneNumberErrorMessage = null)
     }
 
-    fun onEmailChange(email: String) {
-        _uiState.value = _uiState.value.copy(email = email)
-        clearFieldError("email")
+    fun onEmailChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(email = newValue, isEmailError = false, emailErrorMessage = null)
     }
 
-    fun onGenderChange(gender: String) {
-        _uiState.value = _uiState.value.copy(gender = gender)
+    fun onGenderChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(gender = newValue)
     }
 
-    fun onAddressChange(address: String) {
-        _uiState.value = _uiState.value.copy(address = address)
-        clearFieldError("address")
+    fun onAddressChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(address = newValue, isAddressError = false, addressErrorMessage = null)
     }
 
-    fun onMedicalProcedureChange(medicalProcedure: String) {
-        _uiState.value = _uiState.value.copy(medicalProcedure = medicalProcedure)
+    fun onMedicalProcedureChange(newValue: String) {
+        _uiState.value = _uiState.value.copy(medicalProcedure = newValue)
     }
 
-    fun uploadPatientImage(imageUri: android.net.Uri) {
+    fun uploadPatientImage(imageUri: Uri) {
+        if (_uiState.value.isLoading) return
+        
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
+            val result = patientImageManager.uploadPatientImage(imageUri)
             
-            try {
-                // Get the current patient image URL to delete it
-                val currentPatientImageUrl = _uiState.value.patientImageUrl
-                
-                val result = patientRepository.uploadPatientImage(imageUri, currentPatientImageUrl)
-                
-                when (result) {
-                    is Result.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            patientImageUrl = result.data
-                        )
-                        _snackbarMessage.emit(Event("Patient image uploaded successfully"))
-                    }
-                    is Result.Error -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        _snackbarMessage.emit(Event("Failed to upload patient image: ${result.message}"))
-                    }
-                    else -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        _snackbarMessage.emit(Event("Unknown error occurred"))
-                    }
+            when (result) {
+                is Result.Success -> {
+                    _uiState.value = _uiState.value.copy(
+                        patientImageUrl = result.data,
+                        isLoading = false
+                    )
                 }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(isLoading = false)
-                _snackbarMessage.emit(Event("Error uploading patient image: ${e.message}"))
+                is Result.Error -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                    _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
+                }
+                else -> {
+                    _uiState.value = _uiState.value.copy(isLoading = false)
+                }
             }
         }
     }
@@ -107,191 +96,97 @@ class AddPatientViewModel @Inject constructor(
     }
 
     fun addPatient() {
-        if (!validateInputs()) {
+        if (_uiState.value.isLoading || !validateInputs()) {
             return
         }
 
         _uiState.value = _uiState.value.copy(isLoading = true)
 
         viewModelScope.launch {
-            try {
-                // Get current user ID
-                val currentUser = authRepository.getCurrentUser()
-                val userId = currentUser?.id
+            val currentUser = authRepository.getCurrentUser()
+            val userId = currentUser?.id
 
-                if (userId == null) {
-                    _uiState.value = _uiState.value.copy(isLoading = false)
-                    _snackbarMessage.emit(Event("User not authenticated. Please log in again."))
-                    return@launch
-                }
-
-                val patient = Patient(
-                    id = "", // Will be generated by Supabase
-                    userId = userId, // Use current user ID
-                    name = _uiState.value.fullName.trim(),
-                    phoneNumber = _uiState.value.phoneNumber.trim().takeIf { it.isNotEmpty() },
-                    email = _uiState.value.email.trim().takeIf { it.isNotEmpty() },
-                    age = _uiState.value.age.toIntOrNull(),
-                    address = _uiState.value.address.trim().takeIf { it.isNotEmpty() },
-                    medicalHistory = null,
-                    medicalProcedure = _uiState.value.medicalProcedure.trim().takeIf { it.isNotEmpty() },
-                    image = _uiState.value.patientImageUrl // Include image URL
-                )
-
-                when (val result = patientRepository.createPatient(patient)) {
-                    is Result.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            isSuccess = true
-                        )
-                        _snackbarMessage.emit(Event("Patient added successfully"))
-                        clearForm()
-                    }
-                    is Result.Error -> {
-                        _uiState.value = _uiState.value.copy(isLoading = false)
-                        _snackbarMessage.emit(Event("Failed to add patient: ${result.message}"))
-                    }
-                    is Result.Loading -> {
-                        // Handle loading state if needed
-                    }
-                }
-            } catch (e: Exception) {
+            if (userId == null) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
-                _snackbarMessage.emit(Event("Error occurred: ${e.message}"))
+                _snackbarMessage.emit(Event("User not authenticated. Please log in again."))
+                return@launch
+            }
+
+            val patient = Patient(
+                id = "", 
+                userId = userId,
+                name = _uiState.value.fullName.trim(),
+                phoneNumber = _uiState.value.phoneNumber.trim().takeIf { it.isNotEmpty() },
+                email = _uiState.value.email.trim().takeIf { it.isNotEmpty() },
+                age = _uiState.value.age.toIntOrNull(),
+                address = _uiState.value.address.trim().takeIf { it.isNotEmpty() },
+                medicalHistory = null,
+                medicalProcedure = _uiState.value.medicalProcedure.trim().takeIf { it.isNotEmpty() },
+                image = _uiState.value.patientImageUrl,
+                gender = _uiState.value.gender
+            )
+
+            val result = patientRepository.createPatient(patient)
+            
+            _uiState.value = _uiState.value.copy(isLoading = false)
+            
+            when (result) {
+                is Result.Success -> {
+                    _uiState.value = _uiState.value.copy(isSuccess = true)
+                    _snackbarMessage.emit(Event("Patient added successfully"))
+                    clearForm()
+                }
+                is Result.Error -> {
+                    _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
+                }
+                else -> {}
             }
         }
     }
 
     private fun validateInputs(): Boolean {
         var isValid = true
-        val currentState = _uiState.value
+        val state = _uiState.value
 
-        // Validate full name
-        if (currentState.fullName.trim().isEmpty()) {
-            _uiState.value = currentState.copy(
-                isFullNameError = true,
-                fullNameErrorMessage = "Full name is required"
-            )
+        if (state.fullName.isBlank()) {
+            _uiState.value = _uiState.value.copy(isFullNameError = true, fullNameErrorMessage = "Name is required")
             isValid = false
-        } else {
-            _uiState.value = currentState.copy(
-                isFullNameError = false,
-                fullNameErrorMessage = null
-            )
         }
 
-        // Validate age
-        val age = currentState.age.trim()
-        if (age.isNotEmpty()) {
-            val ageInt = age.toIntOrNull()
-            if (ageInt == null || ageInt <= 0 || ageInt > 150) {
-                _uiState.value = _uiState.value.copy(
-                    isAgeError = true,
-                    ageErrorMessage = "Please enter a valid age"
-                )
-                isValid = false
-            } else {
-                _uiState.value = _uiState.value.copy(
-                    isAgeError = false,
-                    ageErrorMessage = null
-                )
-            }
+        if (state.age.isNotBlank() && state.age.toIntOrNull() == null) {
+            _uiState.value = _uiState.value.copy(isAgeError = true, ageErrorMessage = "Invalid age")
+            isValid = false
         }
 
-        // Validate phone number
-        val phoneNumber = currentState.phoneNumber.trim()
-        if (phoneNumber.isNotEmpty() && phoneNumber.length < 10) {
-            _uiState.value = _uiState.value.copy(
-                isPhoneNumberError = true,
-                phoneNumberErrorMessage = "Please enter a valid phone number"
-            )
+        if (state.email.isNotBlank() && !android.util.Patterns.EMAIL_ADDRESS.matcher(state.email).matches()) {
+            _uiState.value = _uiState.value.copy(isEmailError = true, emailErrorMessage = "Invalid email format")
             isValid = false
-        } else {
-            _uiState.value = _uiState.value.copy(
-                isPhoneNumberError = false,
-                phoneNumberErrorMessage = null
-            )
-        }
-
-        // Validate email
-        val email = currentState.email.trim()
-        if (email.isNotEmpty() && !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _uiState.value = _uiState.value.copy(
-                isEmailError = true,
-                emailErrorMessage = "Please enter a valid email address"
-            )
-            isValid = false
-        } else {
-            _uiState.value = _uiState.value.copy(
-                isEmailError = false,
-                emailErrorMessage = null
-            )
         }
 
         return isValid
     }
 
-    private fun clearForm() {
+    fun clearForm() {
         _uiState.value = AddPatientsUiState()
     }
 
-    private fun clearFieldError(field: String) {
+    fun clearFieldError(field: String) {
         when (field) {
-            "fullName" -> {
-                if (_uiState.value.isFullNameError) {
-                    _uiState.value = _uiState.value.copy(
-                        isFullNameError = false,
-                        fullNameErrorMessage = null
-                    )
-                }
-            }
-            "age" -> {
-                if (_uiState.value.isAgeError) {
-                    _uiState.value = _uiState.value.copy(
-                        isAgeError = false,
-                        ageErrorMessage = null
-                    )
-                }
-            }
-            "phoneNumber" -> {
-                if (_uiState.value.isPhoneNumberError) {
-                    _uiState.value = _uiState.value.copy(
-                        isPhoneNumberError = false,
-                        phoneNumberErrorMessage = null
-                    )
-                }
-            }
-            "email" -> {
-                if (_uiState.value.isEmailError) {
-                    _uiState.value = _uiState.value.copy(
-                        isEmailError = false,
-                        emailErrorMessage = null
-                    )
-                }
-            }
-            "address" -> {
-                if (_uiState.value.isAddressError) {
-                    _uiState.value = _uiState.value.copy(
-                        isAddressError = false,
-                        addressErrorMessage = null
-                    )
-                }
-            }
+            "fullName" -> _uiState.value = _uiState.value.copy(isFullNameError = false, fullNameErrorMessage = null)
+            "age" -> _uiState.value = _uiState.value.copy(isAgeError = false, ageErrorMessage = null)
+            "phoneNumber" -> _uiState.value = _uiState.value.copy(isPhoneNumberError = false, phoneNumberErrorMessage = null)
+            "email" -> _uiState.value = _uiState.value.copy(isEmailError = false, emailErrorMessage = null)
+            "address" -> _uiState.value = _uiState.value.copy(isAddressError = false, addressErrorMessage = null)
         }
     }
 
     fun clearErrors() {
         _uiState.value = _uiState.value.copy(
-            isFullNameError = false,
-            fullNameErrorMessage = null,
-            isAgeError = false,
-            ageErrorMessage = null,
-            isPhoneNumberError = false,
-            phoneNumberErrorMessage = null,
-            isEmailError = false,
-            emailErrorMessage = null,
-            isAddressError = false,
-            addressErrorMessage = null,
+            isFullNameError = false, fullNameErrorMessage = null,
+            isAgeError = false, ageErrorMessage = null,
+            isPhoneNumberError = false, phoneNumberErrorMessage = null,
+            isEmailError = false, emailErrorMessage = null,
+            isAddressError = false, addressErrorMessage = null
         )
     }
 }

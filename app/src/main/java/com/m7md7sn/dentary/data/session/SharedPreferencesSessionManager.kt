@@ -3,16 +3,9 @@ package com.m7md7sn.dentary.data.session
 import android.content.Context
 import android.content.SharedPreferences
 import io.github.jan.supabase.auth.SessionManager
-import io.github.jan.supabase.auth.status.SessionStatus
 import io.github.jan.supabase.auth.user.UserSession
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.datetime.Instant
-import kotlinx.serialization.json.Json
 import kotlin.time.ExperimentalTime
 
-@OptIn(ExperimentalTime::class)
 class SharedPreferencesSessionManager(
     context: Context
 ) : SessionManager {
@@ -20,69 +13,56 @@ class SharedPreferencesSessionManager(
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("supabase_session", Context.MODE_PRIVATE)
 
-    private val _sessionStatus = MutableStateFlow<SessionStatus>(SessionStatus.NotAuthenticated())
-    val sessionStatus: StateFlow<SessionStatus> = _sessionStatus.asStateFlow()
-
-    private val json = Json {
-        ignoreUnknownKeys = true
-        coerceInputValues = true
-    }
-
+    @OptIn(ExperimentalTime::class)
     override suspend fun saveSession(session: UserSession) {
-        _sessionStatus.value = SessionStatus.Authenticated(session = session)
-
         try {
-            // Create a simple data structure that can be serialized
-            val sessionMap = mapOf(
-                "accessToken" to session.accessToken,
-                "refreshToken" to session.refreshToken,
-                "expiresAt" to session.expiresAt.epochSeconds.toString(),
-                "expiresIn" to session.expiresIn.toString(),
-                "tokenType" to (session.tokenType ?: "Bearer"),
-                "userEmail" to (session.user?.email ?: ""),
-                "userId" to (session.user?.id ?: "")
-            )
-
-            val sessionString = json.encodeToString(sessionMap)
-            sharedPreferences.edit()
-                .putString(SESSION_KEY, sessionString)
-                .apply()
+            sharedPreferences.edit().apply {
+                putString(KEY_ACCESS_TOKEN, session.accessToken)
+                putString(KEY_REFRESH_TOKEN, session.refreshToken)
+                putLong(KEY_EXPIRES_IN, session.expiresIn)
+                putString(KEY_TOKEN_TYPE, session.tokenType)
+                apply()
+            }
         } catch (e: Exception) {
-            // If serialization fails, remove any existing session
-            sharedPreferences.edit().remove(SESSION_KEY).apply()
+            deleteSession()
         }
     }
 
+    @OptIn(ExperimentalTime::class)
     override suspend fun loadSession(): UserSession? {
-        val sessionString = sharedPreferences.getString(SESSION_KEY, null)
         return try {
-            sessionString?.let {
-                val sessionMap = json.decodeFromString<Map<String, String>>(it)
+            val accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, null) ?: return null
+            val refreshToken = sharedPreferences.getString(KEY_REFRESH_TOKEN, null) ?: return null
+            val expiresIn = sharedPreferences.getLong(KEY_EXPIRES_IN, 0)
+            val tokenType = sharedPreferences.getString(KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
 
-                // Reconstruct UserSession from the stored data
-                val userSession = UserSession(
-                    accessToken = sessionMap["accessToken"] ?: "",
-                    refreshToken = sessionMap["refreshToken"] ?: "",
-                    expiresAt = Instant.fromEpochSeconds(sessionMap["expiresAt"]?.toLongOrNull() ?: 0),
-                    expiresIn = sessionMap["expiresIn"]?.toLongOrNull() ?: 0,
-                    tokenType = sessionMap["tokenType"] ?: "Bearer",
-                    user = null // We'll let Supabase retrieve the user info
-                )
-                userSession
-            }
+            UserSession(
+                accessToken = accessToken,
+                refreshToken = refreshToken,
+                expiresIn = expiresIn,
+                tokenType = tokenType,
+                user = null
+            )
         } catch (e: Exception) {
-            // Clear corrupted session
-            sharedPreferences.edit().remove(SESSION_KEY).apply()
+            deleteSession()
             null
         }
     }
 
     override suspend fun deleteSession() {
-        _sessionStatus.value = SessionStatus.NotAuthenticated()
-        sharedPreferences.edit().remove(SESSION_KEY).apply()
+        sharedPreferences.edit().apply {
+            remove(KEY_ACCESS_TOKEN)
+            remove(KEY_REFRESH_TOKEN)
+            remove(KEY_EXPIRES_IN)
+            remove(KEY_TOKEN_TYPE)
+            apply()
+        }
     }
 
     companion object {
-        private const val SESSION_KEY = "user_session"
+        private const val KEY_ACCESS_TOKEN = "access_token"
+        private const val KEY_REFRESH_TOKEN = "refresh_token"
+        private const val KEY_EXPIRES_IN = "expires_in"
+        private const val KEY_TOKEN_TYPE = "token_type"
     }
 }

@@ -3,10 +3,11 @@ package com.m7md7sn.dentary.data.source.remote
 import com.m7md7sn.dentary.data.model.Appointment
 import com.m7md7sn.dentary.data.model.CreateAppointmentRequest
 import com.m7md7sn.dentary.data.model.UpdateAppointmentRequest
+import com.m7md7sn.dentary.data.util.toDataError
+import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Order
 import javax.inject.Inject
 
 class AppointmentDataSourceImpl @Inject constructor(
@@ -14,32 +15,33 @@ class AppointmentDataSourceImpl @Inject constructor(
     private val postgrest: Postgrest
 ) : AppointmentDataSource {
 
-    override suspend fun getAllAppointments(): Result<List<Appointment>> {
+    override suspend fun getAllAppointments(): Result<List<Appointment>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val appointments = postgrest.from("appointments")
+            val appointments = postgrest
+                .from("appointments")
                 .select {
                     filter {
                         eq("user_id", currentUserId)
                     }
-                    order(column = "appointment_date", order = Order.DESCENDING)
                 }
                 .decodeList<Appointment>()
 
             Result.Success(appointments)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch appointments")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getAppointmentById(id: String): Result<Appointment> {
+    override suspend fun getAppointmentById(id: String): Result<Appointment, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val appointment = postgrest.from("appointments")
+            val appointment = postgrest
+                .from("appointments")
                 .select {
                     filter {
                         eq("id", id)
@@ -50,85 +52,74 @@ class AppointmentDataSourceImpl @Inject constructor(
 
             Result.Success(appointment)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch appointment")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getAppointmentsByPatient(patientId: String): Result<List<Appointment>> {
+    override suspend fun getAppointmentsByPatient(patientId: String): Result<List<Appointment>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val appointments = postgrest.from("appointments")
+            val appointments = postgrest
+                .from("appointments")
                 .select {
                     filter {
                         eq("user_id", currentUserId)
                         eq("patient_id", patientId)
                     }
-                    order(column = "appointment_date", order = Order.ASCENDING)
                 }
                 .decodeList<Appointment>()
 
             Result.Success(appointments)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch patient appointments")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getAppointmentsByDate(date: String): Result<List<Appointment>> {
+    override suspend fun getAppointmentsByDate(date: String): Result<List<Appointment>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val appointments = postgrest.from("appointments")
+            val appointments = postgrest
+                .from("appointments")
                 .select {
                     filter {
                         eq("user_id", currentUserId)
-                        gte("appointment_date", "${date}T00:00:00")
-                        lt("appointment_date", "${date}T23:59:59")
+                        eq("appointment_date", date)
                     }
-                    order(column = "appointment_date", order = Order.ASCENDING)
                 }
                 .decodeList<Appointment>()
 
             Result.Success(appointments)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch appointments by date")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun createAppointment(request: CreateAppointmentRequest): Result<Appointment> {
+    override suspend fun createAppointment(request: CreateAppointmentRequest): Result<Appointment, DataError> {
         return try {
-            val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
-
-            val appointmentData = mapOf(
-                "user_id" to currentUserId,
-                "patient_id" to request.patientId,
-                "title" to request.title,
-                "description" to request.description,
-                "appointment_date" to request.appointmentDate,
-                "duration_minutes" to request.durationMinutes
-            )
-
-            val appointment = postgrest.from("appointments")
-                .insert(appointmentData) {
+            val createdAppointment = postgrest
+                .from("appointments")
+                .insert(request) {
                     select()
                 }
                 .decodeSingle<Appointment>()
 
-            Result.Success(appointment)
+            Result.Success(createdAppointment)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to create appointment")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun updateAppointment(id: String, request: UpdateAppointmentRequest): Result<Appointment> {
+    override suspend fun updateAppointment(id: String, request: UpdateAppointmentRequest): Result<Appointment, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val appointment = postgrest.from("appointments")
+            val updatedAppointment = postgrest
+                .from("appointments")
                 .update(request) {
                     select()
                     filter {
@@ -138,18 +129,19 @@ class AppointmentDataSourceImpl @Inject constructor(
                 }
                 .decodeSingle<Appointment>()
 
-            Result.Success(appointment)
+            Result.Success(updatedAppointment)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to update appointment")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun deleteAppointment(id: String): Result<Unit> {
+    override suspend fun deleteAppointment(id: String): Result<Unit, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            postgrest.from("appointments")
+            postgrest
+                .from("appointments")
                 .delete {
                     filter {
                         eq("id", id)
@@ -159,7 +151,7 @@ class AppointmentDataSourceImpl @Inject constructor(
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to delete appointment")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 }

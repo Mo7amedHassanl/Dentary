@@ -4,17 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(SplashUiState())
     val uiState: StateFlow<SplashUiState> = _uiState.asStateFlow()
@@ -24,34 +24,33 @@ class SplashViewModel @Inject constructor(
     }
 
     private fun checkAuthenticationState() {
+        if (_uiState.value.isLoading) return
+        
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true) }
 
-            delay(500)
+            delay(1000) // Slightly longer splash for better UX
 
             try {
-                val isValid = authRepository.isSessionValid()
                 val user = authRepository.getCurrentUser()
+                val isValid = authRepository.isSessionValid()
 
-                val navigationState = when {
-                    isValid && user != null -> {
-                        _uiState.update {
-                            it.copy(
-                                isUserSignedIn = true,
-                                isLoading = false
-                            )
-                        }
-                        NavigationState.NavigateToHome
+                val navigationState = if (isValid && user != null) {
+                    _uiState.update {
+                        it.copy(
+                            isUserSignedIn = true,
+                            isLoading = false
+                        )
                     }
-                    else -> {
-                        _uiState.update {
-                            it.copy(
-                                isUserSignedIn = false,
-                                isLoading = false
-                            )
-                        }
-                        NavigationState.NavigateToLogin
+                    NavigationState.NavigateToHome
+                } else {
+                    _uiState.update {
+                        it.copy(
+                            isUserSignedIn = false,
+                            isLoading = false
+                        )
                     }
+                    NavigationState.NavigateToLogin
                 }
 
                 _uiState.update { it.copy(navigationState = navigationState) }
@@ -69,6 +68,6 @@ class SplashViewModel @Inject constructor(
     }
 
     fun resetNavigationState() {
-        _uiState.update { it.copy(navigationState = null) }
+        _uiState.update { it.copy(navigationState = NavigationState.Idle) }
     }
 }

@@ -60,6 +60,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     private fun logout(onLogoutSuccess: () -> Unit) {
+        if (_uiState.value.isLoading) return
+        
         viewModelScope.launch {
             _uiState.value = uiState.value.copy(isLoading = true)
 
@@ -70,12 +72,9 @@ class SettingsViewModel @Inject constructor(
                 }
                 is Result.Error -> {
                     _uiState.value = uiState.value.copy(isLoading = false)
-                    // Handle error if needed - for now we'll still call onLogoutSuccess
-                    // since local logout should always work
                     onLogoutSuccess()
                 }
                 is Result.Loading -> {
-                    // Loading state is already set above
                 }
             }
         }
@@ -117,6 +116,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun changePassword(currentPassword: String = uiState.value.currentPassword, newPassword: String = uiState.value.newPassword) {
+        if (_uiState.value.isPasswordChanging) return
+        
         _uiState.value = uiState.value.copy(isPasswordChanging = true, passwordChangeError = null, passwordChangeSuccess = false)
         viewModelScope.launch {
             when (val result = authRepository.changePassword(currentPassword, newPassword)) {
@@ -129,12 +130,13 @@ class SettingsViewModel @Inject constructor(
                     _snackbarMessage.emit(Event("Password changed successfully"))
                 }
                 is Result.Error -> {
+                    val errorMsg = result.message ?: "Password change failed"
                     _uiState.value = uiState.value.copy(
                         isPasswordChanging = false,
                         passwordChangeSuccess = false,
-                        passwordChangeError = result.message
+                        passwordChangeError = errorMsg
                     )
-                    _snackbarMessage.emit(Event(result.message.lines().first()))
+                    _snackbarMessage.emit(Event(errorMsg.lines().first()))
                 }
                 is Result.Loading -> {
                     _uiState.value = uiState.value.copy(isPasswordChanging = true)
@@ -166,8 +168,9 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
                 is Result.Error -> {
-                    _uiState.value = uiState.value.copy(isProfileLoading = false, profileError = result.message, email = email)
-                    _snackbarMessage.emit(Event(result.message.lines().first()))
+                    val errorMsg = result.message ?: "Failed to fetch profile"
+                    _uiState.value = uiState.value.copy(isProfileLoading = false, profileError = errorMsg, email = email)
+                    _snackbarMessage.emit(Event(errorMsg.lines().first()))
                 }
                 is Result.Loading -> {
                     _uiState.value = uiState.value.copy(isProfileLoading = true, email = email)
@@ -199,6 +202,8 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun saveProfile() {
+        if (_uiState.value.isProfileLoading) return
+        
         _uiState.value = uiState.value.copy(isProfileLoading = true, profileUpdateError = null, profileUpdateSuccess = false)
         viewModelScope.launch {
             val req = UpdateProfileRequest(
@@ -214,8 +219,9 @@ class SettingsViewModel @Inject constructor(
                     _snackbarMessage.emit(Event("Profile updated successfully"))
                 }
                 is Result.Error -> {
-                    _uiState.value = uiState.value.copy(isProfileLoading = false, profileUpdateError = result.message)
-                    _snackbarMessage.emit(Event(result.message.lines().first()))
+                    val errorMsg = result.message ?: "Profile update failed"
+                    _uiState.value = uiState.value.copy(isProfileLoading = false, profileUpdateError = errorMsg)
+                    _snackbarMessage.emit(Event(errorMsg.lines().first()))
                 }
                 is Result.Loading -> {
                     _uiState.value = uiState.value.copy(isProfileLoading = true)
@@ -241,7 +247,6 @@ class SettingsViewModel @Inject constructor(
     init {
         _uiState.value = SettingsUiState(currentScreen = SettingsScreen.Main)
 
-        // Initialize with saved language preference or current locale if no preference
         val savedLanguage = LocaleUtils.getSavedLanguage(application)
         val currentLanguage = if (savedLanguage != null) {
             if (savedLanguage == "ar") "Arabic" else "English"

@@ -3,8 +3,8 @@ package com.m7md7sn.dentary.presentation.ui.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
-import com.m7md7sn.dentary.data.repository.PatientRepository
 import com.m7md7sn.dentary.data.repository.ProfileRepository
+import com.m7md7sn.dentary.domain.usecase.patient.GetPatientsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -16,102 +16,90 @@ import com.m7md7sn.dentary.utils.Result
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authRepository: AuthRepository,
-    private val patientRepository: PatientRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val getPatientsUseCase: GetPatientsUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(HomeUiState())
     val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
     init {
+        observePatients()
         loadHomeData()
+    }
+
+    private fun observePatients() {
+        viewModelScope.launch {
+            getPatientsUseCase(sortByRecent = true).collect { result ->
+                handlePatientsResult(result)
+            }
+        }
     }
 
     private fun loadHomeData() {
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
+            
             try {
-                // Load user data
-                val currentUser = authRepository.getCurrentUser()
-                currentUser?.let { user ->
-                    val metadata = user.userMetadata
-                    val displayName = metadata?.get("display_name")?.toString()?.removeSurrounding("\"")
-                        ?: metadata?.get("username")?.toString()?.removeSurrounding("\"")
-                        ?: "مستخدم"
-                    val clinic = metadata?.get("clinic_name")?.toString()?.removeSurrounding("\"")
-                        ?: "عيادة الأسنان"
-
-                    _uiState.value = _uiState.value.copy(
-                        userName = displayName,
-                        clinicName = clinic
-                    )
-                }
-
-                // Load profile data including profile picture
-                loadProfileData()
-
-                // Load recent patients (limit to 4)
-                loadRecentPatients()
+                // Fetch profile
+                val profileResult = profileRepository.getProfile()
+                handleProfileResult(profileResult)
+                
+                // Trigger patients refresh (the observer will update the UI)
+                getPatientsUseCase.refresh()
 
             } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    userName = "مستخدم",
-                    clinicName = "عيادة الأسنان",
-                    errorMessage = e.message,
-                    isLoading = false
-                )
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
             }
         }
     }
 
-    private suspend fun loadProfileData() {
-        when (val result = profileRepository.getProfile()) {
+    private suspend fun handleProfileResult(result: Result<com.m7md7sn.dentary.data.model.Profile, com.m7md7sn.dentary.domain.model.DataError>) {
+        when (result) {
             is Result.Success -> {
                 _uiState.value = _uiState.value.copy(
+                    userName = result.data.fullName ?: "مستخدم",
+                    clinicName = result.data.clinicName ?: "عيادة الأسنان",
                     profilePictureUrl = result.data.profilePicture
                 )
             }
             is Result.Error -> {
-                // Keep existing profile picture URL if loading fails
-                println("Failed to load profile data: ${result.message}")
+                // If profile fails, try getting name from metadata as fallback
+                val currentUser = authRepository.getCurrentUser()
+                val metadata = currentUser?.userMetadata
+                val displayName = metadata?.get("display_name")?.toString()?.removeSurrounding("\"")
+                    ?: metadata?.get("username")?.toString()?.removeSurrounding("\"")
+                    ?: "مستخدم"
+                
+                _uiState.value = _uiState.value.copy(
+                    userName = displayName,
+                    errorMessage = result.message
+                )
             }
-            is Result.Loading -> {
-                // Keep existing state
-            }
+            else -> {}
         }
     }
 
-    private suspend fun loadRecentPatients() {
-        when (val result = patientRepository.getAllPatients()) {
+    private fun handlePatientsResult(result: Result<List<com.m7md7sn.dentary.data.model.Patient>, com.m7md7sn.dentary.domain.model.DataError>) {
+        when (result) {
             is Result.Success -> {
-                // Sort by creation date and take first 4 (most recent)
-                val recentPatients = result.data
-                    .sortedByDescending { it.createdAt ?: "0" }
-                    .take(4)
-
                 _uiState.value = _uiState.value.copy(
-                    recentPatients = recentPatients,
-                    isLoading = false,
-                    errorMessage = null
+                    recentPatients = result.data.take(4)
                 )
             }
             is Result.Error -> {
                 _uiState.value = _uiState.value.copy(
                     recentPatients = emptyList(),
-                    isLoading = false,
                     errorMessage = result.message
                 )
             }
-            is Result.Loading -> {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = true,
-                    errorMessage = null
-                )
-            }
+            else -> {}
         }
     }
 
     fun refreshData() {
-        _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
         loadHomeData()
     }
 

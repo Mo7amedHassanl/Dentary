@@ -1,6 +1,5 @@
 package com.m7md7sn.dentary.presentation.ui.auth.passwordreset.components
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,13 +14,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -29,6 +40,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -59,10 +72,15 @@ fun PasswordResetContent(
     onConfirmPasswordChange: (String) -> Unit,
     onResetPasswordClick: () -> Unit,
     onLoginClick: () -> Unit,
+    onPasswordResetSuccess: () -> Unit,
     isLoading: Boolean,
     isResending: Boolean = false,
     isEmailError: Boolean,
     emailErrorMessage: String?,
+    isPasswordVisible: Boolean = false,
+    onTogglePasswordVisibility: () -> Unit = {},
+    isConfirmPasswordVisible: Boolean = false,
+    onToggleConfirmPasswordVisibility: () -> Unit = {},
     otpError: String = "",
     passwordError: String? = null,
     confirmPasswordError: String? = null,
@@ -75,6 +93,9 @@ fun PasswordResetContent(
             .padding(vertical = 26.dp, horizontal = 36.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        StepIndicator(currentStep = currentStep)
+        Spacer(modifier = Modifier.height(24.dp))
+        
         when (currentStep) {
             PasswordResetStep.EMAIL_INPUT -> {
                 EmailInputStep(
@@ -112,10 +133,80 @@ fun PasswordResetContent(
                     onLoginClick = onLoginClick,
                     isLoading = isLoading,
                     passwordError = passwordError,
-                    confirmPasswordError = confirmPasswordError
+                    confirmPasswordError = confirmPasswordError,
+                    isPasswordVisible = isPasswordVisible,
+                    onTogglePasswordVisibility = onTogglePasswordVisibility,
+                    isConfirmPasswordVisible = isConfirmPasswordVisible,
+                    onToggleConfirmPasswordVisibility = onToggleConfirmPasswordVisibility
                 )
             }
+            PasswordResetStep.SUCCESS -> {
+                SuccessStep(onLoginClick = onPasswordResetSuccess)
+            }
         }
+    }
+}
+
+private fun maskEmail(email: String): String {
+    if (email.isBlank()) return ""
+    val atIndex = email.indexOf('@')
+    if (atIndex <= 1) return email
+    val name = email.substring(0, atIndex)
+    val domain = email.substring(atIndex)
+    val maskedName = name[0] + "***" + name[name.length - 1]
+    return maskedName + domain
+}
+
+@Composable
+fun SuccessStep(onLoginClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .size(100.dp)
+                .background(
+                    color = DentaryBlue.copy(alpha = 0.1f),
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.CheckCircle,
+                contentDescription = null,
+                tint = DentaryBlue,
+                modifier = Modifier.size(64.dp)
+            )
+        }
+        Spacer(modifier = Modifier.height(32.dp))
+        Text(
+            text = "Password Reset Successful!",
+            style = TextStyle(
+                fontSize = 22.sp,
+                fontFamily = AlexandriaBlack,
+                fontWeight = FontWeight.Black,
+                color = DentaryBlue
+            ),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Your password has been changed successfully. You can now use your new password to login.",
+            style = TextStyle(
+                fontSize = 15.sp,
+                fontFamily = AlexandriaBold,
+                fontWeight = FontWeight.Bold,
+                lineHeight = 24.sp,
+                color = Color(0xFFA2A2A2)
+            ),
+            textAlign = TextAlign.Center
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+        CommonButton(
+            text = "Go to Login",
+            onClick = onLoginClick
+        )
     }
 }
 
@@ -210,6 +301,12 @@ fun OTPVerificationStep(
     canResend: Boolean,
     resendCountdown: Int
 ) {
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
     Box(
         modifier = Modifier
             .size(80.dp)
@@ -219,10 +316,11 @@ fun OTPVerificationStep(
             ),
         contentAlignment = Alignment.Center
     ) {
-        Image(
-            painter = painterResource(R.drawable.ic_email_white),
+        Icon(
+            imageVector = Icons.Default.Email,
             contentDescription = null,
-            modifier = Modifier.width(50.dp),
+            tint = Color.White,
+            modifier = Modifier.size(40.dp)
         )
     }
     Spacer(modifier = Modifier.height(24.dp))
@@ -240,12 +338,12 @@ fun OTPVerificationStep(
     if (email.isNotEmpty()) {
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = email,
+            text = "Code sent to ${maskEmail(email)}",
             style = TextStyle(
-                fontSize = 16.sp,
+                fontSize = 15.sp,
                 fontFamily = AlexandriaBold,
                 fontWeight = FontWeight.Bold,
-                color = DentaryBlue,
+                color = Color(0xFFA2A2A2),
                 textAlign = TextAlign.Center,
             )
         )
@@ -256,11 +354,19 @@ fun OTPVerificationStep(
         value = otpCode,
         onValueChange = onOTPCodeChange,
         label = stringResource(R.string.verification_code),
-        errorMessage = if (otpError.isNotEmpty()) otpError else null,
+        errorMessage = otpError.ifEmpty { null },
         keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Number
+            keyboardType = KeyboardType.Number,
+            imeAction = ImeAction.Done
         ),
-        modifier = Modifier.fillMaxWidth()
+        keyboardActions = KeyboardActions(
+            onDone = {
+                onVerifyOTPClick()
+            }
+        ),
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
     )
     Spacer(modifier = Modifier.height(38.dp))
     Text(
@@ -288,7 +394,7 @@ fun OTPVerificationStep(
             val minutes = resendCountdown / 60
             val seconds = resendCountdown % 60
             val timeText = if (resendCountdown >= 60) {
-                "${minutes}:${seconds.toString().padStart(2, '0')}"
+                "$minutes:${seconds.toString().padStart(2, '0')}"
             } else {
                 "${seconds}s"
             }
@@ -338,10 +444,37 @@ fun PasswordChangeStep(
     onLoginClick: () -> Unit,
     isLoading: Boolean,
     passwordError: String?,
-    confirmPasswordError: String?
+    confirmPasswordError: String?,
+    isPasswordVisible: Boolean,
+    onTogglePasswordVisibility: () -> Unit,
+    isConfirmPasswordVisible: Boolean,
+    onToggleConfirmPasswordVisibility: () -> Unit
 ) {
     val focusManager = LocalFocusManager.current
+    val focusRequester = remember { FocusRequester() }
 
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    Box(
+        modifier = Modifier
+            .size(80.dp)
+            .background(
+                color = DentaryBlue,
+                shape = CircleShape
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.Lock,
+            contentDescription = null,
+            tint = Color.White,
+            modifier = Modifier.size(40.dp)
+        )
+    }
+    Spacer(modifier = Modifier.height(24.dp))
+    
     Text(
         text = "Set New Password",
         style = TextStyle(
@@ -385,7 +518,9 @@ fun PasswordChangeStep(
         label = "New Password",
         isError = passwordError != null,
         errorMessage = passwordError,
-        trailingIcon = painterResource(id = R.drawable.ic_lock),
+        trailingIcon = rememberVectorPainter(
+            image = if (isPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+        ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Next,
             keyboardType = KeyboardType.Password
@@ -393,7 +528,11 @@ fun PasswordChangeStep(
         keyboardActions = KeyboardActions(
             onNext = { focusManager.moveFocus(FocusDirection.Down) }
         ),
-        modifier = Modifier.fillMaxWidth()
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        onTrailingIconClick = onTogglePasswordVisibility,
+        modifier = Modifier
+            .fillMaxWidth()
+            .focusRequester(focusRequester)
     )
     Spacer(modifier = Modifier.height(24.dp))
 
@@ -403,7 +542,9 @@ fun PasswordChangeStep(
         label = "Confirm Password",
         isError = confirmPasswordError != null,
         errorMessage = confirmPasswordError,
-        trailingIcon = painterResource(id = R.drawable.ic_lock),
+        trailingIcon = rememberVectorPainter(
+            image = if (isConfirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
+        ),
         keyboardOptions = KeyboardOptions(
             imeAction = ImeAction.Done,
             keyboardType = KeyboardType.Password
@@ -414,6 +555,8 @@ fun PasswordChangeStep(
                 onResetPasswordClick()
             }
         ),
+        visualTransformation = if (isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+        onTrailingIconClick = onToggleConfirmPasswordVisibility,
         modifier = Modifier.fillMaxWidth()
     )
     Spacer(modifier = Modifier.height(42.dp))

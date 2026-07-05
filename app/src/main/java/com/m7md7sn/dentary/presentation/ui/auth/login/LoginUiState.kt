@@ -1,5 +1,6 @@
 package com.m7md7sn.dentary.presentation.ui.auth.login
 
+import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.auth.user.UserInfo
 
@@ -13,5 +14,5 @@ data class LoginUiState(
     val isPasswordVisible: Boolean = false,
     val isLoading: Boolean = false,
 
-    val loginResult: Result<UserInfo>? = null
+    val loginResult: Result<UserInfo, DataError>? = null
 )

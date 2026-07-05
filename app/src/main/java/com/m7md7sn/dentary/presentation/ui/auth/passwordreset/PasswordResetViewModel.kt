@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import com.m7md7sn.dentary.utils.Result
+import com.m7md7sn.dentary.utils.asUiText
 import javax.inject.Inject
 
 data class PasswordResetValidationResult(
@@ -33,6 +34,8 @@ class PasswordResetViewModel @Inject constructor(
     val snackbarMessage: SharedFlow<Event<String>> = _snackbarMessage.asSharedFlow()
 
     fun sendPasswordResetEmail() {
+        if (_uiState.value.isLoading) return
+
         val currentUiState = _uiState.value
         val validationResult = validatePasswordResetInputs(currentUiState.email)
 
@@ -58,12 +61,14 @@ class PasswordResetViewModel @Inject constructor(
                 )
                 startResendCountdown()
             } else if (result is Result.Error) {
-                _snackbarMessage.emit(Event(result.message))
+                _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
             }
         }
     }
 
     fun verifyOTP() {
+        if (_uiState.value.isLoading) return
+
         val currentState = _uiState.value
         val validationResult = validateOTPCode(currentState.otpCode)
 
@@ -93,7 +98,7 @@ class PasswordResetViewModel @Inject constructor(
                     )
                 }
                 is Result.Error -> {
-                    _snackbarMessage.emit(Event(result.message))
+                    _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
                 }
                 is Result.Loading -> { /* Already handled above */ }
             }
@@ -101,6 +106,8 @@ class PasswordResetViewModel @Inject constructor(
     }
 
     fun resetPassword() {
+        if (_uiState.value.isLoading) return
+
         val currentState = _uiState.value
         val passwordValidation = validatePasswords(currentState.newPassword, currentState.confirmPassword)
 
@@ -133,9 +140,13 @@ class PasswordResetViewModel @Inject constructor(
             when (result) {
                 is Result.Success -> {
                     _snackbarMessage.emit(Event("Password reset successfully!"))
+                    _uiState.value = _uiState.value.copy(
+                        isSuccess = true,
+                        currentStep = PasswordResetStep.SUCCESS
+                    )
                 }
                 is Result.Error -> {
-                    _snackbarMessage.emit(Event(result.message))
+                    _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
                 }
                 is Result.Loading -> { /* Already handled above */ }
             }
@@ -143,7 +154,7 @@ class PasswordResetViewModel @Inject constructor(
     }
 
     fun resendPasswordResetEmail() {
-        if (!_uiState.value.canResend) return
+        if (!_uiState.value.canResend || _uiState.value.isResending) return
 
         _uiState.value = _uiState.value.copy(isResending = true)
 
@@ -160,7 +171,7 @@ class PasswordResetViewModel @Inject constructor(
                     startResendCountdown()
                 }
                 is Result.Error -> {
-                    _snackbarMessage.emit(Event(result.message))
+                    _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
                 }
                 is Result.Loading -> { /* Not applicable for this case */ }
             }
@@ -171,15 +182,12 @@ class PasswordResetViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(canResend = false, resendCountdown = 180)
 
         viewModelScope.launch {
-            repeat(180) {
+            while (_uiState.value.resendCountdown > 0) {
                 delay(1000)
-                val currentCountdown = _uiState.value.resendCountdown - 1
-                _uiState.value = _uiState.value.copy(resendCountdown = currentCountdown)
-
-                if (currentCountdown <= 0) {
-                    _uiState.value = _uiState.value.copy(canResend = true, resendCountdown = 0)
-                }
+                val nextValue = _uiState.value.resendCountdown - 1
+                _uiState.value = _uiState.value.copy(resendCountdown = nextValue)
             }
+            _uiState.value = _uiState.value.copy(canResend = true)
         }
     }
 
@@ -203,6 +211,14 @@ class PasswordResetViewModel @Inject constructor(
 
     fun onConfirmPasswordChange(newValue: String) {
         _uiState.value = _uiState.value.copy(confirmPassword = newValue, confirmPasswordError = null)
+    }
+
+    fun toggleNewPasswordVisibility() {
+        _uiState.value = _uiState.value.copy(isPasswordVisible = !_uiState.value.isPasswordVisible)
+    }
+
+    fun toggleConfirmPasswordVisibility() {
+        _uiState.value = _uiState.value.copy(isConfirmPasswordVisible = !_uiState.value.isConfirmPasswordVisible)
     }
 
     // Validation functions

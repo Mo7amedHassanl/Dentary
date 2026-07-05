@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Event
 import com.m7md7sn.dentary.utils.Result
+import com.m7md7sn.dentary.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -32,6 +33,8 @@ class EmailVerificationViewModel @Inject constructor(
     val snackbarMessage: SharedFlow<Event<String>> = _snackbarMessage.asSharedFlow()
 
     fun verifyOTP() {
+        if (_uiState.value.isLoading) return
+
         val currentState = _uiState.value
 
         val validationResult = validateOTPCode(currentState.otpCode)
@@ -71,7 +74,8 @@ class EmailVerificationViewModel @Inject constructor(
                     _snackbarMessage.emit(Event("Email verified successfully!"))
                 }
                 is Result.Error -> {
-                    _snackbarMessage.emit(Event(result.message))
+                    val errorMessage = result.message ?: result.error.asUiText()
+                    _snackbarMessage.emit(Event(errorMessage))
                 }
                 is Result.Loading -> { /* Already handled above */ }
             }
@@ -79,7 +83,7 @@ class EmailVerificationViewModel @Inject constructor(
     }
 
     fun resendVerificationCode() {
-        if (!_uiState.value.canResend) return
+        if (!_uiState.value.canResend || _uiState.value.isResending) return
 
         _uiState.value = _uiState.value.copy(isResending = true)
 
@@ -107,7 +111,8 @@ class EmailVerificationViewModel @Inject constructor(
                     startResendCountdown()
                 }
                 is Result.Error -> {
-                    _snackbarMessage.emit(Event(result.message))
+                    val errorMessage = result.message ?: result.error.asUiText()
+                    _snackbarMessage.emit(Event(errorMessage))
                 }
                 is Result.Loading -> { /* Not applicable for this case */ }
             }
@@ -136,19 +141,16 @@ class EmailVerificationViewModel @Inject constructor(
         _uiState.value = _uiState.value.copy(canResend = false, resendCountdown = 180)
 
         viewModelScope.launch {
-            repeat(180) {
+            while (_uiState.value.resendCountdown > 0) {
                 delay(1000)
-                val currentCountdown = _uiState.value.resendCountdown - 1
-                _uiState.value = _uiState.value.copy(resendCountdown = currentCountdown)
-
-                if (currentCountdown <= 0) {
-                    _uiState.value = _uiState.value.copy(canResend = true, resendCountdown = 0)
-                }
+                val nextValue = _uiState.value.resendCountdown - 1
+                _uiState.value = _uiState.value.copy(resendCountdown = nextValue)
             }
+            _uiState.value = _uiState.value.copy(canResend = true)
         }
     }
 
     fun resetVerificationResult() {
-        _uiState.value = _uiState.value.copy(verificationResult = null)
+        _uiState.value = _uiState.value.copy(verificationResult = null, resendResult = null)
     }
 }

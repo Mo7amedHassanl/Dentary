@@ -3,10 +3,11 @@ package com.m7md7sn.dentary.data.source.remote
 import com.m7md7sn.dentary.data.model.ChatConversation
 import com.m7md7sn.dentary.data.model.ChatMessage
 import com.m7md7sn.dentary.data.model.CreateMessageRequest
+import com.m7md7sn.dentary.data.util.toDataError
+import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import io.github.jan.supabase.postgrest.query.Order
 import javax.inject.Inject
 
 class ChatDataSourceImpl @Inject constructor(
@@ -14,32 +15,33 @@ class ChatDataSourceImpl @Inject constructor(
     private val postgrest: Postgrest
 ) : ChatDataSource {
 
-    override suspend fun getAllConversations(): Result<List<ChatConversation>> {
+    override suspend fun getAllConversations(): Result<List<ChatConversation>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val conversations = postgrest.from("chat_conversations")
+            val conversations = postgrest
+                .from("chat_conversations")
                 .select {
                     filter {
                         eq("user_id", currentUserId)
                     }
-                    order(column = "last_message_at", order = Order.DESCENDING)
                 }
                 .decodeList<ChatConversation>()
 
             Result.Success(conversations)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch conversations")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getConversationByPatient(patientId: String): Result<ChatConversation> {
+    override suspend fun getConversationByPatient(patientId: String): Result<ChatConversation, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val conversation = postgrest.from("chat_conversations")
+            val conversation = postgrest
+                .from("chat_conversations")
                 .select {
                     filter {
                         eq("user_id", currentUserId)
@@ -50,74 +52,64 @@ class ChatDataSourceImpl @Inject constructor(
 
             Result.Success(conversation)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch conversation")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun createConversation(patientId: String): Result<ChatConversation> {
+    override suspend fun createConversation(patientId: String): Result<ChatConversation, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val conversationData = mapOf(
-                "user_id" to currentUserId,
-                "patient_id" to patientId
-            )
-
-            val conversation = postgrest.from("chat_conversations")
-                .insert(conversationData) {
+            val conversation = postgrest
+                .from("chat_conversations")
+                .insert(mapOf("user_id" to currentUserId, "patient_id" to patientId)) {
                     select()
                 }
                 .decodeSingle<ChatConversation>()
 
             Result.Success(conversation)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to create conversation")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getMessagesByConversation(conversationId: String): Result<List<ChatMessage>> {
+    override suspend fun getMessagesByConversation(conversationId: String): Result<List<ChatMessage>, DataError> {
         return try {
-            val messages = postgrest.from("chat_messages")
+            val messages = postgrest
+                .from("chat_messages")
                 .select {
                     filter {
                         eq("conversation_id", conversationId)
                     }
-                    order(column = "created_at", order = Order.ASCENDING)
                 }
                 .decodeList<ChatMessage>()
 
             Result.Success(messages)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch messages")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun sendMessage(request: CreateMessageRequest): Result<ChatMessage> {
+    override suspend fun sendMessage(request: CreateMessageRequest): Result<ChatMessage, DataError> {
         return try {
-            val message = postgrest.from("chat_messages")
+            val message = postgrest
+                .from("chat_messages")
                 .insert(request) {
                     select()
                 }
                 .decodeSingle<ChatMessage>()
 
-            // Update conversation's last_message_at
-            postgrest.from("chat_conversations")
-                .update(mapOf("last_message_at" to "NOW()")) {
-                    filter {
-                        eq("id", request.conversationId)
-                    }
-                }
-
             Result.Success(message)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to send message")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun markMessageAsRead(messageId: String): Result<Unit> {
+    override suspend fun markMessageAsRead(messageId: String): Result<Unit, DataError> {
         return try {
-            postgrest.from("chat_messages")
+            postgrest
+                .from("chat_messages")
                 .update(mapOf("is_read" to true)) {
                     filter {
                         eq("id", messageId)
@@ -126,23 +118,23 @@ class ChatDataSourceImpl @Inject constructor(
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to mark message as read")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun markConversationAsRead(conversationId: String): Result<Unit> {
+    override suspend fun markConversationAsRead(conversationId: String): Result<Unit, DataError> {
         return try {
-            postgrest.from("chat_messages")
+            postgrest
+                .from("chat_messages")
                 .update(mapOf("is_read" to true)) {
                     filter {
                         eq("conversation_id", conversationId)
-                        eq("is_read", false)
                     }
                 }
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to mark conversation as read")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 }

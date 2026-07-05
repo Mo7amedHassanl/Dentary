@@ -32,9 +32,13 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterStep
 
 @Composable
 fun RegisterContent(
+    currentStep: RegisterStep,
+    onNextClick: () -> Unit,
+    onBackClick: () -> Unit,
     onRegisterClick: () -> Unit,
     onLoginClick: () -> Unit,
     email: String,
@@ -44,7 +48,7 @@ fun RegisterContent(
     password: String,
     onPasswordValueChange: (String) -> Unit,
     confirmPassword: String,
-    onConfirmPasswordValueChange: (String) -> Unit,
+    onConfirmPasswordChange: (String) -> Unit,
     isLoading: Boolean,
     isEmailError: Boolean,
     emailErrorMessage: String?,
@@ -80,7 +84,7 @@ fun RegisterContent(
     ) {
         Text(
             text = stringResource(R.string.register),
-            modifier = Modifier.padding(bottom = 24.dp),
+            modifier = Modifier.padding(bottom = 18.dp),
             style = TextStyle(
                 fontSize = 22.sp,
                 fontFamily = AlexandriaBlack,
@@ -89,25 +93,109 @@ fun RegisterContent(
                 color = DentaryBlue
             )
         )
+        
+        RegisterStepIndicator(currentStep = currentStep)
+        
+        Spacer(Modifier.height(24.dp))
+        
+        when (currentStep) {
+            RegisterStep.ACCOUNT_INFO -> {
+                AccountInfoStep(
+                    username = username,
+                    onUsernameChange = onUsernameValueChange,
+                    usernameError = usernameErrorMessage ?: "",
+                    isUsernameError = isUsernameError,
+                    email = email,
+                    onEmailChange = onEmailValueChange,
+                    emailError = emailErrorMessage ?: "",
+                    isEmailError = isEmailError,
+                    password = password,
+                    onPasswordChange = onPasswordValueChange,
+                    passwordError = passwordErrorMessage ?: "",
+                    isPasswordError = isPasswordError,
+                    confirmPassword = confirmPassword,
+                    onConfirmPasswordChange = onConfirmPasswordChange,
+                    confirmPasswordError = confirmPasswordErrorMessage ?: "",
+                    isConfirmPasswordError = isConfirmPasswordError,
+                    isPasswordVisible = isPasswordVisible,
+                    onTogglePasswordVisibility = onTogglePasswordVisibility,
+                    isConfirmPasswordVisible = isConfirmPasswordVisible,
+                    onToggleConfirmPasswordVisibility = onToggleConfirmPasswordVisibility,
+                    onNextClick = onNextClick,
+                    onLoginClick = onLoginClick
+                )
+            }
+            RegisterStep.CLINIC_INFO -> {
+                ClinicInfoStep(
+                    clinicName = clinicName,
+                    onClinicNameChange = onClinicNameValueChange,
+                    clinicNameError = clinicNameErrorMessage ?: "",
+                    isClinicNameError = isClinicNameError,
+                    clinicAddress = clinicAddress,
+                    onClinicAddressChange = onClinicAddressValueChange,
+                    clinicAddressError = clinicAddressErrorMessage ?: "",
+                    isClinicAddressError = isClinicAddressError,
+                    clinicPhone = clinicPhone,
+                    onClinicPhoneChange = onClinicPhoneValueChange,
+                    clinicPhoneError = clinicPhoneErrorMessage ?: "",
+                    isClinicPhoneError = isClinicPhoneError,
+                    isLoading = isLoading,
+                    onBackClick = onBackClick,
+                    onRegisterClick = onRegisterClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AccountInfoStep(
+    username: String,
+    onUsernameChange: (String) -> Unit,
+    usernameError: String,
+    isUsernameError: Boolean,
+    email: String,
+    onEmailChange: (String) -> Unit,
+    emailError: String,
+    isEmailError: Boolean,
+    password: String,
+    onPasswordChange: (String) -> Unit,
+    passwordError: String,
+    isPasswordError: Boolean,
+    confirmPassword: String,
+    onConfirmPasswordChange: (String) -> Unit,
+    confirmPasswordError: String,
+    isConfirmPasswordError: Boolean,
+    isPasswordVisible: Boolean,
+    onTogglePasswordVisibility: () -> Unit,
+    isConfirmPasswordVisible: Boolean,
+    onToggleConfirmPasswordVisibility: () -> Unit,
+    onNextClick: () -> Unit,
+    onLoginClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         SectionTitle(
             title = R.string.register_information,
             titleIcon = R.drawable.ic_lock_round,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
         RegisterInformationTextFields(
             modifier = Modifier.fillMaxWidth(),
             name = username,
-            onNameChange = onUsernameValueChange,
+            onNameChange = onUsernameChange,
             email = email,
-            onEmailChange = onEmailValueChange,
+            onEmailChange = onEmailChange,
             password = password,
-            onPasswordChange = onPasswordValueChange,
+            onPasswordChange = onPasswordChange,
             confirmPassword = confirmPassword,
-            onConfirmPasswordChange = onConfirmPasswordValueChange,
-            nameError = usernameErrorMessage ?: "",
-            emailError = emailErrorMessage ?: "",
-            passwordError = passwordErrorMessage ?: "",
-            confirmPasswordError = confirmPasswordErrorMessage ?: "",
+            onConfirmPasswordChange = onConfirmPasswordChange,
+            nameError = usernameError,
+            emailError = emailError,
+            passwordError = passwordError,
+            confirmPasswordError = confirmPasswordError,
             isNameError = isUsernameError,
             isEmailError = isEmailError,
             isPasswordError = isPasswordError,
@@ -118,22 +206,53 @@ fun RegisterContent(
             onToggleConfirmPasswordVisibility = onToggleConfirmPasswordVisibility,
         )
         Spacer(Modifier.height(24.dp))
+        CommonButton(
+            text = "Next",
+            onClick = onNextClick
+        )
+        Spacer(Modifier.height(18.dp))
+        LoginRedirectSection(onLoginClick)
+    }
+}
+
+@Composable
+fun ClinicInfoStep(
+    clinicName: String,
+    onClinicNameChange: (String) -> Unit,
+    clinicNameError: String,
+    isClinicNameError: Boolean,
+    clinicAddress: String,
+    onClinicAddressChange: (String) -> Unit,
+    clinicAddressError: String,
+    isClinicAddressError: Boolean,
+    clinicPhone: String,
+    onClinicPhoneChange: (String) -> Unit,
+    clinicPhoneError: String,
+    isClinicPhoneError: Boolean,
+    isLoading: Boolean,
+    onBackClick: () -> Unit,
+    onRegisterClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         SectionTitle(
             title = R.string.clinic_information,
             titleIcon = R.drawable.ic_clinic,
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
         RegisterClinicInformationTextFields(
             modifier = Modifier.fillMaxWidth(),
             clinicName = clinicName,
-            onClinicNameChange = onClinicNameValueChange,
+            onClinicNameChange = onClinicNameChange,
             clinicAddress = clinicAddress,
-            onClinicAddressChange = onClinicAddressValueChange,
+            onClinicAddressChange = onClinicAddressChange,
             clinicPhoneNumber = clinicPhone,
-            onClinicPhoneNumberChange = onClinicPhoneValueChange,
-            clinicNameError = clinicNameErrorMessage ?: "",
-            clinicAddressError = clinicAddressErrorMessage ?: "",
-            clinicPhoneNumberError = clinicPhoneErrorMessage ?: "",
+            onClinicPhoneNumberChange = onClinicPhoneChange,
+            clinicNameError = clinicNameError,
+            clinicAddressError = clinicAddressError,
+            clinicPhoneNumberError = clinicPhoneError,
             isClinicNameError = isClinicNameError,
             isClinicAddressError = isClinicAddressError,
             isClinicPhoneNumberError = isClinicPhoneError,
@@ -142,9 +261,27 @@ fun RegisterContent(
         CommonButton(
             text = stringResource(R.string.register_confirm),
             onClick = onRegisterClick,
-            isLoading = isLoading
+            isLoading = isLoading,
+            enabled = !isLoading
         )
-        Spacer(Modifier.height(18.dp))
+        Spacer(Modifier.height(12.dp))
+        TextButton(onClick = onBackClick, enabled = !isLoading) {
+            Text(
+                text = "Back",
+                style = TextStyle(
+                    fontSize = 14.sp,
+                    fontFamily = AlexandriaBold,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFFA2A2A2)
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun LoginRedirectSection(onLoginClick: () -> Unit) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(
             text = stringResource(R.string.have_account),
             style = TextStyle(

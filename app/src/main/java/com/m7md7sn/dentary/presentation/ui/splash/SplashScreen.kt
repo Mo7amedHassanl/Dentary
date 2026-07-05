@@ -44,7 +44,6 @@ fun SplashScreen(
         delay(800)
     }
 
-    // Handle navigation based on UI state
     LaunchedEffect(uiState.navigationState) {
         when (uiState.navigationState) {
             NavigationState.NavigateToHome -> {
@@ -55,8 +54,7 @@ fun SplashScreen(
                 onNavigateToLogin()
                 viewModel.resetNavigationState()
             }
-            null -> {
-                // Still loading or initial state
+            NavigationState.Idle -> {
             }
         }
     }

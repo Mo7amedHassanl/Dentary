@@ -33,8 +33,9 @@ fun ForgetPasswordButton(
                 fontFamily = AlexandriaRegular,
                 fontWeight = FontWeight.Normal,
                 color = if (enabled) Color(0xFFA2A2A2) else Color(0xFFD3D3D3),
-                textAlign = TextAlign.Center,
-            )
+                textAlign = TextAlign.End,
+            ),
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

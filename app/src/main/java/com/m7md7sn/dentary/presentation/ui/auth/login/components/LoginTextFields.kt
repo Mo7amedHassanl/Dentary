@@ -66,7 +66,7 @@ fun LoginTextFields(
         keyboardActions = KeyboardActions(
             onDone = {
                 focusManager.clearFocus()
-                onDone
+                onDone()
             }
         ),
         keyboardOptions = KeyboardOptions(

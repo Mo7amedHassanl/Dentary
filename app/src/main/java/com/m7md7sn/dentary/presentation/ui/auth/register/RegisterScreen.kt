@@ -1,7 +1,6 @@
 package com.m7md7sn.dentary.presentation.ui.auth.register
 
 import androidx.compose.foundation.layout.Box
-import com.m7md7sn.dentary.utils.Result
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.rememberScrollState
@@ -49,23 +48,14 @@ fun RegisterScreen(
 
     LaunchedEffect(uiState.needsEmailVerification) {
         if (uiState.needsEmailVerification) {
-            println("RegisterScreen: Navigating to email verification with email: '${uiState.email}'")
-            onNavigateToEmailVerification(uiState.email)
-            viewModel.resetSignupResult()
-        }
-    }
-
-    LaunchedEffect(uiState.signupResult) {
-        when (uiState.signupResult) {
-            is Result.Error -> {
-                val errorMessage = (uiState.signupResult as Result.Error).message
-                scope.launch { snackbarHostState.showSnackbar(errorMessage) }
+            val emailToVerify = uiState.verificationEmail ?: uiState.email
+            if (emailToVerify.isNotBlank()) {
+                println("RegisterScreen: Navigating to email verification with email: '$emailToVerify'")
+                onNavigateToEmailVerification(emailToVerify)
                 viewModel.resetSignupResult()
             }
-            else -> {}
         }
     }
-
 
     Surface(
         color = BackgroundColor,
@@ -81,6 +71,9 @@ fun RegisterScreen(
             ) {
                 RegisterHeader()
                 RegisterContent(
+                    currentStep = uiState.currentStep,
+                    onNextClick = viewModel::navigateToClinicInfo,
+                    onBackClick = viewModel::navigateBackToAccountInfo,
                     onLoginClick = onLoginClick,
                     onRegisterClick = viewModel::register,
                     modifier = Modifier.fillMaxSize(),
@@ -91,7 +84,7 @@ fun RegisterScreen(
                     password = uiState.password,
                     onPasswordValueChange = viewModel::onPasswordChange,
                     confirmPassword = uiState.confirmPassword,
-                    onConfirmPasswordValueChange = viewModel::onConfirmPasswordChange,
+                    onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
                     isLoading = uiState.isLoading,
                     isEmailError = uiState.emailError != null,
                     emailErrorMessage = uiState.emailError,

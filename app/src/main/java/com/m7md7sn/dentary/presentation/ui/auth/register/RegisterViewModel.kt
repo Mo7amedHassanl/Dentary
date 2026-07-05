@@ -6,8 +6,9 @@ import com.m7md7sn.dentary.data.model.SignUpCredentials
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Event
 import com.m7md7sn.dentary.utils.Result
+import com.m7md7sn.dentary.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
-import jakarta.inject.Inject
+import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -39,6 +40,8 @@ class RegisterViewModel @Inject constructor(
     val snackbarMessage: SharedFlow<Event<String>> = _snackbarMessage.asSharedFlow()
 
     fun register() {
+        if (_uiState.value.isLoading) return
+
         val currentState = _uiState.value
         val validationResult = validateAllInputs(currentState)
 
@@ -57,9 +60,10 @@ class RegisterViewModel @Inject constructor(
 
         _uiState.value = _uiState.value.copy(isLoading = true, signupResult = Result.Loading)
         viewModelScope.launch {
+            val signUpEmail = _uiState.value.email
             val result = authRepository.signUp(
                 SignUpCredentials(
-                    email = _uiState.value.email,
+                    email = signUpEmail,
                     username = _uiState.value.username,
                     password = _uiState.value.password,
                     clinicName = _uiState.value.clinicName,
@@ -73,22 +77,40 @@ class RegisterViewModel @Inject constructor(
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
                         signupResult = result,
-                        needsEmailVerification = true
+                        needsEmailVerification = true,
+                        verificationEmail = signUpEmail
                     )
                     _snackbarMessage.emit(Event("Registration successful! Please check your email for verification code."))
                 }
                 is Result.Error -> {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        signupResult = result,
-                        needsEmailVerification = false
-                    )
-                    _snackbarMessage.emit(Event(result.message))
+                    // Check if it's actually a success that needs verification 
+                    // (Supabase sometimes returns an error if email isn't confirmed yet)
+                    val isEmailNotConfirmed = result.message?.contains("Email not confirmed", ignoreCase = true) == true
+                    
+                    if (isEmailNotConfirmed) {
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            signupResult = null, // Just reset it or keep as is, navigation depends on needsEmailVerification
+                            needsEmailVerification = true,
+                            verificationEmail = signUpEmail
+                        )
+
+                        _snackbarMessage.emit(Event("Registration successful! Please check your email for verification code."))
+                    } else {
+                        val errorMessage = result.message ?: result.error.asUiText()
+                        _uiState.value = _uiState.value.copy(
+                            isLoading = false,
+                            signupResult = result,
+                            needsEmailVerification = false
+                        )
+                        _snackbarMessage.emit(Event(errorMessage))
+                    }
                 }
                 is Result.Loading -> {
                     // Already handled above
                 }
             }
+
         }
     }
 
@@ -130,12 +152,32 @@ class RegisterViewModel @Inject constructor(
             _uiState.value.copy(isConfirmPasswordVisible = !_uiState.value.isConfirmPasswordVisible)
     }
 
+    fun navigateToClinicInfo() {
+        val currentState = _uiState.value
+        val usernameError = validateUsername(currentState.username)
+        val emailError = validateEmail(currentState.email)
+        val passwordError = validatePassword(currentState.password)
+        val confirmPasswordError = validateConfirmPassword(currentState.password, currentState.confirmPassword)
+
+        if (usernameError == null && emailError == null && passwordError == null && confirmPasswordError == null) {
+            _uiState.value = currentState.copy(currentStep = RegisterStep.CLINIC_INFO)
+        } else {
+            _uiState.value = currentState.copy(
+                usernameError = usernameError,
+                emailError = emailError,
+                passwordError = passwordError,
+                confirmPasswordError = confirmPasswordError
+            )
+        }
+    }
+
+    fun navigateBackToAccountInfo() {
+        _uiState.value = _uiState.value.copy(currentStep = RegisterStep.ACCOUNT_INFO)
+    }
+
     private fun validateUsername(username: String): String? {
         return when {
             username.isBlank() -> "Username cannot be empty"
-            username.length < 3 -> "Username must be at least 3 characters"
-            username.length > 20 -> "Username cannot exceed 20 characters"
-            !username.matches(Regex("^[a-zA-Z0-9._]+$")) -> "Username can only contain letters, numbers, dots, and underscores"
             else -> null
         }
     }
@@ -222,6 +264,10 @@ class RegisterViewModel @Inject constructor(
     }
 
     fun resetSignupResult() {
-        _uiState.value = _uiState.value.copy(signupResult = null)
+        _uiState.value = _uiState.value.copy(
+            signupResult = null,
+            needsEmailVerification = false,
+            verificationEmail = null
+        )
     }
 }

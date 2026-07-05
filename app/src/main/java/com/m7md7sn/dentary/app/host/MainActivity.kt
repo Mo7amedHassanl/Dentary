@@ -4,13 +4,17 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.activity.ComponentActivity
+import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.compose.rememberNavController
 import com.m7md7sn.dentary.presentation.navigation.DentaryNavHost
+import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
 import com.m7md7sn.dentary.utils.LocaleUtils
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +29,9 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.dark(DentaryLightBlue.toArgb())
+        )
         val isRtl = Locale.getDefault().language == "ar"
         window.decorView.layoutDirection = if (isRtl) View.LAYOUT_DIRECTION_RTL else View.LAYOUT_DIRECTION_LTR
 

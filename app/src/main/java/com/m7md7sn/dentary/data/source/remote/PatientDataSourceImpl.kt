@@ -4,6 +4,8 @@ import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.data.model.CreatePatientRequest
 import com.m7md7sn.dentary.data.model.MedicalProcedureStats
 import com.m7md7sn.dentary.data.repository.PatientImageManager
+import com.m7md7sn.dentary.data.util.toDataError
+import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
@@ -16,10 +18,10 @@ class PatientDataSourceImpl @Inject constructor(
     private val patientImageManager: PatientImageManager
 ) : PatientDataSource {
 
-    override suspend fun getAllPatients(): Result<List<Patient>> {
+    override suspend fun getAllPatients(): Result<List<Patient>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             val patients = postgrest
                 .from("patients")
@@ -32,14 +34,14 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(patients)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch patients")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getPatientById(id: String): Result<Patient> {
+    override suspend fun getPatientById(id: String): Result<Patient, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             val patient = postgrest
                 .from("patients")
@@ -53,14 +55,14 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(patient)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch patient")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun createPatient(patient: Patient): Result<Patient> {
+    override suspend fun createPatient(patient: Patient): Result<Patient, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             // Create PatientInsert object without ID for insertion
             val createPatientRequest = CreatePatientRequest(
@@ -72,7 +74,8 @@ class PatientDataSourceImpl @Inject constructor(
                 address = patient.address,
                 medicalHistory = patient.medicalHistory,
                 medicalProcedure = patient.medicalProcedure,
-                image = patient.image
+                image = patient.image,
+                gender = patient.gender
             )
 
             val createdPatient = postgrest
@@ -84,14 +87,14 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(createdPatient)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to create patient")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun updatePatient(id: String, patient: Patient): Result<Patient> {
+    override suspend fun updatePatient(id: String, patient: Patient): Result<Patient, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             val updatedPatient = postgrest
                 .from("patients")
@@ -106,14 +109,14 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(updatedPatient)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to update patient")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun deletePatient(id: String): Result<Unit> {
+    override suspend fun deletePatient(id: String): Result<Unit, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             postgrest
                 .from("patients")
@@ -126,14 +129,14 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to delete patient")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun searchPatients(query: String): Result<List<Patient>> {
+    override suspend fun searchPatients(query: String): Result<List<Patient>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             val patients = postgrest
                 .from("patients")
@@ -147,14 +150,14 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(patients)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to search patients")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun getMedicalProcedureStats(): Result<List<MedicalProcedureStats>> {
+    override suspend fun getMedicalProcedureStats(): Result<List<MedicalProcedureStats>, DataError> {
         return try {
             val currentUserId = auth.currentUserOrNull()?.id
-                ?: return Result.Error("User not authenticated")
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
             val patients = postgrest
                 .from("patients")
@@ -177,7 +180,7 @@ class PatientDataSourceImpl @Inject constructor(
 
             // Calculate statistics from patients data
             val patientStats = patients
-                .filter { it.medicalProcedure != null && it.medicalProcedure.isNotEmpty() }
+                .filter { it.medicalProcedure != null && it.medicalProcedure!!.isNotEmpty() }
                 .groupBy { it.medicalProcedure }
                 .mapValues { it.value.size }
 
@@ -191,11 +194,11 @@ class PatientDataSourceImpl @Inject constructor(
 
             Result.Success(stats)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to fetch medical procedure stats")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 
-    override suspend fun uploadPatientImage(imageUri: Uri, oldImageUrl: String?): Result<String> {
+    override suspend fun uploadPatientImage(imageUri: Uri, oldImageUrl: String?): Result<String, DataError> {
         return try {
             val uploadResult = patientImageManager.uploadPatientImage(imageUri, oldImageUrl)
             
@@ -204,14 +207,14 @@ class PatientDataSourceImpl @Inject constructor(
                     Result.Success(uploadResult.data)
                 }
                 is Result.Error -> {
-                    Result.Error(uploadResult.message ?: "Failed to upload patient image")
+                    Result.Error(uploadResult.error, uploadResult.message ?: "Failed to upload patient image")
                 }
                 else -> {
-                    Result.Error("Unknown error occurred during upload")
+                    Result.Error(DataError.Network.UNKNOWN, "Unknown error occurred during upload")
                 }
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to upload patient image")
+            Result.Error(e.toDataError(), e.message)
         }
     }
 }

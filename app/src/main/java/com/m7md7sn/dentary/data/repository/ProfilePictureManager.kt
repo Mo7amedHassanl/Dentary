@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import com.m7md7sn.dentary.data.util.toDataError
+import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.storage.Storage
 import kotlinx.coroutines.Dispatchers
@@ -20,12 +22,12 @@ class ProfilePictureManager @Inject constructor(
     private val context: Context
 ) {
 
-    suspend fun uploadProfilePicture(imageUri: Uri, oldImageUrl: String? = null): Result<String> {
+    suspend fun uploadProfilePicture(imageUri: Uri, oldImageUrl: String? = null): Result<String, DataError> {
         return withContext(Dispatchers.IO) {
             try {
                 val currentUser = authRepository.getCurrentUser()
                 if (currentUser == null) {
-                    return@withContext Result.Error("User not authenticated")
+                    return@withContext Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
                 }
 
                 // Delete old image if it exists
@@ -65,7 +67,7 @@ class ProfilePictureManager @Inject constructor(
                         data = compressedImageBytes
                     )
                 } catch (uploadException: Exception) {
-                    return@withContext Result.Error("Failed to upload to storage: ${uploadException.message}")
+                    return@withContext Result.Error(uploadException.toDataError(), "Failed to upload to storage: ${uploadException.message}")
                 }
 
                 // Get public URL
@@ -73,7 +75,7 @@ class ProfilePictureManager @Inject constructor(
 
                 Result.Success(publicUrl)
             } catch (e: Exception) {
-                Result.Error(e.message ?: "Failed to upload profile picture")
+                Result.Error(e.toDataError(), e.message)
             }
         }
     }
@@ -128,21 +130,20 @@ class ProfilePictureManager @Inject constructor(
         }
     }
 
-    suspend fun deleteProfilePicture(imageUrl: String): Result<Unit> {
+    suspend fun deleteProfilePicture(imageUrl: String): Result<Unit, DataError> {
         return withContext(Dispatchers.IO) {
             try {
                 val currentUser = authRepository.getCurrentUser()
                 if (currentUser == null) {
-                    return@withContext Result.Error("User not authenticated")
+                    return@withContext Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
                 }
 
                 println("Deleting image with URL: $imageUrl")
 
                 // Extract the path from Supabase URL
-                // Supabase URLs look like: https://xxx.supabase.co/storage/v1/object/public/avatars/profile_pictures/user_id/filename.jpg
                 val pathStart = imageUrl.indexOf("/avatars/")
                 if (pathStart == -1) {
-                    return@withContext Result.Error("Invalid Supabase URL format")
+                    return@withContext Result.Error(DataError.Network.UNKNOWN, "Invalid Supabase URL format")
                 }
                 
                 val storagePath = imageUrl.substring(pathStart + 9) // Skip "/avatars/"
@@ -233,12 +234,12 @@ class ProfilePictureManager @Inject constructor(
                     Result.Success(Unit)
                 } else {
                     println("All deletion strategies failed. Last error: $lastError")
-                    Result.Error("Failed to delete profile picture after trying all strategies: $lastError")
+                    Result.Error(DataError.Network.UNKNOWN, "Failed to delete profile picture after trying all strategies: $lastError")
                 }
             } catch (e: Exception) {
                 println("Exception in deleteProfilePicture: ${e.message}")
-                Result.Error(e.message ?: "Failed to delete profile picture")
+                Result.Error(e.toDataError(), e.message)
             }
         }
     }
-} 
+}

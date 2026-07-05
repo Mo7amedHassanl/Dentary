@@ -2,6 +2,8 @@ package com.m7md7sn.dentary.data.source.remote
 
 import com.m7md7sn.dentary.data.model.LoginCredentials
 import com.m7md7sn.dentary.data.model.SignUpCredentials
+import com.m7md7sn.dentary.data.util.toDataError
+import com.m7md7sn.dentary.domain.model.DataError
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.builtin.Email
 import io.github.jan.supabase.auth.user.UserInfo
@@ -11,7 +13,7 @@ import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 import javax.inject.Inject
 import kotlinx.coroutines.withTimeout
-import kotlinx.coroutines.TimeoutCancellationException
+import kotlin.time.Duration.Companion.seconds
 
 class AuthDataSourceImpl @Inject constructor(
     private val auth: Auth
@@ -19,25 +21,15 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun getCurrentUser(): UserInfo? {
         return try {
-            // Add timeout to prevent hanging requests
-            withTimeout(10000) { // 10 second timeout
+            withTimeout(15.seconds) {
                 auth.retrieveUserForCurrentSession(updateSession = true)
             }
-        } catch (timeoutException: TimeoutCancellationException) {
-            null
         } catch (e: Exception) {
-            try {
-                withTimeout(5000) { // 5 second timeout for refresh
-                    auth.refreshCurrentSession()
-                    auth.currentUserOrNull()
-                }
-            } catch (refreshException: Exception) {
-                null
-            }
+            auth.currentUserOrNull()
         }
     }
 
-    override suspend fun login(credentials: LoginCredentials): Result<UserInfo> {
+    override suspend fun login(credentials: LoginCredentials): Result<UserInfo, DataError> {
         return try {
             auth.signInWith(Email) {
                 email = credentials.email
@@ -48,16 +40,16 @@ class AuthDataSourceImpl @Inject constructor(
             if (userInfo != null) {
                 Result.Success(userInfo)
             } else {
-                Result.Error("Authentication failed - user not found")
+                Result.Error(DataError.Auth.INVALID_CREDENTIALS, "Login failed - user not found")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Login failed")
+            Result.Error(e.toDataError(), e.message ?: "Login failed")
         }
     }
 
-    override suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo> {
+    override suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo, DataError> {
         return try {
-            val userSession = auth.signUpWith(Email) {
+            val userInfo = auth.signUpWith(Email) {
                 email = credentials.email
                 password = credentials.password
                 data = buildJsonObject {
@@ -69,44 +61,42 @@ class AuthDataSourceImpl @Inject constructor(
                 }
             }
 
-            if (userSession != null) {
-                Result.Success(userSession)
-            } else {
-                Result.Error("Sign up failed - please try again")
-            }
+            Result.Success(userInfo ?: auth.currentUserOrNull()!!)
+
+
+
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Registration failed")
+            Result.Error(e.toDataError(), e.message ?: "Registration failed")
         }
     }
 
-    override suspend fun signOut(): Result<Unit> {
+    override suspend fun signOut(): Result<Unit, DataError> {
         return try {
             auth.signOut()
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Sign out failed")
+            Result.Error(e.toDataError(), e.message ?: "Sign out failed")
         }
     }
 
-    override suspend fun sendPasswordResetEmail(email: String): Result<Unit> {
+    override suspend fun sendPasswordResetEmail(email: String): Result<Unit, DataError> {
         return try {
             auth.resetPasswordForEmail(email)
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to send password reset email")
+            Result.Error(e.toDataError(), e.message ?: "Failed to send reset email")
         }
     }
 
     override suspend fun isSessionValid(): Boolean {
         return try {
-            val user = getCurrentUser()
-            user != null && auth.currentSessionOrNull() != null
+            auth.currentSessionOrNull() != null
         } catch (e: Exception) {
             false
         }
     }
 
-    override suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo> {
+    override suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo, DataError> {
         return try {
             auth.verifyEmailOtp(
                 type = OtpType.Email.SIGNUP,
@@ -117,35 +107,27 @@ class AuthDataSourceImpl @Inject constructor(
             if (userInfo != null) {
                 Result.Success(userInfo)
             } else {
-                Result.Error("Email verification failed")
+                Result.Error(DataError.Auth.UNKNOWN, "Verification succeeded, but user data is not available yet.")
             }
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Email verification failed")
+            Result.Error(e.toDataError(), e.message ?: "Verification failed")
         }
     }
 
-    override suspend fun resendEmailVerification(email: String): Result<Unit> {
+    override suspend fun resendEmailVerification(email: String): Result<Unit, DataError> {
         return try {
-            // This should resend signup verification, not password reset
             auth.resendEmail(
                 type = OtpType.Email.SIGNUP,
                 email = email
             )
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to resend verification email")
+            Result.Error(e.toDataError(), e.message ?: "Failed to resend code")
         }
     }
 
-    override suspend fun verifyPasswordResetOTP(email: String, token: String): Result<Unit> {
+    override suspend fun verifyPasswordResetOTP(email: String, token: String): Result<Unit, DataError> {
         return try {
-            // Sign out any existing session to ensure clean state
-            try {
-                auth.signOut()
-            } catch (e: Exception) {
-                // Ignore if already signed out
-            }
-
             auth.verifyEmailOtp(
                 type = OtpType.Email.RECOVERY,
                 email = email,
@@ -153,69 +135,53 @@ class AuthDataSourceImpl @Inject constructor(
             )
             Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to verify password reset OTP")
+            Result.Error(e.toDataError(), e.message ?: "OTP verification failed")
         }
     }
 
-    override suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit> {
+    override suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit, DataError> {
         return try {
             auth.updateUser {
                 password = newPassword
             }
-
-            // Sign out the user after password reset to ensure they need to log in again
-            auth.signOut()
-
             Result.Success(Unit)
         } catch (e: Exception) {
-            println("Error resetting password: ${e.message}")
-            Result.Error(e.message ?: "Failed to reset password")
+            Result.Error(e.toDataError(), e.message ?: "Failed to reset password")
         }
     }
 
-    override suspend fun refreshSession(): Result<UserInfo> {
+    override suspend fun refreshSession(): Result<UserInfo, DataError> {
         return try {
-            withTimeout(10000) {
-                auth.refreshCurrentSession()
-                val userInfo = auth.currentUserOrNull()
-                if (userInfo != null) {
-                    Result.Success(userInfo)
-                } else {
-                    Result.Error("Session refresh failed - please log in again")
-                }
+            auth.refreshCurrentSession()
+            val userInfo = auth.currentUserOrNull()
+            if (userInfo != null) {
+                Result.Success(userInfo)
+            } else {
+                Result.Error(DataError.Auth.SESSION_EXPIRED, "Session expired")
             }
-        } catch (timeoutException: TimeoutCancellationException) {
-            Result.Error("Session refresh timed out")
         } catch (e: Exception) {
-            Result.Error("Session expired - please log in again")
+            Result.Error(e.toDataError(), "Session expired")
         }
     }
 
-    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit> {
+    override suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit, DataError> {
         return try {
-            val user = auth.currentUserOrNull()
-            val email = user?.email
-            if (email.isNullOrEmpty()) {
-                return Result.Error("User email not found")
-            }
-            // Step 1: Verify current password by logging in
+            val user = auth.currentUserOrNull() ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
+            val email = user.email ?: return Result.Error(DataError.Auth.USER_NOT_FOUND, "Email not found")
+            
             try {
                 auth.signInWith(Email) {
                     this.email = email
                     this.password = currentPassword
                 }
             } catch (e: Exception) {
-                return Result.Error("Current password is incorrect")
+                return Result.Error(DataError.Auth.INVALID_CREDENTIALS, "Current password is incorrect")
             }
-            // Step 2: Update password
-            try {
-                auth.updateUser { password = newPassword }
-                Result.Success(Unit)
-            } catch (e: Exception) {
-                Result.Error(e.message ?: "Failed to update password")
-            }
+            
+            auth.updateUser { password = newPassword }
+            Result.Success(Unit)
         } catch (e: Exception) {
-            Result.Error(e.message ?: "Failed to change password")
+            Result.Error(e.toDataError(), e.message ?: "Failed to change password")
         }
     }
 }

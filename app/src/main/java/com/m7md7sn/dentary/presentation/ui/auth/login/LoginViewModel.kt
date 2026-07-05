@@ -3,9 +3,10 @@ package com.m7md7sn.dentary.presentation.ui.auth.login
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.model.LoginCredentials
-import com.m7md7sn.dentary.data.repository.AuthRepository
+import com.m7md7sn.dentary.domain.usecase.auth.LoginUseCase
 import com.m7md7sn.dentary.utils.Event
 import com.m7md7sn.dentary.utils.Result
+import com.m7md7sn.dentary.utils.asUiText
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +25,7 @@ data class ValidationResult(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository
+    private val loginUseCase: LoginUseCase
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -33,6 +34,8 @@ class LoginViewModel @Inject constructor(
     val snackbarMessage: SharedFlow<Event<String>> = _snackbarMessage.asSharedFlow()
 
     fun login() {
+        if (_uiState.value.isLoading) return
+
         val currentUiState = _uiState.value
         val validationResult = validateLoginInputs(currentUiState.email, currentUiState.password)
 
@@ -46,7 +49,7 @@ class LoginViewModel @Inject constructor(
 
         _uiState.value = currentUiState.copy(isLoading = true, loginResult = Result.Loading)
         viewModelScope.launch {
-            val result = authRepository.login(
+            val result = loginUseCase(
                 LoginCredentials(
                     email = currentUiState.email,
                     password = currentUiState.password
@@ -55,7 +58,8 @@ class LoginViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = false, loginResult = result)
 
             if (result is Result.Error) {
-                _snackbarMessage.emit(Event(result.message.lines().first()))
+                val errorMessage = result.message ?: result.error.asUiText()
+                _snackbarMessage.emit(Event(errorMessage))
             }
         }
     }

@@ -2,21 +2,21 @@ package com.m7md7sn.dentary.data.source.remote
 
 import com.m7md7sn.dentary.data.model.LoginCredentials
 import com.m7md7sn.dentary.data.model.SignUpCredentials
+import com.m7md7sn.dentary.domain.model.DataError
 import io.github.jan.supabase.auth.user.UserInfo
 import com.m7md7sn.dentary.utils.Result
 
-
 interface AuthDataSource {
     suspend fun getCurrentUser(): UserInfo?
-    suspend fun login(credentials: LoginCredentials): Result<UserInfo>
-    suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo>
-    suspend fun signOut(): Result<Unit>
-    suspend fun sendPasswordResetEmail(email: String): Result<Unit>
-    suspend fun verifyPasswordResetOTP(email: String, token: String): Result<Unit>
-    suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit>
+    suspend fun login(credentials: LoginCredentials): Result<UserInfo, DataError>
+    suspend fun signUp(credentials: SignUpCredentials): Result<UserInfo, DataError>
+    suspend fun signOut(): Result<Unit, DataError>
+    suspend fun sendPasswordResetEmail(email: String): Result<Unit, DataError>
+    suspend fun verifyPasswordResetOTP(email: String, token: String): Result<Unit, DataError>
+    suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit, DataError>
     suspend fun isSessionValid(): Boolean
-    suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo>
-    suspend fun resendEmailVerification(email: String): Result<Unit>
-    suspend fun refreshSession(): Result<UserInfo>
-    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit>
+    suspend fun verifyEmailOTP(email: String, token: String): Result<UserInfo, DataError>
+    suspend fun resendEmailVerification(email: String): Result<Unit, DataError>
+    suspend fun refreshSession(): Result<UserInfo, DataError>
+    suspend fun changePassword(currentPassword: String, newPassword: String): Result<Unit, DataError>
 }

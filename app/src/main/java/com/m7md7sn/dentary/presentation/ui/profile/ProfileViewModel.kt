@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
@@ -39,61 +41,42 @@ class ProfileViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true, isError = false)
 
             try {
-                // Load current user info
-                val currentUser = authRepository.getCurrentUser()
-                val userEmail = currentUser?.email
+                coroutineScope {
+                    val profileDeferred = async { profileRepository.getProfile() }
+                    val patientsDeferred = async { patientRepository.getAllPatients() }
+                    val statsDeferred = async { patientRepository.getMedicalProcedureStats() }
+                    
+                    val profileResult = profileDeferred.await()
+                    val patientsResult = patientsDeferred.await()
+                    val statsResult = statsDeferred.await()
+                    
+                    val currentUser = authRepository.getCurrentUser()
+                    
+                    val totalPatients = if (patientsResult is Result.Success) patientsResult.data.size else 0
+                    val medicalProcedureStats = if (statsResult is Result.Success) statsResult.data else emptyList()
 
-                // Load profile data
-                val profileResult = profileRepository.getProfile()
-
-                // Load total patients count
-                val patientsResult = patientRepository.getAllPatients()
-                val totalPatients = when (patientsResult) {
-                    is Result.Success -> patientsResult.data.size
-                    is Result.Error -> 0
-                    else -> 0
-                }
-
-                // Load medical procedure statistics
-                val statsResult = patientRepository.getMedicalProcedureStats()
-                val medicalProcedureStats = when (statsResult) {
-                    is Result.Success -> statsResult.data
-                    is Result.Error -> emptyList()
-                    else -> emptyList()
-                }
-
-                when (profileResult) {
-                    is Result.Success -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            profile = profileResult.data,
-                            userEmail = userEmail,
-                            totalPatients = totalPatients,
-                            medicalProcedureStats = medicalProcedureStats,
-                            isError = false,
-                            error = null
-                        )
-                    }
-                    is Result.Error -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            isError = true,
-                            error = profileResult.message ?: "Unknown error occurred",
-                            userEmail = userEmail,
-                            totalPatients = totalPatients,
-                            medicalProcedureStats = medicalProcedureStats
-                        )
-                        _snackbarMessage.emit(Event("Failed to load profile data"))
-                    }
-                    else -> {
-                        _uiState.value = _uiState.value.copy(
-                            isLoading = false,
-                            isError = true,
-                            error = "Unknown error occurred",
-                            userEmail = userEmail,
-                            totalPatients = totalPatients,
-                            medicalProcedureStats = medicalProcedureStats
-                        )
+                    when (profileResult) {
+                        is Result.Success -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                profile = profileResult.data,
+                                userEmail = currentUser?.email,
+                                totalPatients = totalPatients,
+                                medicalProcedureStats = medicalProcedureStats,
+                                isError = false
+                            )
+                        }
+                        is Result.Error -> {
+                            _uiState.value = _uiState.value.copy(
+                                isLoading = false,
+                                isError = true,
+                                error = profileResult.message ?: "Failed to load profile",
+                                userEmail = currentUser?.email,
+                                totalPatients = totalPatients,
+                                medicalProcedureStats = medicalProcedureStats
+                            )
+                        }
+                        else -> {}
                     }
                 }
             } catch (e: Exception) {
@@ -102,7 +85,6 @@ class ProfileViewModel @Inject constructor(
                     isError = true,
                     error = e.message ?: "Unknown error occurred"
                 )
-                _snackbarMessage.emit(Event("Error loading profile data"))
             }
         }
     }
@@ -112,10 +94,7 @@ class ProfileViewModel @Inject constructor(
     }
 
     fun onEditProfileClick() {
-        // TODO: Navigate to edit profile screen
-        viewModelScope.launch {
-            _snackbarMessage.emit(Event("Edit profile functionality coming soon"))
-        }
+        // Handled by navigation in the screen
     }
 
     fun onSeeAllPatientsClick(navigateToPatients: () -> Unit) {
@@ -127,9 +106,7 @@ class ProfileViewModel @Inject constructor(
             _uiState.value = _uiState.value.copy(isLoading = true)
             
             try {
-                // Get the current profile picture URL to delete it
                 val currentProfilePictureUrl = _uiState.value.profile?.profilePicture
-                
                 val result = profileRepository.updateProfilePicture(imageUri, currentProfilePictureUrl)
                 
                 when (result) {
@@ -142,11 +119,10 @@ class ProfileViewModel @Inject constructor(
                     }
                     is Result.Error -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
-                        _snackbarMessage.emit(Event("Failed to update profile picture: ${result.message}"))
+                        _snackbarMessage.emit(Event(result.message ?: "Failed to update profile picture"))
                     }
                     else -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
-                        _snackbarMessage.emit(Event("Unknown error occurred"))
                     }
                 }
             } catch (e: Exception) {

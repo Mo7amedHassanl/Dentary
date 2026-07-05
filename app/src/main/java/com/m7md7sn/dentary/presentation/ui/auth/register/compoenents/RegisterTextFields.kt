@@ -122,8 +122,8 @@ fun RegisterInformationTextFields(
                 image = if (isConfirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility
             ),
             keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                onDone = {
+                    focusManager.clearFocus()
                 }
             ),
             keyboardOptions = KeyboardOptions(
@@ -204,8 +204,8 @@ fun RegisterClinicInformationTextFields(
             errorMessage = clinicAddressError,
             trailingIcon = painterResource(id = R.drawable.ic_location),
             keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(focusDirection = FocusDirection.Down)
+                onDone = {
+                    focusManager.clearFocus()
                 }
             ),
             keyboardOptions = KeyboardOptions(

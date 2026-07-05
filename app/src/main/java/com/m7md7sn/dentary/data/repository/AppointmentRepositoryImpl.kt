@@ -4,6 +4,7 @@ import com.m7md7sn.dentary.data.model.Appointment
 import com.m7md7sn.dentary.data.model.CreateAppointmentRequest
 import com.m7md7sn.dentary.data.model.UpdateAppointmentRequest
 import com.m7md7sn.dentary.data.source.remote.AppointmentDataSource
+import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import javax.inject.Inject
 
@@ -11,31 +12,31 @@ class AppointmentRepositoryImpl @Inject constructor(
     private val appointmentDataSource: AppointmentDataSource
 ) : AppointmentRepository {
 
-    override suspend fun getAllAppointments(): Result<List<Appointment>> {
+    override suspend fun getAllAppointments(): Result<List<Appointment>, DataError> {
         return appointmentDataSource.getAllAppointments()
     }
 
-    override suspend fun getAppointmentById(id: String): Result<Appointment> {
+    override suspend fun getAppointmentById(id: String): Result<Appointment, DataError> {
         return appointmentDataSource.getAppointmentById(id)
     }
 
-    override suspend fun getAppointmentsByPatient(patientId: String): Result<List<Appointment>> {
+    override suspend fun getAppointmentsByPatient(patientId: String): Result<List<Appointment>, DataError> {
         return appointmentDataSource.getAppointmentsByPatient(patientId)
     }
 
-    override suspend fun getAppointmentsByDate(date: String): Result<List<Appointment>> {
+    override suspend fun getAppointmentsByDate(date: String): Result<List<Appointment>, DataError> {
         return appointmentDataSource.getAppointmentsByDate(date)
     }
 
-    override suspend fun createAppointment(request: CreateAppointmentRequest): Result<Appointment> {
+    override suspend fun createAppointment(request: CreateAppointmentRequest): Result<Appointment, DataError> {
         return appointmentDataSource.createAppointment(request)
     }
 
-    override suspend fun updateAppointment(id: String, request: UpdateAppointmentRequest): Result<Appointment> {
+    override suspend fun updateAppointment(id: String, request: UpdateAppointmentRequest): Result<Appointment, DataError> {
         return appointmentDataSource.updateAppointment(id, request)
     }
 
-    override suspend fun deleteAppointment(id: String): Result<Unit> {
+    override suspend fun deleteAppointment(id: String): Result<Unit, DataError> {
         return appointmentDataSource.deleteAppointment(id)
     }
 }

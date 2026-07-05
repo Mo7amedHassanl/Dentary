@@ -28,7 +28,7 @@ fun PasswordResetScreen(
     onPasswordResetSuccess: () -> Unit,
     onNavigateToLogin: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: PasswordResetViewModel = hiltViewModel()
+    viewModel: PasswordResetViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -40,9 +40,6 @@ fun PasswordResetScreen(
             event.getContentIfNotHandled()?.let { message ->
                 scope.launch {
                     snackbarHostState.showSnackbar(message)
-                    if (message == "Password reset successfully!") {
-                        onPasswordResetSuccess()
-                    }
                 }
             }
         }
@@ -92,10 +89,15 @@ fun PasswordResetScreen(
                     onConfirmPasswordChange = viewModel::onConfirmPasswordChange,
                     onResetPasswordClick = viewModel::resetPassword,
                     onLoginClick = onNavigateToLogin,
+                    onPasswordResetSuccess = onPasswordResetSuccess,
                     isLoading = uiState.isLoading,
                     isResending = uiState.isResending,
                     isEmailError = uiState.emailError != null,
                     emailErrorMessage = uiState.emailError,
+                    isPasswordVisible = uiState.isPasswordVisible,
+                    onTogglePasswordVisibility = viewModel::toggleNewPasswordVisibility,
+                    isConfirmPasswordVisible = uiState.isConfirmPasswordVisible,
+                    onToggleConfirmPasswordVisibility = viewModel::toggleConfirmPasswordVisibility,
                     otpError = uiState.otpError ?: "",
                     passwordError = uiState.passwordError,
                     confirmPasswordError = uiState.confirmPasswordError,
