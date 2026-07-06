@@ -33,7 +33,6 @@ fun PatientsScreen(
 
     if (uiState.showFilterDialog) {
         FilterPickerDialog(
-            availableFilters = uiState.availableFilters,
             selectedFilters = uiState.selectedFilters,
             onToggleFilter = viewModel::toggleFilter,
             onDismiss = { viewModel.toggleFilterDialog(false) }

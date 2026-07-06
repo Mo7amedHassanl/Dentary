@@ -17,13 +17,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.m7md7sn.dentary.R
+import com.m7md7sn.dentary.data.model.MedicalProcedure
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
 
 @Composable
 fun PatientSearchFilters(
@@ -40,17 +42,18 @@ fun PatientSearchFilters(
     ) {
         item {
             FilterChip(
-                text = "الكل",
+                text = stringResource(R.string.all),
                 isSelected = selectedFilters.isEmpty(),
                 onClick = onClearAll
             )
         }
         
-        items(selectedFilters.toList()) { filter ->
+        items(selectedFilters.toList()) { filterKey ->
+            val localizedName = MedicalProcedure.fromDbValue(filterKey)?.let { stringResource(it.resId) } ?: filterKey
             FilterChip(
-                text = filter,
+                text = localizedName,
                 isSelected = true,
-                onClick = { onFilterRemove(filter) }
+                onClick = { onFilterRemove(filterKey) }
             )
         }
     }

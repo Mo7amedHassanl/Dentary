@@ -27,19 +27,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
+import com.m7md7sn.dentary.data.model.MedicalProcedure
 import com.m7md7sn.dentary.presentation.theme.AlexandriaMedium
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
-
-// List of medical procedure types
-val medicalProcedureTypes = listOf(
-    "حشو عادي",
-    "جراحة",
-    "تنظيف جير",
-    "حشو عصب",
-    "تركيبات متحركة",
-    "تركيبات ثابتة"
-)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,6 +40,14 @@ fun MedicalProcedureDropdown(
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(false) }
+    
+    // Find the current localized name for the value (which is expected to be a dbValue)
+    val displayValue = remember(value) {
+        MedicalProcedure.fromDbValue(value)?.let { "" } // Just a placeholder for now
+    }
+    
+    // In order to correctly display the localized text for a dbValue
+    val currentLocalizedName = MedicalProcedure.fromDbValue(value)?.let { stringResource(it.resId) } ?: value
 
     ExposedDropdownMenuBox(
         expanded = expanded,
@@ -56,7 +55,7 @@ fun MedicalProcedureDropdown(
         modifier = modifier.fillMaxWidth()
     ) {
         OutlinedTextField(
-            value = value,
+            value = currentLocalizedName,
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -90,7 +89,7 @@ fun MedicalProcedureDropdown(
                 textAlign = TextAlign.Center,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.Medium,
-                color = DentaryBlue,
+                color = if (value.isNotEmpty()) DentaryBlue else DentaryBlueGray,
                 fontFamily = AlexandriaMedium
             ),
             modifier = Modifier
@@ -109,11 +108,11 @@ fun MedicalProcedureDropdown(
                 color = DentaryBlue
             ),
         ) {
-            medicalProcedureTypes.forEach { procedure ->
+            MedicalProcedure.entries.forEach { procedure ->
                 DropdownMenuItem(
                     text = {
                         Text(
-                            text = procedure,
+                            text = stringResource(procedure.resId),
                             style = TextStyle(
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.Medium,
@@ -125,7 +124,7 @@ fun MedicalProcedureDropdown(
                         )
                     },
                     onClick = {
-                        onValueChange(procedure)
+                        onValueChange(procedure.dbValue)
                         expanded = false
                     },
 
@@ -133,4 +132,4 @@ fun MedicalProcedureDropdown(
             }
         }
     }
-} 
+}

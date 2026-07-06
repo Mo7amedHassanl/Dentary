@@ -109,4 +109,16 @@
     <string name="select_image_source">اختر مصدر الصورة:</string>
     <string name="gallery">المعرض</string>
     <string name="camera">الكاميرا</string>
+    <string name="filter_by_category">تصفية حسب الفئة</string>
+    <string name="all">الكل</string>
+    <string name="procedure_normal_filling">حشو عادي</string>
+    <string name="procedure_surgery">جراحة</string>
+    <string name="procedure_cleaning">تنظيف جير</string>
+    <string name="procedure_root_canal">حشو عصب</string>
+    <string name="procedure_removable_prosthesis">تركيبات متحركة</string>
+    <string name="procedure_fixed_prosthesis">تركيبات ثابتة</string>
+    <string name="coming_soon">قريباً</string>
+    <string name="feature_not_available">هذه الميزة ستتوفر في تحديث قادم.</string>
+    <string name="appointments_placeholder">إدارة مواعيد العيادة بكل سهولة.</string>
+    <string name="chats_placeholder">ابق على تواصل مع مرضاك.</string>
 </resources>

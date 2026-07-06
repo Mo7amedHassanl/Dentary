@@ -108,4 +108,16 @@
     <string name="select_image_source">Select image source:</string>
     <string name="gallery">Gallery</string>
     <string name="camera">Camera</string>
+    <string name="filter_by_category">Filter by category</string>
+    <string name="all">All</string>
+    <string name="procedure_normal_filling">Normal Filling</string>
+    <string name="procedure_surgery">Surgery</string>
+    <string name="procedure_cleaning">Scaling</string>
+    <string name="procedure_root_canal">Root Canal</string>
+    <string name="procedure_removable_prosthesis">Removable Prosthesis</string>
+    <string name="procedure_fixed_prosthesis">Fixed Prosthesis</string>
+    <string name="coming_soon">Coming Soon</string>
+    <string name="feature_not_available">This feature is coming in a future update.</string>
+    <string name="appointments_placeholder">Manage your clinic appointments with ease.</string>
+    <string name="chats_placeholder">Stay connected with your patients.</string>
 </resources>

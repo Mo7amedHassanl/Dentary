@@ -1,7 +1,9 @@
 package com.m7md7sn.dentary.presentation.ui.patients.components
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
@@ -30,10 +32,12 @@ fun PatientsContent(
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.Start,
     ) {
         item {
-            PatientsTitle()
+            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                PatientsTitle()
+            }
         }
         item {
             Spacer(Modifier.height(20.dp))
@@ -62,7 +66,9 @@ fun PatientsContent(
 
         if (isLoading) {
             item {
-                CircularProgressIndicator()
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
         } else {
             items(patients) { patient ->

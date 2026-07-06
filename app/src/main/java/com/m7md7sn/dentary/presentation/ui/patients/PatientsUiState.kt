@@ -8,13 +8,5 @@ data class PatientsUiState(
     val errorMessage: String? = null,
     val searchQuery: String = "",
     val selectedFilters: Set<String> = emptySet(),
-    val showFilterDialog: Boolean = false,
-    val availableFilters: List<String> = listOf(
-        "حشو عادي",
-        "جراحة",
-        "تنظيف جير",
-        "حشو عصب",
-        "تركيبات متحركة",
-        "تركيبات ثابتة"
-    )
+    val showFilterDialog: Boolean = false
 )
