@@ -1,17 +1,29 @@
 package com.m7md7sn.dentary.presentation.ui.patients.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -30,51 +42,78 @@ import com.m7md7sn.dentary.presentation.theme.DentaryGray
 fun PatientSearchBar(
     query: String = "",
     onQueryChange: (String) -> Unit = {},
+    showFilterButton: Boolean = true,
+    onFilterClick: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxWidth()) {
-        SearchBar(
-            query = query,
-            onQueryChange = onQueryChange,
-            onSearch = {},
-            active = false,
-            onActiveChange = {},
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(55.dp),
-            placeholder = {
-                Text(
-                    text = stringResource(R.string.search_patient),
-                    style = TextStyle(
-                        fontSize = 12.sp,
-                        lineHeight = 30.sp,
-                        fontFamily = AlexandriaMedium,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF697988),
-                        textAlign = TextAlign.Start,
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .height(55.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(modifier = Modifier.weight(1f)) {
+            SearchBar(
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = {},
+                active = false,
+                onActiveChange = {},
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .fillMaxHeight(),
+                placeholder = {
+                    Text(
+                        text = stringResource(R.string.search_patient),
+                        style = TextStyle(
+                            fontSize = 12.sp,
+                            lineHeight = 30.sp,
+                            fontFamily = AlexandriaMedium,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF697988),
+                            textAlign = TextAlign.Start,
+                        )
                     )
+                },
+                trailingIcon = {
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_search),
+                        contentDescription = null,
+                        modifier = Modifier.size(21.dp)
+                    )
+                },
+                shape = CircleShape,
+                colors = SearchBarDefaults.colors(
+                    containerColor = Color.White,
+                    dividerColor = Color.Transparent,
+                    inputFieldColors = SearchBarDefaults.inputFieldColors(
+                        focusedTextColor = DentaryGray,
+                        unfocusedTextColor = DentaryGray,
+                        cursorColor = DentaryBlue,
+                    )
+                ),
+                tonalElevation = 0.dp,
+                shadowElevation = 0.dp,
+                enabled = true
+            ) {}
+        }
+
+        if (showFilterButton) {
+            Spacer(Modifier.width(8.dp))
+            IconButton(
+                onClick = onFilterClick,
+                modifier = Modifier
+                    .size(55.dp)
+                    .background(DentaryBlue, RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(12.dp))
+            ) {
+                Icon(
+                    imageVector = Icons.Default.SwapVert,
+                    contentDescription = "Filter",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
                 )
-            },
-            trailingIcon = {
-                Image(
-                    painter = painterResource(id = R.drawable.ic_search),
-                    contentDescription = null,
-                    modifier = Modifier.size(21.dp)
-                )
-            },
-            shape = CircleShape,
-            colors = SearchBarDefaults.colors(
-                containerColor = Color.White,
-                dividerColor = Color.Transparent,
-                inputFieldColors = SearchBarDefaults.inputFieldColors(
-                    focusedTextColor = DentaryGray,
-                    unfocusedTextColor = DentaryGray,
-                    cursorColor = DentaryBlue,
-                )
-            ),
-            tonalElevation = 0.dp,
-            shadowElevation = 0.dp,
-            enabled = true
-        ) {}
+            }
+        }
     }
 }

@@ -10,11 +10,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
+import com.m7md7sn.dentary.presentation.ui.patients.components.FilterPickerDialog
 import com.m7md7sn.dentary.presentation.ui.patients.components.PatientsContent
 
 @Composable
@@ -31,6 +31,15 @@ fun PatientsScreen(
         initialSearchQuery?.let { viewModel.searchPatients(it) }
     }
 
+    if (uiState.showFilterDialog) {
+        FilterPickerDialog(
+            availableFilters = uiState.availableFilters,
+            selectedFilters = uiState.selectedFilters,
+            onToggleFilter = viewModel::toggleFilter,
+            onDismiss = { viewModel.toggleFilterDialog(false) }
+        )
+    }
+
     Surface(
         color = BackgroundColor,
         modifier = modifier.fillMaxSize()
@@ -45,7 +54,11 @@ fun PatientsScreen(
                 isLoading = uiState.isLoading,
                 errorMessage = uiState.errorMessage,
                 searchQuery = uiState.searchQuery,
+                selectedFilters = uiState.selectedFilters,
                 onSearchQueryChange = viewModel::searchPatients,
+                onFilterClick = { viewModel.toggleFilterDialog(true) },
+                onFilterRemove = viewModel::removeFilter,
+                onClearFilters = viewModel::clearFilters,
                 onNavigateBack = onNavigateBack,
                 onRefresh = viewModel::refreshPatients,
                 onPatientClick = { patient ->
@@ -53,21 +66,5 @@ fun PatientsScreen(
                 }
             )
         }
-    }
-}
-
-@Preview
-@Composable
-private fun PatientsScreenPreviewEn() {
-    DentaryTheme {
-        PatientsScreen()
-    }
-}
-
-@Preview(locale = "ar")
-@Composable
-private fun PatientsScreenPreviewAr() {
-    DentaryTheme {
-        PatientsScreen()
     }
 }

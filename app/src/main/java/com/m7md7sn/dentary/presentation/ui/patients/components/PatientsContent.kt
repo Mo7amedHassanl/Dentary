@@ -19,7 +19,11 @@ fun PatientsContent(
     isLoading: Boolean = false,
     errorMessage: String? = null,
     searchQuery: String = "",
+    selectedFilters: Set<String> = emptySet(),
     onSearchQueryChange: (String) -> Unit = {},
+    onFilterClick: () -> Unit = {},
+    onFilterRemove: (String) -> Unit = {},
+    onClearFilters: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onRefresh: () -> Unit = {},
     onPatientClick: (Patient) -> Unit = {}
@@ -37,14 +41,20 @@ fun PatientsContent(
         item {
             PatientSearchBar(
                 query = searchQuery,
-                onQueryChange = onSearchQueryChange
+                onQueryChange = onSearchQueryChange,
+                showFilterButton = patients.isNotEmpty() || selectedFilters.isNotEmpty() || searchQuery.isNotEmpty(),
+                onFilterClick = onFilterClick
             )
         }
         item {
             Spacer(Modifier.height(12.dp))
         }
         item {
-            PatientSearchFilters()
+            PatientSearchFilters(
+                selectedFilters = selectedFilters,
+                onFilterRemove = onFilterRemove,
+                onClearAll = onClearFilters
+            )
         }
         item {
             Spacer(Modifier.height(20.dp))

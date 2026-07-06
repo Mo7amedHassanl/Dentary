@@ -2,6 +2,7 @@ package com.m7md7sn.dentary.presentation.ui.patients
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.domain.usecase.patient.GetPatientsUseCase
 import com.m7md7sn.dentary.utils.Result
 import com.m7md7sn.dentary.utils.asUiText
@@ -22,6 +23,7 @@ class PatientsViewModel @Inject constructor(
     val uiState: StateFlow<PatientsUiState> = _uiState.asStateFlow()
 
     private var patientsJob: Job? = null
+    private var allPatientsFromRepo: List<Patient> = emptyList()
 
     init {
         observePatients()
@@ -34,8 +36,9 @@ class PatientsViewModel @Inject constructor(
             getPatientsUseCase(query = query).collect { result ->
                 when (result) {
                     is Result.Success -> {
+                        allPatientsFromRepo = result.data
+                        applyFilters()
                         _uiState.value = _uiState.value.copy(
-                            patients = result.data,
                             isLoading = false,
                             errorMessage = null
                         )
@@ -54,10 +57,49 @@ class PatientsViewModel @Inject constructor(
         }
     }
 
+    private fun applyFilters() {
+        val selected = _uiState.value.selectedFilters
+        val filtered = if (selected.isEmpty()) {
+            allPatientsFromRepo
+        } else {
+            allPatientsFromRepo.filter { patient ->
+                patient.medicalProcedure in selected
+            }
+        }
+        _uiState.value = _uiState.value.copy(patients = filtered)
+    }
+
     fun searchPatients(query: String) {
         if (_uiState.value.searchQuery == query) return
         _uiState.value = _uiState.value.copy(searchQuery = query)
         observePatients(query)
+    }
+
+    fun toggleFilterDialog(show: Boolean) {
+        _uiState.value = _uiState.value.copy(showFilterDialog = show)
+    }
+
+    fun toggleFilter(filter: String) {
+        val current = _uiState.value.selectedFilters.toMutableSet()
+        if (current.contains(filter)) {
+            current.remove(filter)
+        } else {
+            current.add(filter)
+        }
+        _uiState.value = _uiState.value.copy(selectedFilters = current)
+        applyFilters()
+    }
+    
+    fun removeFilter(filter: String) {
+        val current = _uiState.value.selectedFilters.toMutableSet()
+        current.remove(filter)
+        _uiState.value = _uiState.value.copy(selectedFilters = current)
+        applyFilters()
+    }
+
+    fun clearFilters() {
+        _uiState.value = _uiState.value.copy(selectedFilters = emptySet())
+        applyFilters()
     }
 
     fun refreshPatients() {
