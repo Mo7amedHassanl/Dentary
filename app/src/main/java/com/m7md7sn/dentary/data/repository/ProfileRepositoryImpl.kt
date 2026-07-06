@@ -11,7 +11,8 @@ import javax.inject.Inject
 
 class ProfileRepositoryImpl @Inject constructor(
     private val profileDataSource: ProfileDataSource,
-    private val profilePictureManager: ProfilePictureManager
+    private val profilePictureManager: ProfilePictureManager,
+    private val clinicLogoManager: ClinicLogoManager
 ) : ProfileRepository {
 
     override suspend fun getProfile(): Result<Profile, DataError> {
@@ -40,6 +41,25 @@ class ProfileRepositoryImpl @Inject constructor(
             }
             is Result.Error -> {
                 Result.Error(uploadResult.error, uploadResult.message ?: "Failed to upload profile picture")
+            }
+            is Result.Loading -> Result.Loading
+        }
+    }
+
+    override suspend fun updateClinicLogo(imageUri: Uri, oldImageUrl: String?): Result<Profile, DataError> {
+        // Upload logo to storage
+        val uploadResult = clinicLogoManager.uploadClinicLogo(imageUri, oldImageUrl)
+        
+        return when (uploadResult) {
+            is Result.Success -> {
+                val imageUrl = uploadResult.data
+                
+                // Update profile with new logo URL
+                val updateRequest = UpdateProfileRequest(clinicLogo = imageUrl)
+                profileDataSource.updateProfile(updateRequest)
+            }
+            is Result.Error -> {
+                Result.Error(uploadResult.error, uploadResult.message ?: "Failed to upload clinic logo")
             }
             is Result.Loading -> Result.Loading
         }

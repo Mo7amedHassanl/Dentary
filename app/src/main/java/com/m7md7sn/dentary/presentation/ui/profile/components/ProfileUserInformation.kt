@@ -4,9 +4,11 @@ import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +24,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,9 +47,10 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaSemiBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
-import com.m7md7sn.dentary.utils.rememberImagePicker
+import com.m7md7sn.dentary.utils.rememberImagePickerWithCamera
 import com.m7md7sn.dentary.presentation.ui.auth.register.compoenents.SectionTitle
 import com.m7md7sn.dentary.presentation.ui.profile.ProfileUiState
+import com.m7md7sn.dentary.presentation.common.components.ImageSourcePickerDialog
 
 @Composable
 fun ProfileUserInformation(
@@ -73,7 +80,8 @@ fun ProfileUserInformation(
         ClinicInformation(
             clinicName = uiState.profile?.clinicName ?: "غير محدد",
             phoneNumber = uiState.profile?.phoneNumber ?: "غير محدد",
-            clinicAddress = uiState.profile?.clinicAddress ?: "غير محدد"
+            clinicAddress = uiState.profile?.clinicAddress ?: "غير محدد",
+            clinicLogo = uiState.profile?.clinicLogo
         )
         Spacer(Modifier.height(10.dp))
         TotalPatientsCard(
@@ -89,6 +97,7 @@ private fun ClinicInformation(
     clinicName: String,
     phoneNumber: String,
     clinicAddress: String,
+    clinicLogo: String?,
 ) {
     SectionTitle(
         title = R.string.clinic_information,
@@ -110,11 +119,57 @@ private fun ClinicInformation(
         icon = R.drawable.ic_location,
     )
     Spacer(Modifier.height(10.dp))
-    ProfileInfoField(
-        text = "شعار العيادة",
-        icon = R.drawable.ic_clinic_logo,
-        modifier = Modifier.height(66.dp)
-    )
+    
+    // Clinic Logo Display
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(120.dp)
+            .background(Color.White, shape = RoundedCornerShape(24.dp))
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Image(
+                painter = painterResource(id = R.drawable.ic_clinic_logo),
+                contentDescription = null,
+                modifier = Modifier.size(24.dp)
+            )
+
+            Box(
+                modifier = Modifier.fillMaxWidth(),
+                contentAlignment = Alignment.Center
+            ) {
+                if (clinicLogo != null && clinicLogo.isNotEmpty()) {
+                    AsyncImage(
+                        model = ImageRequest.Builder(LocalContext.current)
+                            .data(clinicLogo)
+                            .crossfade(true)
+                            .build(),
+                        contentDescription = "Clinic Logo",
+                        modifier = Modifier
+                            .size(100.dp)
+                            .clip(RoundedCornerShape(8.dp)),
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    Text(
+                        text = "شعار العيادة",
+                        style = TextStyle(
+                            fontSize = 14.sp,
+                            fontFamily = AlexandriaRegular,
+                            fontWeight = FontWeight.Normal,
+                            color = Color(0xFF697988),
+                        )
+                    )
+                }
+            }
+        }
+    }
 }
 
 @Composable
@@ -186,8 +241,24 @@ fun ProfilePicture(
     onUpdateProfilePicture: (android.net.Uri) -> Unit,
     modifier: Modifier
 ) {
-    val imagePicker = rememberImagePicker { uri ->
+    val controller = rememberImagePickerWithCamera { uri ->
         uri?.let { onUpdateProfilePicture(it) }
+    }
+    
+    var showPickerDialog by remember { mutableStateOf(false) }
+
+    if (showPickerDialog) {
+        ImageSourcePickerDialog(
+            onGalleryClick = {
+                showPickerDialog = false
+                controller.pickFromGallery()
+            },
+            onCameraClick = {
+                showPickerDialog = false
+                controller.takePhoto()
+            },
+            onDismiss = { showPickerDialog = false }
+        )
     }
     
     Box(
@@ -198,7 +269,7 @@ fun ProfilePicture(
                 .size(105.dp)
                 .background(DentaryBlue, shape = CircleShape)
                 .clip(CircleShape)
-                .clickable(enabled = true, onClick = { imagePicker() }),
+                .clickable(enabled = true, onClick = { showPickerDialog = true }),
             contentAlignment = Alignment.Center
         ) {
             if (profilePictureUrl != null) {
@@ -224,7 +295,7 @@ fun ProfilePicture(
         
         // Show add button only when no profile picture is set
         IconButton(
-                onClick = { imagePicker() },
+                onClick = { showPickerDialog = true },
             modifier = Modifier
                 .size(25.dp)
                 .background(DentaryLighterBlue, CircleShape)

@@ -12,4 +12,5 @@ interface ProfileRepository {
     suspend fun createProfile(request: CreateProfileRequest): Result<Profile, DataError>
     suspend fun updateProfile(request: UpdateProfileRequest): Result<Profile, DataError>
     suspend fun updateProfilePicture(imageUri: Uri, oldImageUrl: String? = null): Result<Profile, DataError>
+    suspend fun updateClinicLogo(imageUri: Uri, oldImageUrl: String? = null): Result<Profile, DataError>
 }

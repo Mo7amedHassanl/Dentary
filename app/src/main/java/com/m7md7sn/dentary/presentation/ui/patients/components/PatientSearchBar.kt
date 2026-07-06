@@ -1,6 +1,7 @@
 package com.m7md7sn.dentary.presentation.ui.patients.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
@@ -31,46 +32,49 @@ fun PatientSearchBar(
     onQueryChange: (String) -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
-    SearchBar(
-        query = query,
-        onQueryChange = onQueryChange,
-        onSearch = {},
-        active = false,
-        onActiveChange = {},
-        modifier = modifier
-            .fillMaxWidth()
-            .height(55.dp),
-        placeholder = {
-            Text(
-                text = stringResource(R.string.search_patient),
-                style = TextStyle(
-                    fontSize = 12.sp,
-                    lineHeight = 30.sp,
-                    fontFamily = AlexandriaMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF697988),
-                    textAlign = TextAlign.Start,
+    Box(modifier = modifier.fillMaxWidth()) {
+        SearchBar(
+            query = query,
+            onQueryChange = onQueryChange,
+            onSearch = {},
+            active = false,
+            onActiveChange = {},
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(55.dp),
+            placeholder = {
+                Text(
+                    text = stringResource(R.string.search_patient),
+                    style = TextStyle(
+                        fontSize = 12.sp,
+                        lineHeight = 30.sp,
+                        fontFamily = AlexandriaMedium,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF697988),
+                        textAlign = TextAlign.Start,
+                    )
                 )
-            )
-        },
-        trailingIcon = {
-            Image(
-                painter = painterResource(id = R.drawable.ic_search),
-                contentDescription = null,
-                modifier = Modifier.size(21.dp)
-            )
-        },
-        shape = CircleShape,
-        colors = SearchBarDefaults.colors(
-            containerColor = Color.White,
-            dividerColor = Color.Transparent,
-            inputFieldColors = SearchBarDefaults.inputFieldColors(
-                focusedTextColor = DentaryGray,
-                unfocusedTextColor = DentaryGray,
-                cursorColor = DentaryBlue,
-            )
-        ),
-        tonalElevation = 0.dp,
-        shadowElevation = 0.dp
-    ) {}
+            },
+            trailingIcon = {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_search),
+                    contentDescription = null,
+                    modifier = Modifier.size(21.dp)
+                )
+            },
+            shape = CircleShape,
+            colors = SearchBarDefaults.colors(
+                containerColor = Color.White,
+                dividerColor = Color.Transparent,
+                inputFieldColors = SearchBarDefaults.inputFieldColors(
+                    focusedTextColor = DentaryGray,
+                    unfocusedTextColor = DentaryGray,
+                    cursorColor = DentaryBlue,
+                )
+            ),
+            tonalElevation = 0.dp,
+            shadowElevation = 0.dp,
+            enabled = true
+        ) {}
+    }
 }

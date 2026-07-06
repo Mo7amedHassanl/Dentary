@@ -1,4 +1,4 @@
-package com.m7md7sn.dentary.presentation.ui.home.compoenents
+package com.m7md7sn.dentary.presentation.ui.home.components
 
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
@@ -19,6 +19,8 @@ fun HomeContent(
     profilePictureUrl: String?,
     recentPatientsList: List<Patient>,
     onPatientSeeAllClick: () -> Unit,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
     onPatientClick: (Patient) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -34,10 +36,13 @@ fun HomeContent(
             )
             Spacer(Modifier.height(8.dp))
         }
-        item {
-            PatientSearchBar()
+        /*item {
+            PatientSearchBar(
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange
+            )
             Spacer(Modifier.height(20.dp))
-        }
+        }*/
         item {
             RecentPatientsTitle(
                 onPatientSeeAllClick = onPatientSeeAllClick

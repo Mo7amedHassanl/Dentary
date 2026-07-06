@@ -89,4 +89,24 @@
     <string name="attachments">ملحقات</string>
     <string name="save">حفظ</string>
     <string name="attachment_description">وصف الملحق</string>
+    <string name="last_update">آخر تحديث: </string>
+    <string name="error_name_required">الاسم الكامل مطلوب</string>
+    <string name="error_invalid_age">يرجى إدخال عمر صحيح</string>
+    <string name="error_invalid_email">صيغة البريد الإلكتروني غير صحيحة</string>
+    <string name="error_invalid_phone">رقم الهاتف غير صحيح</string>
+    <string name="error_gender_required">يرجى اختيار الجنس</string>
+    <string name="error_procedure_required">نوع الإجراء الطبي مطلوب</string>
+    <string name="patient_added_successfully">تمت إضافة المريض بنجاح</string>
+    <string name="unsaved_changes_title">تغييرات غير محفوظة</string>
+    <string name="unsaved_changes_message">لديك تغييرات غير محفوظة. هل أنت متأكد أنك تريد تجاهلها؟</string>
+    <string name="discard">تجاهل</string>
+    <string name="stay">بقاء</string>
+    <string name="success">نجاح</string>
+    <string name="add_another">إضافة مريض آخر</string>
+    <string name="view_patient">عرض المريض</string>
+    <string name="back_to_list">العودة للقائمة</string>
+    <string name="choose_image">اختر صورة</string>
+    <string name="select_image_source">اختر مصدر الصورة:</string>
+    <string name="gallery">المعرض</string>
+    <string name="camera">الكاميرا</string>
 </resources>

@@ -1,18 +1,40 @@
 package com.m7md7sn.dentary.presentation.ui.settings.components
+import android.net.Uri
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -30,10 +52,14 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 import com.m7md7sn.dentary.utils.Event
-import androidx.compose.foundation.layout.fillMaxWidth
 import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsItem
 import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsTextField
 import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsTextFieldNoIcon
+import com.m7md7sn.dentary.utils.rememberImagePickerWithCamera
+import coil.compose.AsyncImage
+import coil.request.ImageRequest
+import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
+import com.m7md7sn.dentary.presentation.common.components.ImageSourcePickerDialog
 
 @Composable
 fun AccountSettings(
@@ -79,7 +105,7 @@ fun DoctorAndClinicInfoSettings(
     onClinicNameChange: (String) -> Unit,
     onPhoneNumberChange: (String) -> Unit,
     onClinicAddressChange: (String) -> Unit,
-    onClinicLogoChange: (String) -> Unit,
+    onClinicLogoUpdate: (Uri) -> Unit,
     onSaveClick: () -> Unit,
     onBackClick: () -> Unit = {},
     fetchProfile: () -> Unit,
@@ -94,16 +120,33 @@ fun DoctorAndClinicInfoSettings(
             }
         }
     }
+    
+    val controller = rememberImagePickerWithCamera { uri ->
+        uri?.let { onClinicLogoUpdate(it) }
+    }
+
+    var showPickerDialog by remember { mutableStateOf(false) }
+
+    if (showPickerDialog) {
+        ImageSourcePickerDialog(
+            onGalleryClick = {
+                showPickerDialog = false
+                controller.pickFromGallery()
+            },
+            onCameraClick = {
+                showPickerDialog = false
+                controller.takePhoto()
+            },
+            onDismiss = { showPickerDialog = false }
+        )
+    }
+
     Column(
         modifier = Modifier,
         horizontalAlignment = Alignment.Start,
     ) {
-        if (uiState.isProfileLoading) {
-            CircularProgressIndicator()
-            Spacer(Modifier.height(16.dp))
-        }
         if (uiState.profileError != null) {
-            Text(text = uiState.profileError ?: "", color = MaterialTheme.colorScheme.error)
+            Text(text = uiState.profileError, color = MaterialTheme.colorScheme.error)
             Spacer(Modifier.height(8.dp))
         }
         SectionTitle(
@@ -201,13 +244,60 @@ fun DoctorAndClinicInfoSettings(
             )
         )
         Spacer(Modifier.height(10.dp))
-        SettingsTextField(
-            value = uiState.clinicLogo,
-            onValueChange = onClinicLogoChange,
-            placeholder = "شعار العيادة",
-            icon = R.drawable.ic_clinic_logo,
-            modifier = Modifier.height(66.dp)
-        )
+        
+        // Clinic Logo Image Picker
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(120.dp)
+                .background(Color.White, shape = RoundedCornerShape(24.dp))
+                .clip(RoundedCornerShape(24.dp))
+                .clickable { showPickerDialog = true }
+                .padding(horizontal = 16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_clinic_logo),
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp)
+                )
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (uiState.clinicLogo.isNotEmpty()) {
+                        AsyncImage(
+                            model = ImageRequest.Builder(LocalContext.current)
+                                .data(uiState.clinicLogo)
+                                .crossfade(true)
+                                .build(),
+                            contentDescription = "Clinic Logo",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(RoundedCornerShape(8.dp)),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Text(
+                            text = "شعار العيادة",
+                            style = TextStyle(
+                                fontSize = 14.sp,
+                                fontFamily = AlexandriaRegular,
+                                fontWeight = FontWeight.Normal,
+                                color = Color(0xFF697988),
+                            )
+                        )
+                    }
+                }
+            }
+        }
+
         Spacer(Modifier.height(22.dp))
         SettingsActionButtons(
             onSaveClick = onSaveClick,

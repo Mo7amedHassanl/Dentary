@@ -1,4 +1,4 @@
-package com.m7md7sn.dentary.presentation.ui.home.compoenents
+package com.m7md7sn.dentary.presentation.ui.home.components
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes

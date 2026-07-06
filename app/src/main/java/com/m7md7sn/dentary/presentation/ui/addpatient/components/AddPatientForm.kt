@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -37,25 +38,22 @@ fun AddPatientForm(
     fullName: String,
     onFullNameChange: (String) -> Unit,
     isFullNameError: Boolean,
-    fullNameErrorMessage: String? = null,
+    fullNameErrorMessage: Int? = null,
     age: String,
     onAgeChange: (String) -> Unit,
     isAgeError: Boolean,
-    ageErrorMessage: String? = null,
+    ageErrorMessage: Int? = null,
     phoneNumber: String,
     onPhoneNumberChange: (String) -> Unit,
     isPhoneNumberError: Boolean,
-    phoneNumberErrorMessage: String? = null,
+    phoneNumberErrorMessage: Int? = null,
     email: String,
     onEmailChange: (String) -> Unit,
     isEmailError: Boolean,
-    emailErrorMessage: String? = null,
-    address: String,
-    onAddressChange: (String) -> Unit,
-    isAddressError: Boolean,
-    addressErrorMessage: String? = null,
+    emailErrorMessage: Int? = null,
     medicalProcedure: String,
     onMedicalProcedureChange: (String) -> Unit,
+    isProcedureError: Boolean = false,
     focusManager: FocusManager,
     modifier: Modifier = Modifier
 ) {
@@ -126,7 +124,7 @@ fun AddPatientForm(
             onValueChange = onEmailChange,
             placeholder = stringResource(R.string.email_optional),
             keyboardActions = KeyboardActions(
-                onNext = {
+                onDone = {
                     focusManager.clearFocus()
                 }
             ),
@@ -137,10 +135,22 @@ fun AddPatientForm(
             isError = isEmailError,
             errorMessage = emailErrorMessage,
         )
-        MedicalProcedureDropdown(
-            value = medicalProcedure,
-            onValueChange = onMedicalProcedureChange
-        )
+        
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            MedicalProcedureDropdown(
+                value = medicalProcedure,
+                onValueChange = onMedicalProcedureChange
+            )
+            if (isProcedureError) {
+                Text(
+                    text = stringResource(R.string.error_procedure_required),
+                    color = MaterialTheme.colorScheme.error,
+                    style = MaterialTheme.typography.bodySmall,
+                    modifier = Modifier.padding(top = 4.dp).fillMaxWidth(),
+                    textAlign = TextAlign.Start
+                )
+            }
+        }
     }
 }
 
@@ -153,7 +163,7 @@ fun AddPatientTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,
-    errorMessage: String? = null,
+    errorMessage: Int? = null,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
     enabled: Boolean = true
@@ -191,16 +201,18 @@ fun AddPatientTextField(
         keyboardActions = keyboardActions,
         keyboardOptions = keyboardOptions,
         isError = isError,
-        supportingText = if (isError && !errorMessage.isNullOrBlank()) {
+        supportingText = if (isError && errorMessage != null) {
             {
                 Text(
-                    text = errorMessage,
+                    text = stringResource(errorMessage),
                     style = TextStyle(
                         fontFamily = AlexandriaMedium,
                         fontWeight = FontWeight.Medium,
                         color = Color.Red,
                         fontSize = 12.sp
-                    )
+                    ),
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Start
                 )
             }
         } else null,

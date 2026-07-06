@@ -19,6 +19,8 @@ data class Profile(
     val specialization: String? = null,
     @SerialName("profile_picture")
     val profilePicture: String? = null,
+    @SerialName("clinic_logo")
+    val clinicLogo: String? = null,
     @SerialName("updated_at")
     val updatedAt: String? = null
 )
@@ -38,7 +40,9 @@ data class CreateProfileRequest(
     @SerialName("specialization")
     val specialization: String? = null,
     @SerialName("profile_picture")
-    val profilePicture: String? = null
+    val profilePicture: String? = null,
+    @SerialName("clinic_logo")
+    val clinicLogo: String? = null
 )
 
 @Serializable
@@ -54,5 +58,7 @@ data class UpdateProfileRequest(
     @SerialName("specialization")
     val specialization: String? = null,
     @SerialName("profile_picture")
-    val profilePicture: String? = null
+    val profilePicture: String? = null,
+    @SerialName("clinic_logo")
+    val clinicLogo: String? = null
 )

@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -19,11 +20,16 @@ import com.m7md7sn.dentary.presentation.ui.patients.components.PatientsContent
 @Composable
 fun PatientsScreen(
     modifier: Modifier = Modifier,
+    initialSearchQuery: String? = null,
     viewModel: PatientsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit = {},
     onNavigateToPatient: (String) -> Unit = {}
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    LaunchedEffect(initialSearchQuery) {
+        initialSearchQuery?.let { viewModel.searchPatients(it) }
+    }
 
     Surface(
         color = BackgroundColor,

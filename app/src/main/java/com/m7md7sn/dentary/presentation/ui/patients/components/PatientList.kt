@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -37,6 +38,8 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import com.m7md7sn.dentary.R
+import java.text.SimpleDateFormat
+import java.util.Locale
 import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
@@ -161,6 +164,20 @@ fun PatientInfo(
         }
     }
 
+    val formattedDate = remember(lastUpdate) {
+        try {
+            if (lastUpdate.isBlank()) "-"
+            else {
+                val inputSdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+                val outputSdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                val date = inputSdf.parse(lastUpdate.trim())
+                date?.let { outputSdf.format(it) } ?: lastUpdate
+            }
+        } catch (e: Exception) {
+            lastUpdate // Fallback if parsing fails
+        }
+    }
+
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.CenterVertically),
@@ -195,7 +212,7 @@ fun PatientInfo(
                     .background(DentaryDarkBlue, shape = CircleShape)
             )
             Text(
-                text = "${lastUpdate}آخر تحديث: ",
+                text = stringResource(R.string.last_update) + formattedDate,
                 style = TextStyle(
                     fontSize = 8.sp,
                     fontFamily = AlexandriaRegular,

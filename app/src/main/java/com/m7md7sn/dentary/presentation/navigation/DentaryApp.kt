@@ -247,16 +247,25 @@ fun DentaryNavHost(
                 }
                 composable(route = Screen.Home.route) {
                     HomeScreen(
-                        onNavigateToPatients = {
-                            navController.navigate(Screen.Patients.route)
+                        onNavigateToPatients = { query ->
+                            navController.navigate(Screen.Patients.createRoute(query))
                         },
                         onNavigateToPatient = { patientId ->
                             navController.navigate(Screen.Patient.createRoute(patientId))
                         }
                     )
                 }
-                composable(route = Screen.Patients.route) {
+                composable(
+                    route = Screen.Patients.route,
+                    arguments = listOf(navArgument("searchQuery") { 
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    })
+                ) { backStackEntry ->
+                    val searchQuery = backStackEntry.arguments?.getString("searchQuery")
                     PatientsScreen(
+                        initialSearchQuery = searchQuery,
                         onNavigateBack = {
                             navController.popBackStack()
                         },
@@ -296,6 +305,11 @@ fun DentaryNavHost(
                     AddPatientScreen(
                         onNavigateBack = {
                             navController.popBackStack()
+                        },
+                        onNavigateToPatient = { patientId ->
+                            navController.navigate(Screen.Patient.createRoute(patientId)) {
+                                popUpTo(Screen.Patients.route) { inclusive = false }
+                            }
                         }
                     )
                 }

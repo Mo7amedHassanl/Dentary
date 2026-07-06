@@ -1,6 +1,7 @@
 package com.m7md7sn.dentary.presentation.ui.settings
 
 import android.app.Application
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
@@ -164,7 +165,7 @@ class SettingsViewModel @Inject constructor(
                         clinicAddress = profile.clinicAddress ?: "",
                         email = email,
                         specialization = profile.specialization ?: "",
-                        clinicLogo = ""
+                        clinicLogo = profile.clinicLogo ?: ""
                     )
                 }
                 is Result.Error -> {
@@ -197,9 +198,6 @@ class SettingsViewModel @Inject constructor(
     fun onClinicAddressChange(value: String) {
         _uiState.value = uiState.value.copy(clinicAddress = value)
     }
-    fun onClinicLogoChange(value: String) {
-        _uiState.value = uiState.value.copy(clinicLogo = value)
-    }
 
     fun saveProfile() {
         if (_uiState.value.isProfileLoading) return
@@ -211,7 +209,8 @@ class SettingsViewModel @Inject constructor(
                 clinicName = uiState.value.clinicName,
                 phoneNumber = uiState.value.phoneNumber,
                 clinicAddress = uiState.value.clinicAddress,
-                specialization = uiState.value.specialization
+                specialization = uiState.value.specialization,
+                clinicLogo = uiState.value.clinicLogo
             )
             when (val result = profileRepository.updateProfile(req)) {
                 is Result.Success -> {
@@ -226,6 +225,37 @@ class SettingsViewModel @Inject constructor(
                 is Result.Loading -> {
                     _uiState.value = uiState.value.copy(isProfileLoading = true)
                 }
+            }
+        }
+    }
+
+    fun updateClinicLogo(imageUri: Uri) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isProfileLoading = true)
+            
+            try {
+                val currentLogoUrl = _uiState.value.clinicLogo.ifEmpty { null }
+                val result = profileRepository.updateClinicLogo(imageUri, currentLogoUrl)
+                
+                when (result) {
+                    is Result.Success -> {
+                        _uiState.value = _uiState.value.copy(
+                            isProfileLoading = false,
+                            clinicLogo = result.data.clinicLogo ?: ""
+                        )
+                        _snackbarMessage.emit(Event("Clinic logo updated successfully"))
+                    }
+                    is Result.Error -> {
+                        _uiState.value = _uiState.value.copy(isProfileLoading = false)
+                        _snackbarMessage.emit(Event(result.message ?: "Failed to update clinic logo"))
+                    }
+                    else -> {
+                        _uiState.value = _uiState.value.copy(isProfileLoading = false)
+                    }
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(isProfileLoading = false)
+                _snackbarMessage.emit(Event("Error updating clinic logo: ${e.message}"))
             }
         }
     }

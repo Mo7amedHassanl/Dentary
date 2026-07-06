@@ -57,6 +57,8 @@ data class CreatePatientRequest(
     val image: String? = null,
     @SerialName("gender")
     val gender: String? = null,
+    @SerialName("last_visit_date")
+    val lastVisitDate: String? = null,
 )
 
 @Serializable

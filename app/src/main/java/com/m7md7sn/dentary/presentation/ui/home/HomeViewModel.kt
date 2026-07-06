@@ -99,6 +99,14 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun onSearchQueryChange(query: String) {
+        _uiState.value = _uiState.value.copy(searchQuery = query)
+    }
+
+    fun clearSearchQuery() {
+        _uiState.value = _uiState.value.copy(searchQuery = "")
+    }
+
     fun refreshData() {
         loadHomeData()
     }

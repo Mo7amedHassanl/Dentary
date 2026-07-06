@@ -87,5 +87,25 @@
     <string name="enter_description">اكتب وصف التاريخ الطبي هنا</string>
     <string name="attachments">ملحقات</string>
     <string name="save">حفظ</string>
-    <string name="attachment_description">وصف الملحق</string>
+    <string name="attachment_description">Attachment Description</string>
+    <string name="last_update">Last Update: </string>
+    <string name="error_name_required">Full name is required</string>
+    <string name="error_invalid_age">Please enter a valid age</string>
+    <string name="error_invalid_email">Invalid email format</string>
+    <string name="error_invalid_phone">Invalid phone number</string>
+    <string name="error_gender_required">Please select a gender</string>
+    <string name="error_procedure_required">Medical procedure is required</string>
+    <string name="patient_added_successfully">Patient added successfully</string>
+    <string name="unsaved_changes_title">Unsaved Changes</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Are you sure you want to discard them?</string>
+    <string name="discard">Discard</string>
+    <string name="stay">Stay</string>
+    <string name="success">Success</string>
+    <string name="add_another">Add Another</string>
+    <string name="view_patient">View Patient</string>
+    <string name="back_to_list">Back to List</string>
+    <string name="choose_image">Choose Image</string>
+    <string name="select_image_source">Select image source:</string>
+    <string name="gallery">Gallery</string>
+    <string name="camera">Camera</string>
 </resources>

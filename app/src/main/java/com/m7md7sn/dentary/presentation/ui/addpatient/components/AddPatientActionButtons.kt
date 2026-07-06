@@ -27,6 +27,7 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 @Composable
 fun AddPatientActionButtons(
     isLoading: Boolean = false,
+    enabled: Boolean = true,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -39,7 +40,7 @@ fun AddPatientActionButtons(
             text = stringResource(R.string.save_patient),
             hasBorder = false,
             onClick = onSaveClick,
-            enabled = !isLoading,
+            enabled = enabled && !isLoading,
         )
 
         AddPatientActionButton(
@@ -68,10 +69,10 @@ fun AddPatientActionButton(
         modifier = modifier
             .size(width = 148.dp, height = 58.dp)
             .clip(CircleShape)
-            .background(backgroundColor)
+            .background(if (enabled) backgroundColor else backgroundColor.copy(alpha = 0.5f))
             .border(
                 width = if (!hasBorder) 0.dp else 1.dp,
-                color = if (!hasBorder) Color.Transparent else DentaryBlue,
+                color = if (!hasBorder) Color.Transparent else if (enabled) DentaryBlue else DentaryBlue.copy(alpha = 0.5f),
                 shape = CircleShape
             )
             .clickable(enabled = enabled) { onClick() },
@@ -82,7 +83,7 @@ fun AddPatientActionButton(
             fontSize = fontSize,
             fontFamily = fontFamily,
             fontWeight = fontWeight,
-            color = if (hasBorder) DentaryBlue else Color.White,
+            color = if (hasBorder) (if (enabled) DentaryBlue else DentaryBlue.copy(alpha = 0.5f)) else Color.White,
             lineHeight = fontSize
         )
     }

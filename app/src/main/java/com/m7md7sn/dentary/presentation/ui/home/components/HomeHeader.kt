@@ -1,4 +1,4 @@
-package com.m7md7sn.dentary.presentation.ui.home.compoenents
+package com.m7md7sn.dentary.presentation.ui.home.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -88,7 +88,9 @@ fun HomeHeader(
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(48.dp)
-                        .background(DentaryBlue, shape = CircleShape)
+                        .background(DentaryBlue, shape = CircleShape),
+                    placeholder = painterResource(id = R.drawable.ic_user_sharp),
+                    error = painterResource(id = R.drawable.ic_user_sharp)
                 )
             } else {
                 Image(

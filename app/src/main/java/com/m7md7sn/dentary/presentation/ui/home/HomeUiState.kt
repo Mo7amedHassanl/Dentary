@@ -8,5 +8,6 @@ data class HomeUiState(
     val profilePictureUrl: String? = null,
     val recentPatients: List<Patient> = emptyList(),
     val isLoading: Boolean = true,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val searchQuery: String = ""
 )

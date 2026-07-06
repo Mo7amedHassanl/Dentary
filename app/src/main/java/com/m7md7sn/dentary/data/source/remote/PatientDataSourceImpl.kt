@@ -12,6 +12,11 @@ import io.github.jan.supabase.postgrest.Postgrest
 import javax.inject.Inject
 import android.net.Uri
 
+import java.util.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
+import java.util.TimeZone
+
 class PatientDataSourceImpl @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
@@ -64,6 +69,10 @@ class PatientDataSourceImpl @Inject constructor(
             val currentUserId = auth.currentUserOrNull()?.id
                 ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            val currentTime = sdf.format(Date())
+
             // Create PatientInsert object without ID for insertion
             val createPatientRequest = CreatePatientRequest(
                 userId = currentUserId,
@@ -75,7 +84,8 @@ class PatientDataSourceImpl @Inject constructor(
                 medicalHistory = patient.medicalHistory,
                 medicalProcedure = patient.medicalProcedure,
                 image = patient.image,
-                gender = patient.gender
+                gender = patient.gender,
+                lastVisitDate = currentTime
             )
 
             val createdPatient = postgrest
@@ -96,9 +106,14 @@ class PatientDataSourceImpl @Inject constructor(
             val currentUserId = auth.currentUserOrNull()?.id
                 ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            val currentTime = sdf.format(Date())
+            val updatedPatientWithDate = patient.copy(lastVisitDate = currentTime)
+
             val updatedPatient = postgrest
                 .from("patients")
-                .update(patient) {
+                .update(updatedPatientWithDate) {
                     select()
                     filter {
                         eq("id", id)

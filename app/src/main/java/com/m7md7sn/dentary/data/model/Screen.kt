@@ -12,7 +12,9 @@ sealed class Screen (
         fun createRoute(email: String) = "email_verification/$email"
     }
     object Welcome : Screen("welcome")
-    object Patients : Screen("patients")
+    object Patients : Screen("patients?searchQuery={searchQuery}") {
+        fun createRoute(searchQuery: String? = null) = if (searchQuery != null) "patients?searchQuery=$searchQuery" else "patients"
+    }
     object Appointments : Screen("appointments")
     object Profile : Screen("profile")
     object Settings : Screen("settings")

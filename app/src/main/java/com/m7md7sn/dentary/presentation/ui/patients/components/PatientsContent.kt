@@ -36,8 +36,8 @@ fun PatientsContent(
         }
         item {
             PatientSearchBar(
-//                query = searchQuery,
-//                onQueryChange = onSearchQueryChange
+                query = searchQuery,
+                onQueryChange = onSearchQueryChange
             )
         }
         item {

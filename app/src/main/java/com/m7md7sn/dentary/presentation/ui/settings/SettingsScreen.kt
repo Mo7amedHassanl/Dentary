@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -96,7 +97,7 @@ fun SettingsScreen(
                             onClinicNameChange = viewModel::onClinicNameChange,
                             onPhoneNumberChange = viewModel::onPhoneNumberChange,
                             onClinicAddressChange = viewModel::onClinicAddressChange,
-                            onClinicLogoChange = viewModel::onClinicLogoChange,
+                            onClinicLogoUpdate = viewModel::updateClinicLogo,
                             onSaveClick = viewModel::saveProfile,
                             onBackClick = { viewModel.navigateBack() },
                             fetchProfile = viewModel::fetchProfile,
@@ -167,6 +168,12 @@ fun SettingsScreen(
                 hostState = snackbarHostState,
                 modifier = Modifier.align(Alignment.BottomCenter),
             )
+
+            if (uiState.isProfileLoading || uiState.isPasswordChanging || uiState.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
 
     }
