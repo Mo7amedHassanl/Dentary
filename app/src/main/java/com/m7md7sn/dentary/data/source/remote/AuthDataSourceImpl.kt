@@ -170,6 +170,8 @@ class AuthDataSourceImpl @Inject constructor(
             val email = user.email ?: return Result.Error(DataError.Auth.USER_NOT_FOUND, "Email not found")
             
             try {
+                // Re-authenticate by signing in again with the current password
+                // This refreshes the session's 'amr' (authentication method reference)
                 auth.signInWith(Email) {
                     this.email = email
                     this.password = currentPassword
@@ -178,7 +180,13 @@ class AuthDataSourceImpl @Inject constructor(
                 return Result.Error(DataError.Auth.INVALID_CREDENTIALS, "Current password is incorrect")
             }
             
-            auth.updateUser { password = newPassword }
+            // Modern Supabase might still return "current password required" if configured to demand it in the body.
+            // If this fails, the user must disable "Secure password change" in the Supabase Dashboard,
+            // as this version of the SDK only supports re-auth via nonce/email for that specific setting.
+            auth.updateUser {
+                password = newPassword
+            }
+            
             Result.Success(Unit)
         } catch (e: Exception) {
             Result.Error(e.toDataError(), e.message ?: "Failed to change password")

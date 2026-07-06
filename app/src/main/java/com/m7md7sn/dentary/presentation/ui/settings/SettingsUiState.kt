@@ -15,6 +15,14 @@ data class SettingsUiState(
     val isLoading: Boolean = false,
     val currentScreen: SettingsScreen = SettingsScreen.Main,
     val showLogoutConfirmDialog: Boolean = false,
+    
+    // Support contact fields
+    val supportEmail: String = "",
+    val supportMessage: String = "",
+    val isSupportEmailError: Boolean = false,
+    val isSupportMessageError: Boolean = false,
+    val isSupportSending: Boolean = false,
+
     val passwordChangeSuccess: Boolean = false,
     val passwordChangeError: String? = null,
     val isPasswordChanging: Boolean = false,
@@ -23,6 +31,9 @@ data class SettingsUiState(
     val confirmNewPassword: String = "",
     val newPasswordError: String? = null,
     val confirmPasswordError: String? = null,
+    val isCurrentPasswordVisible: Boolean = false,
+    val isNewPasswordVisible: Boolean = false,
+    val isConfirmNewPasswordVisible: Boolean = false,
 
     // Doctor and clinic info fields
     val fullName: String = "",

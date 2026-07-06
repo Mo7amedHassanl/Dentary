@@ -18,8 +18,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.SwapVert
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -40,6 +46,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
@@ -250,7 +258,7 @@ fun DoctorAndClinicInfoSettings(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(120.dp)
-                .background(Color.White, shape = RoundedCornerShape(24.dp))
+                .background(Color.White, shape = CircleShape)
                 .clip(RoundedCornerShape(24.dp))
                 .clickable { showPickerDialog = true }
                 .padding(horizontal = 16.dp),
@@ -315,6 +323,9 @@ fun PasswordChangeSettings(
     onCurrentPasswordChange: (String) -> Unit,
     onNewPasswordChange: (String) -> Unit,
     onConfirmNewPasswordChange: (String) -> Unit,
+    toggleCurrentPasswordVisibility: () -> Unit,
+    toggleNewPasswordVisibility: () -> Unit,
+    toggleConfirmNewPasswordVisibility: () -> Unit,
     validateNewPassword: () -> Boolean,
     changePassword: () -> Unit,
     clearPasswordFields: () -> Unit,
@@ -323,7 +334,6 @@ fun PasswordChangeSettings(
     snackbarHostState: SnackbarHostState,
     snackbarMessageFlow: SharedFlow<Event<String>>,
 ) {
-    rememberCoroutineScope()
     LaunchedEffect(Unit) {
         snackbarMessageFlow.collect { event ->
             event.getContentIfNotHandled()?.let { message ->
@@ -346,6 +356,7 @@ fun PasswordChangeSettings(
             titleIcon = R.drawable.ic_lock,
         )
         Spacer(Modifier.height(20.dp))
+        
         SettingsTextFieldNoIcon(
             value = uiState.currentPassword,
             onValueChange = onCurrentPasswordChange,
@@ -354,15 +365,21 @@ fun PasswordChangeSettings(
                 imeAction = ImeAction.Next,
                 keyboardType = KeyboardType.Password
             ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            visualTransformation = if (uiState.isCurrentPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = toggleCurrentPasswordVisibility) {
+                    Icon(
+                        imageVector = if (uiState.isCurrentPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = null,
+                        tint = DentaryBlue
                     )
                 }
-            )
+            }
         )
+        
         Spacer(Modifier.height(10.dp))
+        
         SettingsTextFieldNoIcon(
             value = uiState.newPassword,
             onValueChange = onNewPasswordChange,
@@ -371,17 +388,23 @@ fun PasswordChangeSettings(
                 imeAction = ImeAction.Next,
                 keyboardType = KeyboardType.Password
             ),
-            keyboardActions = KeyboardActions(
-                onNext = {
-                    focusManager.moveFocus(
-                        FocusDirection.Down
+            keyboardActions = KeyboardActions(onNext = { focusManager.moveFocus(FocusDirection.Down) }),
+            isError = uiState.newPasswordError != null,
+            errorMessage = uiState.newPasswordError ?: "",
+            visualTransformation = if (uiState.isNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = toggleNewPasswordVisibility) {
+                    Icon(
+                        imageVector = if (uiState.isNewPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = null,
+                        tint = DentaryBlue
                     )
                 }
-            ),
-            isError = uiState.newPasswordError != null,
-            errorMessage = uiState.newPasswordError ?: ""
+            }
         )
+        
         Spacer(Modifier.height(10.dp))
+        
         SettingsTextFieldNoIcon(
             value = uiState.confirmNewPassword,
             onValueChange = onConfirmNewPasswordChange,
@@ -390,14 +413,21 @@ fun PasswordChangeSettings(
                 imeAction = ImeAction.Done,
                 keyboardType = KeyboardType.Password
             ),
-            keyboardActions = KeyboardActions(
-                onDone = {
-                    focusManager.clearFocus()
-                }
-            ),
+            keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
             isError = uiState.confirmPasswordError != null,
-            errorMessage = uiState.confirmPasswordError ?: ""
+            errorMessage = uiState.confirmPasswordError ?: "",
+            visualTransformation = if (uiState.isConfirmNewPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                IconButton(onClick = toggleConfirmNewPasswordVisibility) {
+                    Icon(
+                        imageVector = if (uiState.isConfirmNewPasswordVisible) Icons.Default.VisibilityOff else Icons.Default.Visibility,
+                        contentDescription = null,
+                        tint = DentaryBlue
+                    )
+                }
+            }
         )
+
         Spacer(Modifier.height(22.dp))
         SettingsActionButtons(
             onSaveClick = {

@@ -25,6 +25,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.m7md7sn.dentary.data.model.Screen
+import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
@@ -43,6 +44,7 @@ import com.m7md7sn.dentary.presentation.ui.profile.ProfileScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsViewModel
 import com.m7md7sn.dentary.presentation.ui.patient.PatientScreen
+import com.m7md7sn.dentary.presentation.ui.common.ComingSoonPlaceholder
 
 @Composable
 fun DentaryNavHost(
@@ -286,10 +288,16 @@ fun DentaryNavHost(
                     )
                 }
                 composable(route = Screen.Appointments.route) {
-                    // Appointments screen content
+                    ComingSoonPlaceholder(
+                        iconRes = R.drawable.ic_calendar,
+                        descriptionRes = R.string.appointments_placeholder
+                    )
                 }
                 composable(route = Screen.Chats.route) {
-                    // Chats screen content
+                    ComingSoonPlaceholder(
+                        iconRes = R.drawable.ic_chat,
+                        descriptionRes = R.string.chats_placeholder
+                    )
                 }
                 composable(route = Screen.Settings.route) {
                     SettingsScreen(

@@ -73,6 +73,7 @@ fun SupportContent(
     onEmailChange: (String) -> Unit,
     onMessageChange: (String) -> Unit,
     onSendClick: () -> Unit,
+    onBackClick: () -> Unit,
     focusManager: FocusManager
 ) {
     Column(
@@ -129,8 +130,12 @@ fun SupportContent(
 
         Spacer(modifier = Modifier.height(24.dp))
         SettingsActionButtons(
-            onSaveClick = {  },
-            onCancelClick = {  }
+            isLoading = isLoading,
+            onSaveClick = { onSendClick() },
+            onCancelClick = {
+                focusManager.clearFocus()
+                onBackClick()
+            }
         )
     }
 }

@@ -40,7 +40,8 @@ fun SettingsTextField(
     shape: Shape = CircleShape,
     modifier: Modifier = Modifier,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = value,
@@ -66,9 +67,11 @@ fun SettingsTextField(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = if (isError) Color.Red else DentaryBlueGray,
-                    fontFamily = AlexandriaRegular
+                    fontFamily = AlexandriaRegular,
+                    textAlign = TextAlign.Start
                 ),
-                textAlign = TextAlign.Center
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Start
             )
         },
         keyboardActions = keyboardActions,
@@ -82,8 +85,10 @@ fun SettingsTextField(
                         fontFamily = AlexandriaRegular,
                         fontWeight = FontWeight.Normal,
                         color = Color.Red,
-                        fontSize = 14.sp
-                    )
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center
+                    ),
+                    textAlign = TextAlign.Center
                 )
             }
         } else null,
@@ -91,7 +96,7 @@ fun SettingsTextField(
         enabled = enabled,
         shape = shape,
         textStyle = TextStyle(
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             color = if (isError) Color.Red else DentaryBlue,
@@ -102,7 +107,8 @@ fun SettingsTextField(
                 painter = painterResource(id = icon),
                 contentDescription = null,
             )
-        }
+        },
+        trailingIcon = trailingIcon
     )
 }
 
@@ -119,7 +125,8 @@ fun SettingsTextFieldNoIcon(
     modifier: Modifier = Modifier,
     shape: Shape = CircleShape,
     visualTransformation: VisualTransformation = VisualTransformation.None,
-    enabled: Boolean = true
+    enabled: Boolean = true,
+    trailingIcon: @Composable (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = value,
@@ -148,7 +155,7 @@ fun SettingsTextFieldNoIcon(
                     fontFamily = AlexandriaRegular
                 ),
                 modifier = Modifier.fillMaxSize(),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Start
             )
         },
         keyboardActions = keyboardActions,
@@ -171,11 +178,12 @@ fun SettingsTextFieldNoIcon(
         enabled = enabled,
         shape = shape,
         textStyle = TextStyle(
-            textAlign = TextAlign.Center,
+            textAlign = TextAlign.Start,
             fontSize = 14.sp,
             fontWeight = FontWeight.Normal,
             color = if (isError) Color.Red else DentaryBlue,
             fontFamily = AlexandriaRegular
         ),
+        trailingIcon = trailingIcon
     )
 }

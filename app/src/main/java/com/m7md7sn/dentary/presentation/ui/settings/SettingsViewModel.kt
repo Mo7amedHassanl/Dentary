@@ -90,19 +90,39 @@ class SettingsViewModel @Inject constructor(
     fun onConfirmNewPasswordChange(value: String) {
         _uiState.value = uiState.value.copy(confirmNewPassword = value, confirmPasswordError = null)
     }
+
+    fun toggleCurrentPasswordVisibility() {
+        _uiState.value = uiState.value.copy(isCurrentPasswordVisible = !uiState.value.isCurrentPasswordVisible)
+    }
+
+    fun toggleNewPasswordVisibility() {
+        _uiState.value = uiState.value.copy(isNewPasswordVisible = !uiState.value.isNewPasswordVisible)
+    }
+
+    fun toggleConfirmNewPasswordVisibility() {
+        _uiState.value = uiState.value.copy(isConfirmNewPasswordVisible = !uiState.value.isConfirmNewPasswordVisible)
+    }
+
     fun validateNewPassword(): Boolean {
         var error: String? = null
         var confirmError: String? = null
         val newPassword = uiState.value.newPassword
         val confirmNewPassword = uiState.value.confirmNewPassword
+        
         if (newPassword.length < 8) {
             error = "Password must be at least 8 characters."
         } else if (!newPassword.any { it.isDigit() }) {
             error = "Password must contain at least one number."
+        } else if (!newPassword.any { it.isUpperCase() }) {
+            error = "Password must contain at least one uppercase letter."
+        } else if (!newPassword.any { !it.isLetterOrDigit() }) {
+            error = "Password must contain at least one special character."
         }
+        
         if (newPassword != confirmNewPassword) {
             confirmError = "Passwords do not match."
         }
+
         _uiState.value = uiState.value.copy(newPasswordError = error, confirmPasswordError = confirmError)
         return error == null && confirmError == null
     }
@@ -288,5 +308,43 @@ class SettingsViewModel @Inject constructor(
 
     sealed class Event {
         object RecreateActivity : Event()
+        data class SendSupportEmail(val email: String, val message: String) : Event()
+    }
+
+    // Support functions
+    fun onSupportEmailChange(value: String) {
+        _uiState.value = uiState.value.copy(supportEmail = value, isSupportEmailError = false)
+    }
+
+    fun onSupportMessageChange(value: String) {
+        _uiState.value = uiState.value.copy(supportMessage = value, isSupportMessageError = false)
+    }
+
+    fun sendSupportInquiry() {
+        if (_uiState.value.isSupportSending) return
+        // Validate
+        val email = uiState.value.supportEmail.trim()
+        val message = uiState.value.supportMessage.trim()
+        var valid = true
+        if (email.isBlank() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            _uiState.value = uiState.value.copy(isSupportEmailError = true)
+            valid = false
+        }
+        if (message.isBlank()) {
+            _uiState.value = uiState.value.copy(isSupportMessageError = true)
+            valid = false
+        }
+        if (!valid) return
+
+        viewModelScope.launch {
+            _uiState.value = uiState.value.copy(isSupportSending = true)
+            // Emit an event to let the UI launch an email intent
+            _eventChannel.send(Event.SendSupportEmail(email = email, message = message))
+            // Show snackbar that email composer is opening
+            _snackbarMessage.emit(Event("Opening email app..."))
+            _uiState.value = uiState.value.copy(isSupportSending = false)
+            // Optionally clear message
+            _uiState.value = uiState.value.copy(supportMessage = "")
+        }
     }
 }
