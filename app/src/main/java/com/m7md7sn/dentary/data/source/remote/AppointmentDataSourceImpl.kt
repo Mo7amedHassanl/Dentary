@@ -154,4 +154,25 @@ class AppointmentDataSourceImpl @Inject constructor(
             Result.Error(e.toDataError(), e.message)
         }
     }
+
+    override suspend fun getAppointmentsUpdatedAfter(timestamp: String): Result<List<Appointment>, DataError> {
+        return try {
+            val currentUserId = auth.currentUserOrNull()?.id
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
+
+            val appointments = postgrest
+                .from("appointments")
+                .select {
+                    filter {
+                        eq("user_id", currentUserId)
+                        gt("updated_at", timestamp)
+                    }
+                }
+                .decodeList<Appointment>()
+
+            Result.Success(appointments)
+        } catch (e: Exception) {
+            Result.Error(e.toDataError(), e.message)
+        }
+    }
 }

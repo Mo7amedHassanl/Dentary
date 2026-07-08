@@ -180,7 +180,7 @@ fun AddPatientScreen(
             },
             text = {
                 Text(
-                    text = stringResource(R.string.patient_added_successfully),
+                    text = if (uiState.isEditMode) stringResource(R.string.success) else stringResource(R.string.patient_added_successfully),
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontFamily = AlexandriaRegular,
@@ -279,6 +279,10 @@ fun AddPatientScreen(
                     onEmailChange = viewModel::onEmailChange,
                     isEmailError = uiState.isEmailError,
                     emailErrorMessage = uiState.emailErrorMessage,
+                    address = uiState.address,
+                    onAddressChange = viewModel::onAddressChange,
+                    isAddressError = uiState.isAddressError,
+                    addressErrorMessage = uiState.addressErrorMessage,
                     gender = uiState.gender,
                     onGenderChange = viewModel::onGenderChange,
                     isGenderError = uiState.isGenderError,
@@ -291,7 +295,8 @@ fun AddPatientScreen(
                     isImageUploading = uiState.isImageUploading,
                     onSaveClick = viewModel::addPatient,
                     onCancelClick = viewModel::onCancelClick,
-                    focusManager = focusManager
+                    focusManager = focusManager,
+                    isEditMode = uiState.isEditMode
                 )
             }
             SnackbarHost(

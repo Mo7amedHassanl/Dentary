@@ -21,7 +21,9 @@ data class PatientEntity(
     val lastVisitDate: String?,
     val createdAt: String?,
     val updatedAt: String?,
-    val isSynced: Boolean = true
+    val isSynced: Boolean = true,
+    val lastUpdatedLocal: Long = System.currentTimeMillis(),
+    val isDeletedLocally: Boolean = false
 )
 
 fun PatientEntity.toDomain(): Patient {
@@ -43,7 +45,11 @@ fun PatientEntity.toDomain(): Patient {
     )
 }
 
-fun Patient.toEntity(isSynced: Boolean = true): PatientEntity {
+fun Patient.toEntity(
+    isSynced: Boolean = true,
+    lastUpdatedLocal: Long = System.currentTimeMillis(),
+    isDeletedLocally: Boolean = false
+): PatientEntity {
     return PatientEntity(
         id = id,
         userId = userId,
@@ -59,6 +65,8 @@ fun Patient.toEntity(isSynced: Boolean = true): PatientEntity {
         lastVisitDate = lastVisitDate,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        isSynced = isSynced
+        isSynced = isSynced,
+        lastUpdatedLocal = lastUpdatedLocal,
+        isDeletedLocally = isDeletedLocally
     )
 }

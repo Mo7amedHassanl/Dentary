@@ -1,6 +1,8 @@
 package com.m7md7sn.dentary.presentation.ui.auth.login
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
+import com.m7md7sn.dentary.R
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.model.LoginCredentials
 import com.m7md7sn.dentary.domain.usecase.auth.LoginUseCase
@@ -25,7 +27,8 @@ data class ValidationResult(
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginUseCase: LoginUseCase
+    private val loginUseCase: LoginUseCase,
+    private val application: Application
 ) : ViewModel() {
     private val _uiState = MutableStateFlow(LoginUiState())
     val uiState: StateFlow<LoginUiState> = _uiState.asStateFlow()
@@ -82,13 +85,13 @@ class LoginViewModel @Inject constructor(
 
     private fun validateLoginInputs(email: String, password: String): ValidationResult {
         val emailError = when {
-            email.isBlank() -> "Email cannot be empty"
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
+            email.isBlank() -> application.getString(R.string.error_email_empty)
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> application.getString(R.string.error_email_format)
             else -> null
         }
 
         val passwordError = when {
-            password.isBlank() -> "Password cannot be empty"
+            password.isBlank() -> application.getString(R.string.error_password_empty)
             else -> null
         }
 

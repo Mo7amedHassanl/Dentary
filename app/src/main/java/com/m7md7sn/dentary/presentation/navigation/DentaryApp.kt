@@ -1,23 +1,41 @@
 package com.m7md7sn.dentary.presentation.navigation
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.CloudOff
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -40,11 +58,14 @@ import com.m7md7sn.dentary.presentation.ui.home.HomeScreen
 import com.m7md7sn.dentary.presentation.ui.medicalhistory.AddMedicalHistoryScreen
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 import com.m7md7sn.dentary.presentation.ui.patients.PatientsScreen
+import com.m7md7sn.dentary.presentation.ui.patients.PatientsViewModel
+import com.m7md7sn.dentary.presentation.ui.patients.components.PatientSortMenu
 import com.m7md7sn.dentary.presentation.ui.profile.ProfileScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsScreen
 import com.m7md7sn.dentary.presentation.ui.settings.SettingsViewModel
 import com.m7md7sn.dentary.presentation.ui.patient.PatientScreen
 import com.m7md7sn.dentary.presentation.ui.common.ComingSoonPlaceholder
+import com.m7md7sn.dentary.utils.ConnectivityObserver
 
 @Composable
 fun DentaryNavHost(
@@ -56,6 +77,22 @@ fun DentaryNavHost(
 
     val settingsViewModel: SettingsViewModel = hiltViewModel()
     val settingsUiState by settingsViewModel.uiState.collectAsState()
+
+    val networkViewModel: NetworkStatusViewModel = hiltViewModel()
+    val networkStatus by networkViewModel.networkStatus.collectAsState()
+
+    val isPatientsScreen = currentRoute?.startsWith("patients") == true
+    val patientsViewModel: PatientsViewModel? = if (isPatientsScreen) {
+        val entry = remember(navBackStackEntry) {
+            try {
+                navController.getBackStackEntry(Screen.Patients.route)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        if (entry != null) hiltViewModel(entry) else null
+    } else null
+    val patientsUiState by (patientsViewModel?.uiState?.collectAsState() ?: remember { mutableStateOf(null) })
 
     val showBottomBar = when (currentRoute) {
         Screen.Home.route, Screen.Profile.route, Screen.Settings.route, Screen.Appointments.route, Screen.Chats.route -> true
@@ -79,6 +116,8 @@ fun DentaryNavHost(
         else -> false
     }
 
+    val isSelectionMode = patientsUiState?.isSelectionMode == true
+
     Scaffold(
         modifier = modifier,
         containerColor = Color.Transparent,
@@ -99,43 +138,130 @@ fun DentaryNavHost(
         },
         topBar = {
             if (showTopBar) {
-                if (currentRoute == Screen.Settings.route) {
-                    DentaryTopBar(
-                        navController = navController,
-                        showBackButton = settingsUiState.currentScreen != SettingsScreen.Main,
-                        onBackClick = { settingsViewModel.navigateBack() },
-                        onNavDrawerClicked = {},
-                        iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue
-                    )
-                } else {
-                    DentaryTopBar(
-                        navController = navController,
-                        showBackButton = topBarShowBackButton,
-                        onBackClick = { navController.popBackStack() },
-                        onNavDrawerClicked = {},
-                        containerColor = if (isTopBarColorBlue) DentaryLightBlue else BackgroundColor,
-                        iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue
-                    )
+                Box {
+                    if (currentRoute == Screen.Settings.route) {
+                        DentaryTopBar(
+                            navController = navController,
+                            showBackButton = settingsUiState.currentScreen != SettingsScreen.Main,
+                            onBackClick = { settingsViewModel.navigateBack() },
+                            onNavDrawerClicked = {},
+                            iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue,
+                            actions = {
+                                IconButton(
+                                    onClick = { /* onNavDrawerClicked() */ },
+                                    modifier = Modifier.padding(end = 8.dp)
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_nav_drawer),
+                                        contentDescription = "Notifications",
+                                        tint = if (isTopBarColorBlue) Color.White else DentaryBlue
+                                    )
+                                }
+                            }
+                        )
+                    } else {
+                        DentaryTopBar(
+                            navController = navController,
+                            showBackButton = topBarShowBackButton,
+                            onBackClick = { navController.popBackStack() },
+                            onNavDrawerClicked = {},
+                            containerColor = if (isTopBarColorBlue) DentaryLightBlue else BackgroundColor,
+                            iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue,
+                            actions = {
+                                if (isPatientsScreen && patientsViewModel != null && patientsUiState != null) {
+                                    PatientSortMenu(
+                                        currentSortOrder = patientsUiState!!.sortOrder,
+                                        onSortOrderChange = { patientsViewModel.setSortOrder(it) },
+                                        isSelectionMode = patientsUiState!!.isSelectionMode,
+                                        onEnterSelectionMode = { patientsViewModel.enterSelectionMode() },
+                                        onDeleteSelected = { patientsViewModel.deleteSelectedPatients() },
+                                        onClearSelection = { patientsViewModel.clearSelection() },
+                                        iconColor = if (isTopBarColorBlue) Color.White else DentaryBlue
+                                    )
+                                } else {
+                                    IconButton(
+                                        onClick = { /* onNavDrawerClicked() */ },
+                                        modifier = Modifier.padding(end = 8.dp)
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_nav_drawer),
+                                            contentDescription = "Notifications",
+                                            tint = if (isTopBarColorBlue) Color.White else DentaryBlue
+                                        )
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    if (networkStatus != ConnectivityObserver.Status.Available) {
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(28.dp)
+                                .align(Alignment.BottomCenter),
+                            color = DentaryBlue.copy(alpha = 0.8f)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxSize(),
+                                horizontalArrangement = Arrangement.Center,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.CloudOff,
+                                    contentDescription = null,
+                                    tint = Color.White,
+                                    modifier = Modifier.size(14.dp)
+                                )
+                                Spacer(modifier = Modifier.width(6.dp))
+                                Text(
+                                    text = stringResource(R.string.offline_mode),
+                                    color = Color.White,
+                                    fontSize = 11.sp,
+                                    style = MaterialTheme.typography.labelSmall
+                                )
+                            }
+                        }
+                    }
                 }
             }
         },
         floatingActionButton = {
             if (showFAB) {
-                IconButton(
-                    onClick = {
-                        navController.navigate(Screen.AddPatient.route)
-                    },
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = DentaryBlue,
-                        contentColor = Color.White
-                    ),
-                    modifier = Modifier.size(56.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Add,
-                        contentDescription = null,
-                        modifier = Modifier.padding(8.dp).fillMaxSize()
-                    )
+                if (isSelectionMode && isPatientsScreen) {
+                    IconButton(
+                        onClick = {
+                            patientsViewModel?.deleteSelectedPatients()
+                        },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = Color.Red,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(56.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = stringResource(R.string.delete_selected),
+                            modifier = Modifier.padding(8.dp).fillMaxSize()
+                        )
+                    }
+                } else {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Screen.AddPatient.createRoute())
+                        },
+                        colors = IconButtonDefaults.filledIconButtonColors(
+                            containerColor = DentaryBlue,
+                            contentColor = Color.White
+                        ),
+                        modifier = Modifier.size(56.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Add,
+                            contentDescription = null,
+                            modifier = Modifier.padding(8.dp).fillMaxSize()
+                        )
+                    }
                 }
             } else if( currentRoute == Screen.MedicalHistoryScreen.route){
                 IconButton(
@@ -309,7 +435,14 @@ fun DentaryNavHost(
                         }
                     )
                 }
-                composable(route = Screen.AddPatient.route) {
+                composable(
+                    route = Screen.AddPatient.route,
+                    arguments = listOf(navArgument("patientId") { 
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    })
+                ) {
                     AddPatientScreen(
                         onNavigateBack = {
                             navController.popBackStack()

@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import com.m7md7sn.dentary.data.util.toDataError
 import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
@@ -33,22 +34,22 @@ class PatientImageManager @Inject constructor(
                 // Delete old image if it exists
                 if (oldImageUrl != null) {
                     try {
-                        println("Attempting to delete old patient image: $oldImageUrl")
+                        Log.d("PatientImageMgr", "Attempting to delete old patient image: $oldImageUrl")
                         val deleteResult = deletePatientImage(oldImageUrl)
                         when (deleteResult) {
                             is Result.Success -> {
-                                println("Successfully deleted old patient image")
+                                Log.d("PatientImageMgr", "Successfully deleted old patient image")
                             }
                             is Result.Error -> {
-                                println("Failed to delete old patient image: ${deleteResult.message}")
+                                Log.w("PatientImageMgr", "Failed to delete old patient image: ${deleteResult.message}")
                             }
                             is Result.Loading -> {
-                                println("Delete operation is loading (unexpected)")
+                                Log.w("PatientImageMgr", "Delete operation is loading (unexpected)")
                             }
                         }
                     } catch (e: Exception) {
                         // Log the error but continue with upload
-                        println("Exception while deleting old patient image: ${e.message}")
+                        Log.w("PatientImageMgr", "Exception while deleting old patient image: ${e.message}")
                     }
                 }
 
@@ -85,6 +86,10 @@ class PatientImageManager @Inject constructor(
                 val inputStream = context.contentResolver.openInputStream(imageUri)
                 val originalBitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
+
+                if (originalBitmap == null) {
+                    throw Exception("Failed to decode image — file may be corrupt or unsupported format")
+                }
 
                 // Calculate new dimensions (max 512x512 for patient images)
                 val maxSize = 512
@@ -126,7 +131,7 @@ class PatientImageManager @Inject constructor(
                     return@withContext Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
                 }
 
-                println("Deleting patient image with URL: $imageUrl")
+                Log.d("PatientImageMgr", "Deleting patient image with URL: $imageUrl")
 
                 // Extract the path from Supabase URL
                 // Supabase URLs look like: https://xxx.supabase.co/storage/v1/object/public/avatars/patient_images/user_id/filename.jpg
@@ -140,11 +145,11 @@ class PatientImageManager @Inject constructor(
                 // Remove any query parameters
                 val cleanPath = storagePath.split("?").first()
                 
-                println("Extracted storage path: $cleanPath")
+                Log.d("PatientImageMgr", "Extracted storage path: $cleanPath")
 
                 // Check if file exists before attempting deletion
                 val fileExists = fileExistsInStorage(cleanPath)
-                println("File exists check: $fileExists")
+                Log.d("PatientImageMgr", "File exists check: $fileExists")
 
                 // Try multiple deletion strategies
                 var deletionSuccessful = false
@@ -152,13 +157,13 @@ class PatientImageManager @Inject constructor(
 
                 // Strategy 1: Direct path deletion
                 try {
-                    println("Trying direct path deletion: $cleanPath")
+                    Log.d("PatientImageMgr", "Trying direct path deletion: $cleanPath")
                     storage.from("avatars").delete(cleanPath)
-                    println("Direct deletion successful")
+                    Log.d("PatientImageMgr", "Direct deletion successful")
                     deletionSuccessful = true
                 } catch (e: Exception) {
                     lastError = "Direct deletion failed: ${e.message}"
-                    println(lastError)
+                    Log.w("PatientImageMgr", lastError)
                 }
 
                 // Strategy 2: Extract filename and reconstruct path
@@ -166,14 +171,14 @@ class PatientImageManager @Inject constructor(
                     try {
                         val fileName = imageUrl.substringAfterLast("/").split("?").first()
                         val reconstructedPath = "patient_images/${currentUser.id}/$fileName"
-                        println("Trying reconstructed path: $reconstructedPath")
+                        Log.d("PatientImageMgr", "Trying reconstructed path: $reconstructedPath")
                         
                         storage.from("avatars").delete(reconstructedPath)
-                        println("Reconstructed path deletion successful")
+                        Log.d("PatientImageMgr", "Reconstructed path deletion successful")
                         deletionSuccessful = true
                     } catch (e: Exception) {
                         lastError = "Reconstructed path deletion failed: ${e.message}"
-                        println(lastError)
+                        Log.w("PatientImageMgr", lastError)
                     }
                 }
 
@@ -181,23 +186,23 @@ class PatientImageManager @Inject constructor(
                 if (!deletionSuccessful) {
                     try {
                         val fileName = imageUrl.substringAfterLast("/").split("?").first()
-                        println("Trying filename-only deletion: $fileName")
+                        Log.d("PatientImageMgr", "Trying filename-only deletion: $fileName")
                         
                         storage.from("avatars").delete(fileName)
-                        println("Filename-only deletion successful")
+                        Log.d("PatientImageMgr", "Filename-only deletion successful")
                         deletionSuccessful = true
                     } catch (e: Exception) {
                         lastError = "Filename-only deletion failed: ${e.message}"
-                        println(lastError)
+                        Log.w("PatientImageMgr", lastError)
                     }
                 }
 
                 // Strategy 4: Try to list files and find the exact path
                 if (!deletionSuccessful) {
                     try {
-                        println("Trying to list files to find exact path...")
+                        Log.d("PatientImageMgr", "Trying to list files to find exact path...")
                         val files = storage.from("avatars").list("patient_images/${currentUser.id}")
-                        println("Found files: ${files.map { it.name }}")
+                        Log.d("PatientImageMgr", "Found files: ${files.map { it.name }}")
                         
                         // Look for files that match our pattern
                         val targetFileName = imageUrl.substringAfterLast("/").split("?").first()
@@ -205,28 +210,28 @@ class PatientImageManager @Inject constructor(
                         
                         if (matchingFile != null) {
                             val exactPath = "patient_images/${currentUser.id}/${matchingFile.name}"
-                            println("Found exact path: $exactPath")
+                            Log.d("PatientImageMgr", "Found exact path: $exactPath")
                             storage.from("avatars").delete(exactPath)
-                            println("Exact path deletion successful")
+                            Log.d("PatientImageMgr", "Exact path deletion successful")
                             deletionSuccessful = true
                         } else {
-                            println("No matching file found in listing")
+                            Log.d("PatientImageMgr", "No matching file found in listing")
                         }
                     } catch (e: Exception) {
                         lastError = "File listing and exact path deletion failed: ${e.message}"
-                        println(lastError)
+                        Log.w("PatientImageMgr", lastError)
                     }
                 }
 
                 if (deletionSuccessful) {
-                    println("Deletion completed successfully")
+                    Log.d("PatientImageMgr", "Deletion completed successfully")
                     Result.Success(Unit)
                 } else {
-                    println("All deletion strategies failed. Last error: $lastError")
+                    Log.w("PatientImageMgr", "All deletion strategies failed. Last error: $lastError")
                     Result.Error(DataError.Network.UNKNOWN, "Failed to delete patient image after trying all strategies: $lastError")
                 }
             } catch (e: Exception) {
-                println("Exception in deletePatientImage: ${e.message}")
+                Log.e("PatientImageMgr", "Exception in deletePatientImage", e)
                 Result.Error(e.toDataError(), e.message)
             }
         }
@@ -237,7 +242,7 @@ class PatientImageManager @Inject constructor(
             storage.from("avatars").list(filePath.substringBeforeLast("/"))
                 .any { it.name == filePath.substringAfterLast("/") }
         } catch (e: Exception) {
-            println("Error checking if file exists: ${e.message}")
+            Log.w("PatientImageMgr", "Error checking if file exists: ${e.message}")
             false
         }
     }

@@ -14,4 +14,5 @@ interface AppointmentDataSource {
     suspend fun createAppointment(request: CreateAppointmentRequest): Result<Appointment, DataError>
     suspend fun updateAppointment(id: String, request: UpdateAppointmentRequest): Result<Appointment, DataError>
     suspend fun deleteAppointment(id: String): Result<Unit, DataError>
+    suspend fun getAppointmentsUpdatedAfter(timestamp: String): Result<List<Appointment>, DataError>
 }

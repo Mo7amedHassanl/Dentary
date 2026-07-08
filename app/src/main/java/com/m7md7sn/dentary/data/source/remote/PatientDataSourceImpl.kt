@@ -1,27 +1,33 @@
 package com.m7md7sn.dentary.data.source.remote
 
-import com.m7md7sn.dentary.data.model.Patient
+import android.net.Uri
 import com.m7md7sn.dentary.data.model.CreatePatientRequest
 import com.m7md7sn.dentary.data.model.MedicalProcedureStats
+import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.data.repository.PatientImageManager
 import com.m7md7sn.dentary.data.util.toDataError
 import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
-import javax.inject.Inject
-import android.net.Uri
-
+import io.github.jan.supabase.postgrest.query.Order
 import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.TimeZone
+import javax.inject.Inject
 
 class PatientDataSourceImpl @Inject constructor(
     private val auth: Auth,
     private val postgrest: Postgrest,
     private val patientImageManager: PatientImageManager
 ) : PatientDataSource {
+
+    companion object {
+        private val timestampFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US).apply {
+            timeZone = TimeZone.getTimeZone("UTC")
+        }
+    }
 
     override suspend fun getAllPatients(): Result<List<Patient>, DataError> {
         return try {
@@ -69,12 +75,11 @@ class PatientDataSourceImpl @Inject constructor(
             val currentUserId = auth.currentUserOrNull()?.id
                 ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
-            sdf.timeZone = TimeZone.getTimeZone("UTC")
-            val currentTime = sdf.format(Date())
+            val currentTime = timestampFormat.format(Date())
 
-            // Create PatientInsert object without ID for insertion
+            // Create PatientInsert object with ID if it's not a temporary/empty one
             val createPatientRequest = CreatePatientRequest(
+                id = if (patient.id.isNotBlank()) patient.id else null,
                 userId = currentUserId,
                 name = patient.name,
                 phoneNumber = patient.phoneNumber,
@@ -106,9 +111,7 @@ class PatientDataSourceImpl @Inject constructor(
             val currentUserId = auth.currentUserOrNull()?.id
                 ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSXXX", Locale.US)
-            sdf.timeZone = TimeZone.getTimeZone("UTC")
-            val currentTime = sdf.format(Date())
+            val currentTime = timestampFormat.format(Date())
             val updatedPatientWithDate = patient.copy(lastVisitDate = currentTime)
 
             val updatedPatient = postgrest
@@ -183,53 +186,46 @@ class PatientDataSourceImpl @Inject constructor(
                 }
                 .decodeList<Patient>()
 
-            // Define all medical procedure types
-            val allProcedures = listOf(
-                "حشو عادي",
-                "جراحة",
-                "تنظيف جير",
-                "حشو عصب",
-                "تركيبات متحركة",
-                "تركيبات ثابتة"
-            )
+            val procedureCounts = patients
+                .filter { it.medicalProcedure != null && it.medicalProcedure.isNotEmpty() }
+                .groupBy { it.medicalProcedure!! }
+                .map { (procedure, list) ->
+                    MedicalProcedureStats(procedure, list.size)
+                }
 
-            // Calculate statistics from patients data
-            val patientStats = patients
-                .filter { it.medicalProcedure != null && it.medicalProcedure!!.isNotEmpty() }
-                .groupBy { it.medicalProcedure }
-                .mapValues { it.value.size }
+            Result.Success(procedureCounts)
+        } catch (e: Exception) {
+            Result.Error(e.toDataError(), e.message)
+        }
+    }
 
-            // Create stats for all procedures, including those with 0 patients
-            val stats = allProcedures.map { procedure ->
-                MedicalProcedureStats(
-                    procedure = procedure,
-                    count = patientStats[procedure] ?: 0
-                )
-            }
+    override suspend fun getPatientsUpdatedAfter(timestamp: String): Result<List<Patient>, DataError> {
+        return try {
+            val currentUserId = auth.currentUserOrNull()?.id
+                ?: return Result.Error(DataError.Auth.SESSION_EXPIRED, "User not authenticated")
 
-            Result.Success(stats)
+            val patients = postgrest
+                .from("patients")
+                .select {
+                    filter {
+                        eq("user_id", currentUserId)
+                        gt("updated_at", timestamp)
+                    }
+                }
+                .decodeList<Patient>()
+
+            Result.Success(patients)
         } catch (e: Exception) {
             Result.Error(e.toDataError(), e.message)
         }
     }
 
     override suspend fun uploadPatientImage(imageUri: Uri, oldImageUrl: String?): Result<String, DataError> {
-        return try {
-            val uploadResult = patientImageManager.uploadPatientImage(imageUri, oldImageUrl)
-            
-            when (uploadResult) {
-                is Result.Success -> {
-                    Result.Success(uploadResult.data)
-                }
-                is Result.Error -> {
-                    Result.Error(uploadResult.error, uploadResult.message ?: "Failed to upload patient image")
-                }
-                else -> {
-                    Result.Error(DataError.Network.UNKNOWN, "Unknown error occurred during upload")
-                }
-            }
-        } catch (e: Exception) {
-            Result.Error(e.toDataError(), e.message)
+        val uploadResult = patientImageManager.uploadPatientImage(imageUri, oldImageUrl)
+        return when (uploadResult) {
+            is Result.Success -> Result.Success(uploadResult.data)
+            is Result.Error -> Result.Error(uploadResult.error, uploadResult.message)
+            is Result.Loading -> Result.Loading
         }
     }
 }

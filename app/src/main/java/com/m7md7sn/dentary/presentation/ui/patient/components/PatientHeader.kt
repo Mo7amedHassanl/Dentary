@@ -31,12 +31,15 @@ import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBlack
 import com.m7md7sn.dentary.presentation.theme.AlexandriaSemiBold
 
-@Preview
 @Composable
 fun PatientHeader(
     patientName: String = "محمد حسن علي",
     medicalCondition: String = "حشو عصب",
     imageUri: String? = null,
+    onEditClick: () -> Unit = {},
+    onCallClick: () -> Unit = {},
+    onChatClick: () -> Unit = {},
+    onWhatsAppClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -97,6 +100,11 @@ fun PatientHeader(
                 }
             }
         }
-        PatientActionButtons()
+        PatientActionButtons(
+            onEditClick = onEditClick,
+            onCallClick = onCallClick,
+            onChatClick = onChatClick,
+            onWhatsAppClick = onWhatsAppClick,
+        )
     }
 }

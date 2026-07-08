@@ -37,6 +37,8 @@ data class Patient(
 
 @Serializable
 data class CreatePatientRequest(
+    @SerialName("id")
+    val id: String? = null,
     @SerialName("user_id")
     val userId: String,
     @SerialName("name")
@@ -61,16 +63,3 @@ data class CreatePatientRequest(
     val lastVisitDate: String? = null,
 )
 
-@Serializable
-data class UpdatePatientRequest(
-    val name: String? = null,
-    val phoneNumber: String? = null,
-    val email: String? = null,
-    val age: Int? = null,
-    val address: String? = null,
-    val medicalHistory: String? = null,
-    val medicalProcedure: String? = null,
-    val image: String? = null,
-    val lastVisitDate: String? = null,
-    val gender: String? = null
-)

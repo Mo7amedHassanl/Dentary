@@ -66,22 +66,63 @@ val patientActionButtonList = listOf(
     )
 )
 
-@Preview
 @Composable
-fun PatientActionButtons(modifier: Modifier = Modifier) {
+fun PatientActionButtons(
+    onEditClick: () -> Unit = {},
+    onCallClick: () -> Unit = {},
+    onChatClick: () -> Unit = {},
+    onWhatsAppClick: () -> Unit = {},
+    onPdfClick: () -> Unit = {},
+    onAppointmentClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(10.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        patientActionButtonList.forEach { patientActionButtonData ->
-            PatientActionButton(
-                onClick = patientActionButtonData.onClick,
-                buttonColor = patientActionButtonData.buttonColor,
-                iconColor = patientActionButtonData.iconColor,
-                icon = patientActionButtonData.icon,
-            )
-        }
+        // Edit
+        PatientActionButton(
+            onClick = onEditClick,
+            buttonColor = Color(0xFF073FB8),
+            iconColor = Color.White,
+            icon = R.drawable.ic_edit
+        )
+        // Call
+        PatientActionButton(
+            onClick = onCallClick,
+            buttonColor = Color.White,
+            iconColor = DentaryLighterBlue,
+            icon = R.drawable.ic_call
+        )
+        // Chat
+        PatientActionButton(
+            onClick = onChatClick,
+            buttonColor = Color(0xFF5F67EC),
+            iconColor = Color.White,
+            icon = R.drawable.ic_chat
+        )
+        // WhatsApp
+        PatientActionButton(
+            onClick = onWhatsAppClick,
+            buttonColor = Color(0xFF6FE074),
+            iconColor = Color.White,
+            icon = R.drawable.ic_whatsapp
+        )
+        // PDF
+        PatientActionButton(
+            onClick = onPdfClick,
+            buttonColor = Color(0xFFEF6F5E),
+            iconColor = Color.White,
+            icon = R.drawable.ic_pdf
+        )
+        // Appointment
+        PatientActionButton(
+            onClick = onAppointmentClick,
+            buttonColor = Color(0xFF33CCCC),
+            iconColor = Color.White,
+            icon = R.drawable.ic_appoitment
+        )
     }
 }
 

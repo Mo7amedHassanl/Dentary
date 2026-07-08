@@ -21,12 +21,8 @@ import io.github.jan.supabase.annotations.SupabaseInternal
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import okhttp3.OkHttpClient
-import java.security.cert.X509Certificate
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import javax.net.ssl.SSLContext
-import javax.net.ssl.TrustManager
-import javax.net.ssl.X509TrustManager
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -35,32 +31,11 @@ object SupabaseModule {
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {
-        return try {
-            // Create a trust manager that accepts all certificates (for development only)
-            val trustAllCerts = arrayOf<TrustManager>(object : X509TrustManager {
-                override fun checkClientTrusted(chain: Array<X509Certificate>, authType: String) {}
-                override fun checkServerTrusted(chain: Array<X509Certificate>, authType: String) {}
-                override fun getAcceptedIssuers(): Array<X509Certificate> = arrayOf()
-            })
-
-            val sslContext = SSLContext.getInstance("SSL")
-            sslContext.init(null, trustAllCerts, java.security.SecureRandom())
-
-            OkHttpClient.Builder()
-                .connectTimeout(120, TimeUnit.SECONDS)
-                .readTimeout(120, TimeUnit.SECONDS)
-                .writeTimeout(120, TimeUnit.SECONDS)
-                .sslSocketFactory(sslContext.socketFactory, trustAllCerts[0] as X509TrustManager)
-                .hostnameVerifier { _, _ -> true } // Accept all hostnames (for development)
-                .build()
-        } catch (e: Exception) {
-            // Fallback to default client if SSL configuration fails
-            OkHttpClient.Builder()
-                .connectTimeout(120, TimeUnit.SECONDS)
-                .readTimeout(120, TimeUnit.SECONDS)
-                .writeTimeout(120, TimeUnit.SECONDS)
-                .build()
-        }
+        return OkHttpClient.Builder()
+            .connectTimeout(30, TimeUnit.SECONDS)
+            .readTimeout(30, TimeUnit.SECONDS)
+            .writeTimeout(30, TimeUnit.SECONDS)
+            .build()
     }
 
     @OptIn(SupabaseInternal::class)
@@ -82,16 +57,14 @@ object SupabaseModule {
             // Configure Ktor client timeouts
             httpConfig {
                 install(HttpTimeout) {
-                    requestTimeoutMillis = 120000
-                    connectTimeoutMillis = 120000
-                    socketTimeoutMillis = 120000
+                    requestTimeoutMillis = 30000
+                    connectTimeoutMillis = 30000
+                    socketTimeoutMillis = 30000
                 }
             }
 
             install(Auth) {
                 sessionManager = SharedPreferencesSessionManager(context)
-                autoSaveToStorage = true
-                autoLoadFromStorage = true
             }
 
             install(Postgrest)

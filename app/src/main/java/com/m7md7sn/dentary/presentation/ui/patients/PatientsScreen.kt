@@ -54,6 +54,8 @@ fun PatientsScreen(
                 errorMessage = uiState.errorMessage,
                 searchQuery = uiState.searchQuery,
                 selectedFilters = uiState.selectedFilters,
+                selectedPatientIds = uiState.selectedPatientIds,
+                isSelectionMode = uiState.isSelectionMode,
                 onSearchQueryChange = viewModel::searchPatients,
                 onFilterClick = { viewModel.toggleFilterDialog(true) },
                 onFilterRemove = viewModel::removeFilter,
@@ -62,6 +64,12 @@ fun PatientsScreen(
                 onRefresh = viewModel::refreshPatients,
                 onPatientClick = { patient ->
                     patient.id?.let { onNavigateToPatient(it) }
+                },
+                onPatientLongClick = { patient ->
+                    viewModel.togglePatientSelection(patient.id)
+                },
+                onToggleSelection = { id ->
+                    viewModel.togglePatientSelection(id)
                 }
             )
         }

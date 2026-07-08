@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.util.Log
 import com.m7md7sn.dentary.data.util.toDataError
 import com.m7md7sn.dentary.domain.model.DataError
 import com.m7md7sn.dentary.utils.Result
@@ -33,10 +34,10 @@ class ClinicLogoManager @Inject constructor(
                 // Delete old image if it exists
                 if (oldImageUrl != null) {
                     try {
-                        println("Attempting to delete old clinic logo: $oldImageUrl")
+                        Log.d("ClinicLogoMgr", "Attempting to delete old clinic logo: $oldImageUrl")
                         deleteClinicLogo(oldImageUrl)
                     } catch (e: Exception) {
-                        println("Exception while deleting old clinic logo: ${e.message}")
+                        Log.w("ClinicLogoMgr", "Exception while deleting old clinic logo: ${e.message}")
                     }
                 }
 
@@ -72,6 +73,10 @@ class ClinicLogoManager @Inject constructor(
                 val inputStream = context.contentResolver.openInputStream(imageUri)
                 val originalBitmap = BitmapFactory.decodeStream(inputStream)
                 inputStream?.close()
+
+                if (originalBitmap == null) {
+                    throw Exception("Failed to decode image — file may be corrupt or unsupported format")
+                }
 
                 // Max 1024x1024 for clinic logos (a bit higher quality than profile pics)
                 val maxSize = 1024

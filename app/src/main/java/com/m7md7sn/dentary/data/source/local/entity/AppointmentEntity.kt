@@ -20,7 +20,9 @@ data class AppointmentEntity(
     val cost: Double?,
     val createdAt: String?,
     val updatedAt: String?,
-    val isSynced: Boolean = true
+    val isSynced: Boolean = true,
+    val lastUpdatedLocal: Long = System.currentTimeMillis(),
+    val isDeletedLocally: Boolean = false
 )
 
 fun AppointmentEntity.toDomain(): Appointment {
@@ -40,7 +42,11 @@ fun AppointmentEntity.toDomain(): Appointment {
     )
 }
 
-fun Appointment.toEntity(isSynced: Boolean = true): AppointmentEntity {
+fun Appointment.toEntity(
+    isSynced: Boolean = true,
+    lastUpdatedLocal: Long = System.currentTimeMillis(),
+    isDeletedLocally: Boolean = false
+): AppointmentEntity {
     return AppointmentEntity(
         id = id,
         userId = userId,
@@ -54,6 +60,8 @@ fun Appointment.toEntity(isSynced: Boolean = true): AppointmentEntity {
         cost = cost,
         createdAt = createdAt,
         updatedAt = updatedAt,
-        isSynced = isSynced
+        isSynced = isSynced,
+        lastUpdatedLocal = lastUpdatedLocal,
+        isDeletedLocally = isDeletedLocally
     )
 }

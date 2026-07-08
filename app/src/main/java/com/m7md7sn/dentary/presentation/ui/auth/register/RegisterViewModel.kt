@@ -1,7 +1,9 @@
 package com.m7md7sn.dentary.presentation.ui.auth.register
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.data.model.SignUpCredentials
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Event
@@ -30,6 +32,7 @@ data class RegisterValidationResult(
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
+    private val application: Application,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -184,20 +187,20 @@ class RegisterViewModel @Inject constructor(
 
     private fun validateEmail(email: String): String? {
         return when {
-            email.isBlank() -> "Email cannot be empty"
-            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Invalid email format"
+            email.isBlank() -> application.getString(R.string.error_email_empty)
+            !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> application.getString(R.string.error_email_format)
             else -> null
         }
     }
 
     private fun validatePassword(password: String): String? {
         return when {
-            password.isBlank() -> "Password cannot be empty"
-            password.length < 8 -> "Password must be at least 8 characters"
-            !password.any { it.isUpperCase() } -> "Password must contain at least one uppercase letter"
-            !password.any { it.isLowerCase() } -> "Password must contain at least one lowercase letter"
-            !password.any { it.isDigit() } -> "Password must contain at least one number"
-            !password.any { "!@#$%^&*()_+-=[]{}|;:,.<>?".contains(it) } -> "Password must contain at least one special character"
+            password.isBlank() -> application.getString(R.string.error_password_empty)
+            password.length < 8 -> application.getString(R.string.password_min_length)
+            !password.any { it.isUpperCase() } -> application.getString(R.string.password_require_uppercase)
+            !password.any { it.isLowerCase() } -> application.getString(R.string.password_require_lowercase)
+            !password.any { it.isDigit() } -> application.getString(R.string.password_require_number)
+            !password.any { "!@#$%^&*()_+-=[]{}|;:,.<>?".contains(it) } -> application.getString(R.string.password_require_special)
             else -> null
         }
     }
@@ -205,7 +208,7 @@ class RegisterViewModel @Inject constructor(
     private fun validateConfirmPassword(password: String, confirmPassword: String): String? {
         return when {
             confirmPassword.isBlank() -> "Confirm Password cannot be empty"
-            password != confirmPassword -> "Passwords do not match"
+            password != confirmPassword -> application.getString(R.string.password_mismatch)
             else -> null
         }
     }

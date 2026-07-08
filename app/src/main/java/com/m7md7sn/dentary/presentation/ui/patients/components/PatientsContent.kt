@@ -28,7 +28,11 @@ fun PatientsContent(
     onClearFilters: () -> Unit = {},
     onNavigateBack: () -> Unit = {},
     onRefresh: () -> Unit = {},
-    onPatientClick: (Patient) -> Unit = {}
+    onPatientClick: (Patient) -> Unit = {},
+    selectedPatientIds: Set<String> = emptySet(),
+    isSelectionMode: Boolean = false,
+    onPatientLongClick: (Patient) -> Unit = {},
+    onToggleSelection: (String) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier.fillMaxSize(),
@@ -64,15 +68,27 @@ fun PatientsContent(
             Spacer(Modifier.height(20.dp))
         }
 
-        if (isLoading) {
+        if (isLoading && patients.isEmpty()) {
             item {
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }
             }
         } else {
-            items(patients) { patient ->
-                PatientItem(patient = patient, onClick = { onPatientClick(patient) })
+            items(patients, key = { it.id }) { patient ->
+                PatientItem(
+                    patient = patient,
+                    isSelected = selectedPatientIds.contains(patient.id),
+                    isSelectionMode = isSelectionMode,
+                    onClick = {
+                        if (isSelectionMode) {
+                            onToggleSelection(patient.id)
+                        } else {
+                            onPatientClick(patient)
+                        }
+                    },
+                    onLongClick = { onPatientLongClick(patient) }
+                )
             }
         }
     }

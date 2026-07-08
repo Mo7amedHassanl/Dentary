@@ -1,6 +1,7 @@
 package com.m7md7sn.dentary.presentation.ui.addpatient
 
 import android.net.Uri
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.R
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,11 +27,50 @@ import javax.inject.Inject
 class AddPatientViewModel @Inject constructor(
     private val patientRepository: PatientRepository,
     private val authRepository: AuthRepository,
-    private val patientImageManager: PatientImageManager
+    private val patientImageManager: PatientImageManager,
+    private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AddPatientsUiState())
     val uiState: StateFlow<AddPatientsUiState> = _uiState.asStateFlow()
+
+    private val patientId: String? = savedStateHandle["patientId"]
+
+    init {
+        patientId?.let { loadPatientData(it) }
+    }
+
+    private fun loadPatientData(id: String) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            val result = patientRepository.getPatientById(id)
+            when (result) {
+                is Result.Success -> {
+                    val p = result.data
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            isEditMode = true,
+                            fullName = p.name,
+                            age = p.age?.toString() ?: "",
+                            phoneNumber = p.phoneNumber ?: "",
+                            email = p.email ?: "",
+                            gender = p.gender ?: "",
+                            address = p.address ?: "",
+                            medicalProcedure = p.medicalProcedure ?: "",
+                            patientImageUrl = p.image,
+                            isDirty = false
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))
+                }
+                else -> {}
+            }
+        }
+    }
 
     private val _snackbarMessage = MutableSharedFlow<Event<String>>()
     val snackbarMessage: SharedFlow<Event<String>> = _snackbarMessage.asSharedFlow()
@@ -154,39 +195,48 @@ class AddPatientViewModel @Inject constructor(
             }
 
             val patient = Patient(
-                id = "", 
+                id = patientId ?: "", 
                 userId = userId,
                 name = _uiState.value.fullName.trim(),
                 phoneNumber = _uiState.value.phoneNumber.trim().takeIf { it.isNotEmpty() },
                 email = _uiState.value.email.trim().takeIf { it.isNotEmpty() },
                 age = _uiState.value.age.toIntOrNull(),
-                address = null, // Address field removed from UI
+                address = _uiState.value.address.trim().takeIf { it.isNotEmpty() },
                 medicalHistory = null,
                 medicalProcedure = _uiState.value.medicalProcedure.trim().takeIf { it.isNotEmpty() },
                 image = _uiState.value.patientImageUrl,
                 gender = _uiState.value.gender
             )
 
-            val result = patientRepository.createPatient(patient)
+            val result = if (patientId == null) {
+                patientRepository.createPatient(patient)
+            } else {
+                patientRepository.updatePatient(patientId, patient)
+            }
             
             _uiState.value = _uiState.value.copy(isLoading = false)
             
             when (result) {
                 is Result.Success -> {
-                    _uiState.value = _uiState.value.copy(
-                        isSuccess = true, 
-                        showSuccessDialog = true, 
-                        createdPatientId = result.data.id,
-                        isDirty = false,
-                        fullName = "",
-                        age = "",
-                        phoneNumber = "",
-                        email = "",
-                        gender = "",
-                        address = "",
-                        medicalProcedure = "",
-                        patientImageUrl = null
-                    )
+                    if (patientId == null) {
+                        _uiState.value = _uiState.value.copy(
+                            isSuccess = true,
+                            showSuccessDialog = true,
+                            createdPatientId = result.data.id,
+                            isDirty = false,
+                            fullName = "",
+                            age = "",
+                            phoneNumber = "",
+                            email = "",
+                            gender = "",
+                            address = "",
+                            medicalProcedure = "",
+                            patientImageUrl = null
+                        )
+                    } else {
+                        _uiState.value = _uiState.value.copy(isLoading = false)
+                        _navigationEvent.emit(Event(NavigationEvent.NavigateToPatient(result.data.id)))
+                    }
                 }
                 is Result.Error -> {
                     _snackbarMessage.emit(Event(result.message ?: result.error.asUiText()))

@@ -66,7 +66,58 @@ class PatientsViewModel @Inject constructor(
                 patient.medicalProcedure in selected
             }
         }
-        _uiState.value = _uiState.value.copy(patients = filtered)
+        
+        val sorted = when (_uiState.value.sortOrder) {
+            PatientSortOrder.NAME -> filtered.sortedBy { it.name }
+            PatientSortOrder.LAST_UPDATE -> filtered.sortedByDescending { it.updatedAt }
+        }
+        
+        _uiState.value = _uiState.value.copy(patients = sorted)
+    }
+
+    fun setSortOrder(order: PatientSortOrder) {
+        _uiState.value = _uiState.value.copy(sortOrder = order)
+        applyFilters()
+    }
+
+    fun togglePatientSelection(id: String) {
+        val currentSelected = _uiState.value.selectedPatientIds.toMutableSet()
+        if (currentSelected.contains(id)) {
+            currentSelected.remove(id)
+        } else {
+            currentSelected.add(id)
+        }
+        
+        _uiState.value = _uiState.value.copy(
+            selectedPatientIds = currentSelected,
+            isSelectionMode = currentSelected.isNotEmpty()
+        )
+    }
+
+    fun enterSelectionMode() {
+        _uiState.value = _uiState.value.copy(isSelectionMode = true)
+    }
+
+    fun clearSelection() {
+        _uiState.value = _uiState.value.copy(
+            selectedPatientIds = emptySet(),
+            isSelectionMode = false
+        )
+    }
+
+    fun deleteSelectedPatients() {
+        val selectedIds = _uiState.value.selectedPatientIds
+        if (selectedIds.isEmpty()) return
+
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(isLoading = true)
+            selectedIds.forEach { id ->
+                getPatientsUseCase.deletePatient(id)
+            }
+            clearSelection()
+            // The observer will update the UI automatically as the Flow emits
+            _uiState.value = _uiState.value.copy(isLoading = false)
+        }
     }
 
     fun searchPatients(query: String) {

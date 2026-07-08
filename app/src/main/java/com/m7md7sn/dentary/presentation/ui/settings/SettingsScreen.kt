@@ -88,7 +88,7 @@ fun SettingsScreen(
             },
             text = {
                 Text(
-                    text = "Password changed successfully",
+                    text = stringResource(R.string.password_changed_successfully),
                     style = TextStyle(
                         fontSize = 16.sp,
                         fontFamily = AlexandriaRegular,

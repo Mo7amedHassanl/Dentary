@@ -51,6 +51,10 @@ fun AddPatientForm(
     onEmailChange: (String) -> Unit,
     isEmailError: Boolean,
     emailErrorMessage: Int? = null,
+    address: String = "",
+    onAddressChange: (String) -> Unit = {},
+    isAddressError: Boolean = false,
+    addressErrorMessage: Int? = null,
     medicalProcedure: String,
     onMedicalProcedureChange: (String) -> Unit,
     isProcedureError: Boolean = false,
@@ -124,16 +128,34 @@ fun AddPatientForm(
             onValueChange = onEmailChange,
             placeholder = stringResource(R.string.email_optional),
             keyboardActions = KeyboardActions(
+                onNext = {
+                    focusManager.moveFocus(
+                        FocusDirection.Down
+                    )
+                }
+            ),
+            keyboardOptions = KeyboardOptions(
+                imeAction = ImeAction.Next,
+                keyboardType = KeyboardType.Email
+            ),
+            isError = isEmailError,
+            errorMessage = emailErrorMessage,
+        )
+        AddPatientTextField(
+            value = address,
+            onValueChange = onAddressChange,
+            placeholder = stringResource(R.string.address),
+            keyboardActions = KeyboardActions(
                 onDone = {
                     focusManager.clearFocus()
                 }
             ),
             keyboardOptions = KeyboardOptions(
                 imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Email
+                keyboardType = KeyboardType.Text
             ),
-            isError = isEmailError,
-            errorMessage = emailErrorMessage,
+            isError = isAddressError,
+            errorMessage = addressErrorMessage,
         )
         
         Column(horizontalAlignment = Alignment.CenterHorizontally) {

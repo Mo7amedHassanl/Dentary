@@ -3,6 +3,7 @@ package com.m7md7sn.dentary.presentation.ui.settings
 import android.app.Application
 import android.net.Uri
 import androidx.lifecycle.ViewModel
+import com.m7md7sn.dentary.R
 import androidx.lifecycle.viewModelScope
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Result
@@ -110,17 +111,17 @@ class SettingsViewModel @Inject constructor(
         val confirmNewPassword = uiState.value.confirmNewPassword
         
         if (newPassword.length < 8) {
-            error = "Password must be at least 8 characters."
+            error = application.getString(R.string.password_min_length)
         } else if (!newPassword.any { it.isDigit() }) {
-            error = "Password must contain at least one number."
+            error = application.getString(R.string.password_require_number)
         } else if (!newPassword.any { it.isUpperCase() }) {
-            error = "Password must contain at least one uppercase letter."
+            error = application.getString(R.string.password_require_uppercase)
         } else if (!newPassword.any { !it.isLetterOrDigit() }) {
-            error = "Password must contain at least one special character."
+            error = application.getString(R.string.password_require_special)
         }
         
         if (newPassword != confirmNewPassword) {
-            confirmError = "Passwords do not match."
+            confirmError = application.getString(R.string.password_mismatch)
         }
 
         _uiState.value = uiState.value.copy(newPasswordError = error, confirmPasswordError = confirmError)
@@ -148,10 +149,10 @@ class SettingsViewModel @Inject constructor(
                         passwordChangeSuccess = true,
                         passwordChangeError = null
                     )
-                    _snackbarMessage.emit(Event("Password changed successfully"))
+                    _snackbarMessage.emit(Event(application.getString(R.string.password_changed_successfully)))
                 }
                 is Result.Error -> {
-                    val errorMsg = result.message ?: "Password change failed"
+                    val errorMsg = result.message ?: application.getString(R.string.password_change_failed)
                     _uiState.value = uiState.value.copy(
                         isPasswordChanging = false,
                         passwordChangeSuccess = false,
@@ -189,7 +190,7 @@ class SettingsViewModel @Inject constructor(
                     )
                 }
                 is Result.Error -> {
-                    val errorMsg = result.message ?: "Failed to fetch profile"
+                    val errorMsg = result.message ?: application.getString(R.string.profile_fetch_failed)
                     _uiState.value = uiState.value.copy(isProfileLoading = false, profileError = errorMsg, email = email)
                     _snackbarMessage.emit(Event(errorMsg.lines().first()))
                 }
@@ -235,10 +236,10 @@ class SettingsViewModel @Inject constructor(
             when (val result = profileRepository.updateProfile(req)) {
                 is Result.Success -> {
                     _uiState.value = uiState.value.copy(isProfileLoading = false, profileUpdateSuccess = true)
-                    _snackbarMessage.emit(Event("Profile updated successfully"))
+                    _snackbarMessage.emit(Event(application.getString(R.string.profile_updated_successfully)))
                 }
                 is Result.Error -> {
-                    val errorMsg = result.message ?: "Profile update failed"
+                    val errorMsg = result.message ?: application.getString(R.string.profile_update_failed)
                     _uiState.value = uiState.value.copy(isProfileLoading = false, profileUpdateError = errorMsg)
                     _snackbarMessage.emit(Event(errorMsg.lines().first()))
                 }
@@ -263,11 +264,11 @@ class SettingsViewModel @Inject constructor(
                             isProfileLoading = false,
                             clinicLogo = result.data.clinicLogo ?: ""
                         )
-                        _snackbarMessage.emit(Event("Clinic logo updated successfully"))
+                        _snackbarMessage.emit(Event(application.getString(R.string.clinic_logo_updated)))
                     }
                     is Result.Error -> {
                         _uiState.value = _uiState.value.copy(isProfileLoading = false)
-                        _snackbarMessage.emit(Event(result.message ?: "Failed to update clinic logo"))
+                        _snackbarMessage.emit(Event(result.message ?: application.getString(R.string.clinic_logo_update_failed)))
                     }
                     else -> {
                         _uiState.value = _uiState.value.copy(isProfileLoading = false)
@@ -275,7 +276,7 @@ class SettingsViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isProfileLoading = false)
-                _snackbarMessage.emit(Event("Error updating clinic logo: ${e.message}"))
+                _snackbarMessage.emit(Event(application.getString(R.string.error_logo_update) + ": ${e.message}"))
             }
         }
     }
@@ -341,7 +342,7 @@ class SettingsViewModel @Inject constructor(
             // Emit an event to let the UI launch an email intent
             _eventChannel.send(Event.SendSupportEmail(email = email, message = message))
             // Show snackbar that email composer is opening
-            _snackbarMessage.emit(Event("Opening email app..."))
+                _snackbarMessage.emit(Event(application.getString(R.string.opening_email_app)))
             _uiState.value = uiState.value.copy(isSupportSending = false)
             // Optionally clear message
             _uiState.value = uiState.value.copy(supportMessage = "")

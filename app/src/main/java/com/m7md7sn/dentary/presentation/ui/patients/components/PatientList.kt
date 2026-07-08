@@ -1,24 +1,34 @@
 package com.m7md7sn.dentary.presentation.ui.patients.components
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.outlined.Circle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -26,6 +36,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -43,25 +54,38 @@ import java.util.Locale
 import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
+import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryDarkBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
-@Preview
 @Composable
 fun PatientList(
     modifier: Modifier = Modifier,
     patients: List<Patient> = emptyList(),
-    onPatientClick: (Patient) -> Unit = {}
+    selectedPatientIds: Set<String> = emptySet(),
+    isSelectionMode: Boolean = false,
+    onPatientClick: (Patient) -> Unit = {},
+    onPatientLongClick: (Patient) -> Unit = {},
+    onToggleSelection: (String) -> Unit = {}
 ) {
     LazyColumn(
         modifier = modifier
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        items(patients){
+        items(patients, key = { it.id }) { patient ->
             PatientItem(
-                patient = it,
-                onClick = { onPatientClick(it) }
+                patient = patient,
+                isSelected = selectedPatientIds.contains(patient.id),
+                isSelectionMode = isSelectionMode,
+                onClick = { 
+                    if (isSelectionMode) {
+                        onToggleSelection(patient.id)
+                    } else {
+                        onPatientClick(patient)
+                    }
+                },
+                onLongClick = { onPatientLongClick(patient) }
             )
         }
     }
@@ -70,18 +94,29 @@ fun PatientList(
 @Composable
 fun PatientItem(
     patient: Patient,
+    isSelected: Boolean = false,
+    isSelectionMode: Boolean = false,
     modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
+    onLongClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = 10.dp),
+            .padding(bottom = 10.dp)
+            .pointerInput(onClick, onLongClick) {
+                detectTapGestures(
+                    onTap = { onClick() },
+                    onLongPress = { onLongClick() }
+                )
+            },
         shape = RoundedCornerShape(20.dp),
-        onClick = onClick,
-        border = BorderStroke(width = 1.dp, color = Color(0xFFE3E7F2)),
+        border = BorderStroke(
+            width = 1.dp, 
+            color = if (isSelected) DentaryBlue else Color(0xFFE3E7F2)
+        ),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = if (isSelected) Color(0xFFF0F4FF) else Color.White
         )
     ) {
         Row(
@@ -91,31 +126,52 @@ fun PatientItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Row(
+                modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.spacedBy(18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                if (isSelectionMode) {
+                    Icon(
+                        imageVector = if (isSelected) Icons.Filled.CheckCircle else Icons.Outlined.Circle,
+                        contentDescription = null,
+                        tint = if (isSelected) DentaryBlue else Color.Gray,
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
                 PatientImage(patient.image)
                 PatientInfo(
                     name = patient.name,
                     phoneNumber = patient.phoneNumber ?: "",
-                    lastUpdate = patient.lastVisitDate ?: "",
+                    lastUpdate = patient.updatedAt ?: patient.lastVisitDate ?: "",
                 )
             }
-            PatientActionButtons()
+            if (!isSelectionMode) {
+                PatientActionButtons(phoneNumber = patient.phoneNumber)
+            }
         }
     }
 }
 
 @Composable
 fun PatientActionButtons(
+    phoneNumber: String? = null,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     Row(
         modifier = modifier.padding(horizontal = 16.dp),
         horizontalArrangement = Arrangement.spacedBy(10.dp),
     ) {
         IconButton(
-            onClick = { },
+            onClick = {
+                phoneNumber?.let { phone ->
+                    context.startActivity(
+                        Intent(Intent.ACTION_DIAL).apply {
+                            data = Uri.parse("tel:$phone")
+                        }
+                    )
+                }
+            },
             modifier = Modifier
                 .size(40.dp)
                 .background(DentaryLighterBlue, RoundedCornerShape(10.dp))
@@ -130,7 +186,15 @@ fun PatientActionButtons(
             )
         }
         IconButton(
-            onClick = { },
+            onClick = {
+                phoneNumber?.let { phone ->
+                    context.startActivity(
+                        Intent(Intent.ACTION_SENDTO).apply {
+                            data = Uri.parse("smsto:$phone")
+                        }
+                    )
+                }
+            },
             modifier = Modifier
                 .size(40.dp)
                 .background(Color(0xFF5F67EC), RoundedCornerShape(10.dp))

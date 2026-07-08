@@ -18,8 +18,6 @@ import kotlin.math.min
 fun rememberImagePicker(
     onImageSelected: (Uri?) -> Unit
 ): () -> Unit {
-    LocalContext.current
-
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->

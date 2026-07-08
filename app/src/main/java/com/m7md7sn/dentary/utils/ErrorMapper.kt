@@ -18,6 +18,5 @@ fun DataError.asUiText(): String {
         DataError.Auth.USER_ALREADY_EXISTS -> "An account with this email already exists."
         DataError.Auth.SESSION_EXPIRED -> "Session expired. Please log in again."
         DataError.Auth.UNKNOWN -> "Authentication failed."
-        else -> "An error occurred."
     }
 }

@@ -21,7 +21,7 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun getCurrentUser(): UserInfo? {
         return try {
-            withTimeout(15.seconds) {
+            withTimeout(5.seconds) {
                 auth.retrieveUserForCurrentSession(updateSession = true)
             }
         } catch (e: Exception) {
@@ -31,9 +31,11 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun login(credentials: LoginCredentials): Result<UserInfo, DataError> {
         return try {
-            auth.signInWith(Email) {
-                email = credentials.email
-                password = credentials.password
+            withTimeout(30.seconds) {
+                auth.signInWith(Email) {
+                    email = credentials.email
+                    password = credentials.password
+                }
             }
 
             val userInfo = auth.currentUserOrNull()
@@ -61,9 +63,12 @@ class AuthDataSourceImpl @Inject constructor(
                 }
             }
 
-            Result.Success(userInfo ?: auth.currentUserOrNull()!!)
-
-
+            val sessionUser = userInfo ?: auth.currentUserOrNull()
+            if (sessionUser != null) {
+                Result.Success(sessionUser)
+            } else {
+                Result.Error(DataError.Auth.UNKNOWN, "Registration succeeded but no user session found")
+            }
 
         } catch (e: Exception) {
             Result.Error(e.toDataError(), e.message ?: "Registration failed")
@@ -141,6 +146,9 @@ class AuthDataSourceImpl @Inject constructor(
 
     override suspend fun resetPasswordWithToken(email: String, token: String, newPassword: String): Result<Unit, DataError> {
         return try {
+            val otpResult = verifyPasswordResetOTP(email, token)
+            if (otpResult is Result.Error) return otpResult
+
             auth.updateUser {
                 password = newPassword
             }

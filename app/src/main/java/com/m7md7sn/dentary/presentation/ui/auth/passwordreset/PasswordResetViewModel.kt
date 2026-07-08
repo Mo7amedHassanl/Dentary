@@ -1,7 +1,9 @@
 package com.m7md7sn.dentary.presentation.ui.auth.passwordreset
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.utils.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,6 +26,7 @@ data class PasswordResetValidationResult(
 
 @HiltViewModel
 class PasswordResetViewModel @Inject constructor(
+    private val application: Application,
     private val authRepository: AuthRepository
 ) : ViewModel() {
 
@@ -224,7 +227,7 @@ class PasswordResetViewModel @Inject constructor(
     // Validation functions
     private fun validateEmail(email: String): String? {
         return when {
-            email.isBlank() -> "Email cannot be empty"
+            email.isBlank() -> application.getString(R.string.error_email_empty)
             email.length > 254 -> "Email address is too long"
             !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() -> "Please enter a valid email address"
             !isValidEmailDomain(email) -> "Please enter an email with a valid domain"
@@ -266,7 +269,7 @@ class PasswordResetViewModel @Inject constructor(
         val passwordError = validatePassword(password)
         val confirmPasswordError = when {
             confirmPassword.isBlank() -> "Please confirm your password"
-            password != confirmPassword -> "Passwords do not match"
+            password != confirmPassword -> application.getString(R.string.password_mismatch)
             else -> null
         }
 
@@ -279,11 +282,11 @@ class PasswordResetViewModel @Inject constructor(
 
     private fun validatePassword(password: String): String? {
         return when {
-            password.isBlank() -> "Password cannot be empty"
-            password.length < 8 -> "Password must be at least 8 characters"
-            !password.any { it.isUpperCase() } -> "Password must contain at least one uppercase letter"
-            !password.any { it.isLowerCase() } -> "Password must contain at least one lowercase letter"
-            !password.any { it.isDigit() } -> "Password must contain at least one number"
+            password.isBlank() -> application.getString(R.string.error_password_empty)
+            password.length < 8 -> application.getString(R.string.password_min_length)
+            !password.any { it.isUpperCase() } -> application.getString(R.string.password_require_uppercase)
+            !password.any { it.isLowerCase() } -> application.getString(R.string.password_require_lowercase)
+            !password.any { it.isDigit() } -> application.getString(R.string.password_require_number)
             else -> null
         }
     }

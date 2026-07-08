@@ -16,4 +16,5 @@ interface PatientRepository {
     suspend fun searchPatients(query: String): Result<List<Patient>, DataError>
     suspend fun getMedicalProcedureStats(): Result<List<MedicalProcedureStats>, DataError>
     suspend fun uploadPatientImage(imageUri: android.net.Uri, oldImageUrl: String? = null): Result<String, DataError>
+    suspend fun syncUnsyncedPatients(): Boolean
 }

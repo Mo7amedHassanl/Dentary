@@ -1,6 +1,7 @@
 package com.m7md7sn.dentary.presentation.navigation
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -32,6 +33,18 @@ fun DentaryTopBar(
     containerColor: Color = BackgroundColor,
     iconColor: Color = DentaryBlue,
     onNavDrawerClicked: () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {
+        IconButton(
+            onClick = { onNavDrawerClicked() },
+            modifier = Modifier.padding(end = 8.dp)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_nav_drawer),
+                contentDescription = "Notifications",
+                tint = iconColor
+            )
+        }
+    }
 ) {
     TopAppBar(
         title = {},
@@ -60,18 +73,7 @@ fun DentaryTopBar(
                 }
             }
         },
-        actions = {
-            IconButton(
-                onClick = { onNavDrawerClicked() },
-                modifier = Modifier.padding(end = 8.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_nav_drawer),
-                    contentDescription = "Notifications",
-                    tint = iconColor
-                )
-            }
-        },
+        actions = actions,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = containerColor
         ),

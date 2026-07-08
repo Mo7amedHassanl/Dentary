@@ -31,6 +31,10 @@ fun AddPatientContent(
     onEmailChange: (String) -> Unit,
     isEmailError: Boolean,
     emailErrorMessage: Int? = null,
+    address: String = "",
+    onAddressChange: (String) -> Unit = {},
+    isAddressError: Boolean = false,
+    addressErrorMessage: Int? = null,
     gender: String,
     onGenderChange: (String) -> Unit,
     isGenderError: Boolean,
@@ -44,13 +48,14 @@ fun AddPatientContent(
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
     focusManager: FocusManager,
+    isEditMode: Boolean = false,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        AddPatientTitle()
+        AddPatientTitle(isEditMode = isEditMode)
         Spacer(modifier = Modifier.height(40.dp))
         AddPatientImage(
             patientImageUrl = patientImageUrl,
@@ -101,6 +106,10 @@ fun AddPatientContent(
             onEmailChange = onEmailChange,
             isEmailError = isEmailError,
             emailErrorMessage = emailErrorMessage,
+            address = address,
+            onAddressChange = onAddressChange,
+            isAddressError = isAddressError,
+            addressErrorMessage = addressErrorMessage,
             medicalProcedure = medicalProcedure,
             onMedicalProcedureChange = onMedicalProcedureChange,
             isProcedureError = isProcedureError,

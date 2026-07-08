@@ -16,6 +16,7 @@ data class AddPatientsUiState(
     val showUnsavedChangesDialog: Boolean = false,
     val showSuccessDialog: Boolean = false,
     val createdPatientId: String? = null,
+    val isEditMode: Boolean = false,
     
     // Inline Errors
     val isFullNameError: Boolean = false,

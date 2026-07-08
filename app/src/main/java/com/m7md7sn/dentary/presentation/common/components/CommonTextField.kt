@@ -25,10 +25,10 @@ import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 
 @Composable
 fun CommonTextField(
-    value: String = "Johnsondoe@nomail.com",
+    value: String = "",
     onValueChange: (String) -> Unit = {},
-    label: String = "البريد الإلكتروني",
-    trailingIcon: Painter? = painterResource(id = R.drawable.ic_user),
+    label: String = "",
+    trailingIcon: Painter? = null,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     isError: Boolean = false,

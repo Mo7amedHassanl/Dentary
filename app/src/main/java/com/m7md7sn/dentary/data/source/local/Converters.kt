@@ -11,6 +11,10 @@ class Converters {
 
     @TypeConverter
     fun toAppointmentStatus(name: String): AppointmentStatus {
-        return AppointmentStatus.valueOf(name)
+        return try {
+            AppointmentStatus.valueOf(name)
+        } catch (e: IllegalArgumentException) {
+            AppointmentStatus.SCHEDULED
+        }
     }
 }

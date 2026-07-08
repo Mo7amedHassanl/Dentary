@@ -1,7 +1,9 @@
 package com.m7md7sn.dentary.presentation.ui.profile
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.data.repository.PatientRepository
 import com.m7md7sn.dentary.data.repository.ProfileRepository
@@ -21,6 +23,7 @@ import kotlinx.coroutines.coroutineScope
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val application: Application,
     private val profileRepository: ProfileRepository,
     private val authRepository: AuthRepository,
     private val patientRepository: PatientRepository
@@ -119,7 +122,7 @@ class ProfileViewModel @Inject constructor(
                     }
                     is Result.Error -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
-                        _snackbarMessage.emit(Event(result.message ?: "Failed to update profile picture"))
+                        _snackbarMessage.emit(Event(result.message ?: application.getString(R.string.profile_picture_update_failed)))
                     }
                     else -> {
                         _uiState.value = _uiState.value.copy(isLoading = false)
@@ -127,7 +130,7 @@ class ProfileViewModel @Inject constructor(
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(isLoading = false)
-                _snackbarMessage.emit(Event("Error updating profile picture: ${e.message}"))
+                _snackbarMessage.emit(Event(application.getString(R.string.error_profile_picture_update) + ": ${e.message}"))
             }
         }
     }

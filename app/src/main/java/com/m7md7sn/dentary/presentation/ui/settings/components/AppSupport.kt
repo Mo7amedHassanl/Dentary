@@ -94,7 +94,7 @@ fun SupportContent(
             placeholder = stringResource(R.string.email),
             icon = R.drawable.ic_user,
             isError = isEmailError,
-            errorMessage = if (isEmailError) "Invalid email format" else null,
+            errorMessage = if (isEmailError) stringResource(R.string.error_email_format) else null,
             modifier = Modifier.fillMaxWidth(),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email,

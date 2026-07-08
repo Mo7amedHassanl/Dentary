@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import io.github.jan.supabase.auth.SessionManager
 import io.github.jan.supabase.auth.user.UserSession
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import kotlin.time.ExperimentalTime
 
 class SharedPreferencesSessionManager(
@@ -13,14 +15,17 @@ class SharedPreferencesSessionManager(
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("supabase_session", Context.MODE_PRIVATE)
 
+    private val json = Json {
+        ignoreUnknownKeys = true
+        encodeDefaults = true
+    }
+
     @OptIn(ExperimentalTime::class)
     override suspend fun saveSession(session: UserSession) {
         try {
+            val sessionJson = json.encodeToString(session)
             sharedPreferences.edit().apply {
-                putString(KEY_ACCESS_TOKEN, session.accessToken)
-                putString(KEY_REFRESH_TOKEN, session.refreshToken)
-                putLong(KEY_EXPIRES_IN, session.expiresIn)
-                putString(KEY_TOKEN_TYPE, session.tokenType)
+                putString(KEY_SESSION, sessionJson)
                 apply()
             }
         } catch (e: Exception) {
@@ -31,18 +36,8 @@ class SharedPreferencesSessionManager(
     @OptIn(ExperimentalTime::class)
     override suspend fun loadSession(): UserSession? {
         return try {
-            val accessToken = sharedPreferences.getString(KEY_ACCESS_TOKEN, null) ?: return null
-            val refreshToken = sharedPreferences.getString(KEY_REFRESH_TOKEN, null) ?: return null
-            val expiresIn = sharedPreferences.getLong(KEY_EXPIRES_IN, 0)
-            val tokenType = sharedPreferences.getString(KEY_TOKEN_TYPE, "Bearer") ?: "Bearer"
-
-            UserSession(
-                accessToken = accessToken,
-                refreshToken = refreshToken,
-                expiresIn = expiresIn,
-                tokenType = tokenType,
-                user = null
-            )
+            val sessionJson = sharedPreferences.getString(KEY_SESSION, null) ?: return null
+            json.decodeFromString<UserSession>(sessionJson)
         } catch (e: Exception) {
             deleteSession()
             null
@@ -51,18 +46,17 @@ class SharedPreferencesSessionManager(
 
     override suspend fun deleteSession() {
         sharedPreferences.edit().apply {
-            remove(KEY_ACCESS_TOKEN)
-            remove(KEY_REFRESH_TOKEN)
-            remove(KEY_EXPIRES_IN)
-            remove(KEY_TOKEN_TYPE)
+            remove(KEY_SESSION)
+            // Legacy keys cleanup
+            remove("access_token")
+            remove("refresh_token")
+            remove("expires_in")
+            remove("token_type")
             apply()
         }
     }
 
     companion object {
-        private const val KEY_ACCESS_TOKEN = "access_token"
-        private const val KEY_REFRESH_TOKEN = "refresh_token"
-        private const val KEY_EXPIRES_IN = "expires_in"
-        private const val KEY_TOKEN_TYPE = "token_type"
+        private const val KEY_SESSION = "user_session"
     }
 }

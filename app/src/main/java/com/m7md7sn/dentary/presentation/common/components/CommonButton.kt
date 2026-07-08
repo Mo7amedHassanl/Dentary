@@ -28,8 +28,7 @@ fun CommonButton(
     enabled: Boolean = true
 ) {
     Button(
-        modifier = modifier
-            .size(240.dp, 45.dp),
+        modifier = modifier,
         onClick = onClick,
         shape = RoundedCornerShape(20.dp),
         colors = ButtonDefaults.buttonColors(

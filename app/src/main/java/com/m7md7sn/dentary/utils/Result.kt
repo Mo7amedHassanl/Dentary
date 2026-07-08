@@ -8,4 +8,3 @@ sealed interface Result<out D, out E: Error> {
     data object Loading : Result<Nothing, Nothing>
 }
 
-typealias EmptyResult<E> = Result<Unit, E>

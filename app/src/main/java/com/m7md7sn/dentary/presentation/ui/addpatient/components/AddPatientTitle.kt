@@ -20,19 +20,25 @@ import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 
 @Composable
-fun AddPatientTitle(modifier: Modifier = Modifier) {
+fun AddPatientTitle(
+    modifier: Modifier = Modifier,
+    isEditMode: Boolean = false
+) {
+    val title = if (isEditMode) stringResource(R.string.edit_patient) else stringResource(R.string.add_patient)
+    val icon = if (isEditMode) R.drawable.ic_edit else R.drawable.ic_add_patient
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Image(
-            painter = painterResource(R.drawable.ic_add_patient),
-            contentDescription = stringResource(R.string.add_patient),
+            painter = painterResource(icon),
+            contentDescription = title,
             modifier = Modifier.size(width = 27.5.dp, height = 25.5.dp)
         )
         Spacer(Modifier.width(12.dp))
         Text(
-            text = stringResource(R.string.add_patient),
+            text = title,
             style = TextStyle(
                 fontSize = 20.sp,
                 fontFamily = AlexandriaBold,
