@@ -7,4 +7,6 @@ data class PatientUiState(
     val patient: Patient? = null,
     val error: String? = null,
     val isPatientDetailsListVisible: Boolean = false,
+    val selectedMedicalHistoryIds: Set<String> = emptySet(),
+    val isSelectionMode: Boolean = false,
 )

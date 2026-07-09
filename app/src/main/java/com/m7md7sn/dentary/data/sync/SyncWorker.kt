@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import com.m7md7sn.dentary.data.repository.MedicalHistoryRepository
 import com.m7md7sn.dentary.data.repository.PatientRepository
 import com.m7md7sn.dentary.data.repository.AppointmentRepository
 import com.m7md7sn.dentary.data.repository.ProfileRepository
@@ -20,7 +21,8 @@ class SyncWorker @AssistedInject constructor(
     @Assisted params: WorkerParameters,
     private val patientRepository: PatientRepository,
     private val appointmentRepository: AppointmentRepository,
-    private val profileRepository: ProfileRepository
+    private val profileRepository: ProfileRepository,
+    private val medicalHistoryRepository: MedicalHistoryRepository
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result = coroutineScope {
@@ -28,8 +30,9 @@ class SyncWorker @AssistedInject constructor(
             val patientSync = async { patientRepository.syncUnsyncedPatients() }
             val appointmentSync = async { appointmentRepository.syncUnsyncedAppointments() }
             val profileSync = async { profileRepository.syncUnsyncedProfile() }
+            val medicalHistorySync = async { medicalHistoryRepository.syncUnsyncedMedicalHistories() }
 
-            val results = awaitAll(patientSync, appointmentSync, profileSync)
+            val results = awaitAll(patientSync, appointmentSync, profileSync, medicalHistorySync)
 
             if (results.all { it }) {
                 androidx.work.ListenableWorker.Result.success()

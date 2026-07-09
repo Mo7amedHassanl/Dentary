@@ -1,8 +1,9 @@
 package com.m7md7sn.dentary.presentation.ui.patient
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +18,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,20 +36,24 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.clickable
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.m7md7sn.dentary.R
 import com.m7md7sn.dentary.data.model.Patient
 import com.m7md7sn.dentary.data.model.Screen
+import com.m7md7sn.dentary.presentation.theme.AlexandriaRegular
 import com.m7md7sn.dentary.presentation.theme.BackgroundColor
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
+import com.m7md7sn.dentary.presentation.theme.DentaryBlueGray
 import com.m7md7sn.dentary.presentation.theme.DentaryLightBlue
-import com.m7md7sn.dentary.presentation.theme.DentaryLighterBlue
 import com.m7md7sn.dentary.presentation.theme.DentaryTheme
+import com.m7md7sn.dentary.presentation.ui.patient.components.MedicalHistoryCard
 import com.m7md7sn.dentary.presentation.ui.patient.components.PatientDetailsList
 import com.m7md7sn.dentary.presentation.ui.patient.components.PatientHeader
 import com.m7md7sn.dentary.presentation.ui.profile.components.PatientContent
@@ -61,163 +67,225 @@ fun PatientScreen(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val patient = uiState.patient
+    val medicalHistories by viewModel.medicalHistories.collectAsState()
     val context = LocalContext.current
 
-    // Load patient data when patientId changes
     LaunchedEffect(patientId) {
         viewModel.loadPatient(patientId)
     }
 
-    val scrollState = rememberScrollState()
     Surface(
         color = DentaryLightBlue,
         modifier = modifier.fillMaxSize()
     ) {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState, enabled = true),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                when {
-                    uiState.isLoading -> CircularProgressIndicator()
-                    uiState.error != null -> Text(
-                        text = uiState.error ?: "Unknown error",
-                        color = Color.Red
-                    )
+        Column(modifier = Modifier.fillMaxSize()) {
+            when {
+                uiState.isLoading -> CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
+                uiState.error != null -> Text(
+                    text = uiState.error ?: "Unknown error",
+                    color = Color.Red,
+                    modifier = Modifier.align(Alignment.CenterHorizontally)
+                )
 
-                    uiState.patient != null -> {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentHeight()
-                                .background(color = DentaryLightBlue),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
-                                painter = painterResource(R.drawable.patient_header_bg),
-                                contentDescription = null
-                            )
-                            PatientHeader(
-                                patientName = patient?.name ?: stringResource(R.string.unknown_patient),
-                                medicalCondition = patient?.medicalProcedure
-                                    ?: stringResource(R.string.no_medical_condition),
-                                imageUri = patient?.image,
-                                onEditClick = {
-                                    navController.navigate(Screen.AddPatient.createRoute(patientId))
-                                },
-                                onCallClick = {
-                                    patient?.phoneNumber?.let { phone ->
-                                        context.startActivity(
-                                            Intent(Intent.ACTION_DIAL).apply {
-                                                data = Uri.parse("tel:$phone")
-                                            }
-                                        )
-                                    }
-                                },
-                                onChatClick = {
-                                    patient?.phoneNumber?.let { phone ->
-                                        context.startActivity(
-                                            Intent(Intent.ACTION_SENDTO).apply {
-                                                data = Uri.parse("smsto:$phone")
-                                            }
-                                        )
-                                    }
-                                },
-                                onWhatsAppClick = {
-                                    patient?.phoneNumber?.let { phone ->
-                                        val waNumber = phone.trimStart('+').trimStart('0').let {
-                                            if (it.startsWith("20")) it else "20$it"
+                uiState.patient != null -> {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .wrapContentHeight()
+                            .background(color = DentaryLightBlue),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = painterResource(R.drawable.patient_header_bg),
+                            contentDescription = null
+                        )
+                        PatientHeader(
+                            patientName = patient?.name ?: stringResource(R.string.unknown_patient),
+                            medicalCondition = patient?.medicalProcedure
+                                ?: stringResource(R.string.no_medical_condition),
+                            imageUri = patient?.image,
+                            onEditClick = {
+                                navController.navigate(Screen.AddPatient.createRoute(patientId))
+                            },
+                            onCallClick = {
+                                patient?.phoneNumber?.let { phone ->
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_DIAL).apply {
+                                            data = Uri.parse("tel:$phone")
                                         }
-                                        context.startActivity(
-                                            Intent(Intent.ACTION_VIEW).apply {
-                                                data = Uri.parse("https://wa.me/$waNumber")
-                                            }
-                                        )
+                                    )
+                                }
+                            },
+                            onChatClick = {
+                                patient?.phoneNumber?.let { phone ->
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_SENDTO).apply {
+                                            data = Uri.parse("smsto:$phone")
+                                        }
+                                    )
+                                }
+                            },
+                            onWhatsAppClick = {
+                                patient?.phoneNumber?.let { phone ->
+                                    val waNumber = phone.trimStart('+').trimStart('0').let {
+                                        if (it.startsWith("20")) it else "20$it"
                                     }
-                                },
-                            )
-                        }
+                                    context.startActivity(
+                                        Intent(Intent.ACTION_VIEW).apply {
+                                            data = Uri.parse("https://wa.me/$waNumber")
+                                        }
+                                    )
+                                }
+                            },
+                        )
+                    }
+
+                    Box(
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxWidth()
+                    ) {
                         Box(
-                            modifier = Modifier
-                                .weight(1f)
-                                .fillMaxWidth()
+                            modifier = Modifier.fillMaxSize()
                         ) {
-                            Box {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(top = 30.dp)
+                                    .background(
+                                        color = BackgroundColor,
+                                        shape = RoundedCornerShape(
+                                            topEnd = 35.dp,
+                                            topStart = 35.dp
+                                        )
+                                    )
+                                    .padding(top = 30.dp)
+                                    .verticalScroll(rememberScrollState()),
+                                contentAlignment = Alignment.TopCenter
+                            ) {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.spacedBy(12.dp),
+                                        modifier = Modifier.fillMaxWidth()
+                                    ) {
+                                        PatientContent(
+                                            patient = patient ?: Patient(
+                                                id = "",
+                                                name = "",
+                                                email = "",
+                                                address = "",
+                                            )
+                                        )
+
+                                        if (medicalHistories.isNotEmpty()) {
+                                            medicalHistories.forEach { history ->
+                                                MedicalHistoryCard(
+                                                    medicalHistory = history,
+                                                    isSelected = uiState.selectedMedicalHistoryIds.contains(history.id),
+                                                    isSelectionMode = uiState.isSelectionMode,
+                                                    onLongClick = {
+                                                        viewModel.toggleMedicalHistorySelection(history.id)
+                                                    },
+                                                    onToggleSelection = {
+                                                        viewModel.toggleMedicalHistorySelection(history.id)
+                                                    },
+                                                    modifier = Modifier.padding(horizontal = 30.dp)
+                                                )
+                                            }
+                                        } else {
+                                            Text(
+                                                text = stringResource(R.string.no_medical_history),
+                                                style = TextStyle(
+                                                    fontSize = 13.sp,
+                                                    fontFamily = AlexandriaRegular,
+                                                    fontWeight = FontWeight.Normal,
+                                                    color = DentaryBlueGray,
+                                                ),
+                                                modifier = Modifier.padding(
+                                                    horizontal = 30.dp,
+                                                    vertical = 16.dp
+                                                )
+                                            )
+                                        }
+                                    }
+                            }
+
+                            if (uiState.isPatientDetailsListVisible)
                                 Box(
                                     modifier = Modifier
-                                        .padding(top = 30.dp)
                                         .fillMaxSize()
+                                        .padding(top = 30.dp)
                                         .background(
-                                            color = BackgroundColor,
+                                            color = Color(0xFFC8D0E8).copy(alpha = 0.5f),
                                             shape = RoundedCornerShape(
                                                 topEnd = 35.dp,
                                                 topStart = 35.dp
                                             )
                                         )
-                                        .padding(top = 30.dp),
-                                    contentAlignment = Alignment.TopCenter
-                                ) {
-                                    PatientContent(
-                                        patient = patient ?: Patient(
-                                            id = "",
-                                            name = "",
-                                            email = "",
-                                            address = "",
-                                        )
-                                    )
-                                }
-                                if (uiState.isPatientDetailsListVisible)
-                                    Box(
-                                        modifier = Modifier
-                                            .padding(top = 30.dp)
-                                            .fillMaxSize()
-                                            .background(
-                                                color = Color(0xFFC8D0E8).copy(alpha = 0.5f),
-                                                shape = RoundedCornerShape(
-                                                    topEnd = 35.dp,
-                                                    topStart = 35.dp
-                                                )
-                                            )
-                                            .clickable { viewModel.togglePatientDetailsListVisibility() }
-                                    )
-                            }
-                            Column(
-                                modifier = Modifier.align(Alignment.TopCenter),
-                                horizontalAlignment = Alignment.CenterHorizontally
-                            ) {
-                                IconButton(
-                                    onClick = {
-                                        viewModel.togglePatientDetailsListVisibility()
-                                    },
-                                    colors = IconButtonDefaults.filledIconButtonColors(
-                                        containerColor = DentaryBlue,
-                                        contentColor = Color.White
-                                    ),
-                                    modifier = Modifier.size(58.dp)
+                                        .clickable { viewModel.togglePatientDetailsListVisibility() }
+                                )
+                        }
 
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Add,
-                                        contentDescription = null,
-                                        modifier = Modifier
-                                            .padding(8.dp)
-                                            .fillMaxSize()
-                                    )
-                                }
-                                if (uiState.isPatientDetailsListVisible) {
-                                    Spacer(Modifier.height(8.dp))
-                                    PatientDetailsList(
-                                        navController = navController,
-                                        patientId = patientId,
-                                    )
-                                }
+                        Column(
+                            modifier = Modifier.align(Alignment.TopCenter),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.togglePatientDetailsListVisibility()
+                                },
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = DentaryBlue,
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier.size(58.dp)
+
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Add,
+                                    contentDescription = null,
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .fillMaxSize()
+                                )
+                            }
+                            if (uiState.isPatientDetailsListVisible) {
+                                Spacer(Modifier.height(8.dp))
+                                PatientDetailsList(
+                                    navController = navController,
+                                    patientId = patientId,
+                                )
+                            }
+                        }
+
+                        if (uiState.isSelectionMode) {
+                            IconButton(
+                                onClick = {
+                                    viewModel.deleteSelectedMedicalHistories()
+                                    viewModel.clearMedicalHistorySelection()
+                                },
+                                colors = IconButtonDefaults.filledIconButtonColors(
+                                    containerColor = Color(0xFFE53935),
+                                    contentColor = Color.White
+                                ),
+                                modifier = Modifier
+                                    .align(Alignment.BottomEnd)
+                                    .padding(24.dp)
+                                    .size(58.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Delete,
+                                    contentDescription = stringResource(R.string.delete_selected),
+                                    modifier = Modifier
+                                        .padding(8.dp)
+                                        .fillMaxSize()
+                                )
                             }
                         }
                     }
                 }
-
             }
         }
     }

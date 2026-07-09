@@ -151,4 +151,12 @@
     <string name="error_profile_picture_update">خطأ في تحديث صورة الملف الشخصي</string>
     <string name="unknown_patient">مريض غير معروف</string>
     <string name="no_medical_condition">لا يوجد إجراء طبي</string>
+    <string name="upload_from_device">رفع من جهازك</string>
+    <string name="saving">جارٍ الحفظ...</string>
+    <string name="no_medical_history">لا يوجد تاريخ طبي مسجل</string>
+    <string name="medical_history_saved">تم حفظ التاريخ الطبي بنجاح</string>
+    <string name="no_attachments">لا توجد ملحقات</string>
+    <string name="no_app_to_open_file">لا يوجد تطبيق لفتح هذا الملف</string>
+    <string name="file_not_found">الملف غير موجود</string>
+    <string name="error_opening_file">خطأ في فتح الملف</string>
 </resources>

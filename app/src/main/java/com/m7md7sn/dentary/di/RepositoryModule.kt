@@ -4,14 +4,20 @@ import com.m7md7sn.dentary.data.repository.AppointmentRepository
 import com.m7md7sn.dentary.data.repository.AppointmentRepositoryImpl
 import com.m7md7sn.dentary.data.repository.AuthRepository
 import com.m7md7sn.dentary.data.repository.AuthRepositoryImpl
+import com.m7md7sn.dentary.data.repository.MedicalHistoryRepository
+import com.m7md7sn.dentary.data.repository.MedicalHistoryRepositoryImpl
 import com.m7md7sn.dentary.data.repository.PatientRepository
 import com.m7md7sn.dentary.data.repository.PatientRepositoryImpl
 import com.m7md7sn.dentary.data.repository.ProfileRepository
 import com.m7md7sn.dentary.data.repository.ProfileRepositoryImpl
 import com.m7md7sn.dentary.data.source.remote.AppointmentDataSource
 import com.m7md7sn.dentary.data.source.remote.AppointmentDataSourceImpl
+import com.m7md7sn.dentary.data.source.remote.AttachmentDataSource
+import com.m7md7sn.dentary.data.source.remote.AttachmentDataSourceImpl
 import com.m7md7sn.dentary.data.source.remote.AuthDataSource
 import com.m7md7sn.dentary.data.source.remote.AuthDataSourceImpl
+import com.m7md7sn.dentary.data.source.remote.MedicalHistoryDataSource
+import com.m7md7sn.dentary.data.source.remote.MedicalHistoryDataSourceImpl
 import com.m7md7sn.dentary.data.source.remote.PatientDataSource
 import com.m7md7sn.dentary.data.source.remote.PatientDataSourceImpl
 import com.m7md7sn.dentary.data.source.remote.ProfileDataSource
@@ -73,4 +79,22 @@ abstract class RepositoryModule {
     abstract fun bindAppointmentRepository(
         appointmentRepositoryImpl: AppointmentRepositoryImpl
     ): AppointmentRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindMedicalHistoryDataSource(
+        medicalHistoryDataSourceImpl: MedicalHistoryDataSourceImpl
+    ): MedicalHistoryDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindAttachmentDataSource(
+        attachmentDataSourceImpl: AttachmentDataSourceImpl
+    ): AttachmentDataSource
+
+    @Binds
+    @Singleton
+    abstract fun bindMedicalHistoryRepository(
+        medicalHistoryRepositoryImpl: MedicalHistoryRepositoryImpl
+    ): MedicalHistoryRepository
 }

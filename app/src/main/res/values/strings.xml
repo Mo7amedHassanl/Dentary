@@ -79,15 +79,15 @@
     <string name="personal_info">Personal Information</string>
     <string name="gender">Gender</string>
     <string name="address">Address</string>
-    <string name="medical_history">التاريخ الطبي</string>
-    <string name="treatment_plan">خطة العلاج</string>
-    <string name="teeth_structure">مخطط الأسنان</string>
-    <string name="medical_note">ملاحظة طبية</string>
-    <string name="patient_pictures">صور الحالة</string>
-    <string name="description">وصف</string>
-    <string name="enter_description">اكتب وصف التاريخ الطبي هنا</string>
-    <string name="attachments">ملحقات</string>
-    <string name="save">حفظ</string>
+    <string name="medical_history">Medical History</string>
+    <string name="treatment_plan">Treatment Plan</string>
+    <string name="teeth_structure">Teeth Structure</string>
+    <string name="medical_note">Medical Note</string>
+    <string name="patient_pictures">Patient Pictures</string>
+    <string name="description">Description</string>
+    <string name="enter_description">Enter medical history description here</string>
+    <string name="attachments">Attachments</string>
+    <string name="save">Save</string>
     <string name="attachment_description">Attachment Description</string>
     <string name="last_update">Last Update: </string>
     <string name="error_name_required">Full name is required</string>
@@ -150,4 +150,12 @@
     <string name="error_profile_picture_update">Error updating profile picture</string>
     <string name="unknown_patient">Unknown Patient</string>
     <string name="no_medical_condition">No Medical Condition</string>
+    <string name="upload_from_device">Upload from your device</string>
+    <string name="saving">Saving...</string>
+    <string name="no_medical_history">No medical history recorded</string>
+    <string name="medical_history_saved">Medical history saved successfully</string>
+    <string name="no_attachments">No attachments</string>
+    <string name="no_app_to_open_file">No app available to open this file</string>
+    <string name="file_not_found">File not found</string>
+    <string name="error_opening_file">Error opening file</string>
 </resources>

@@ -56,6 +56,7 @@ import com.m7md7sn.dentary.presentation.ui.auth.register.RegisterScreen
 import com.m7md7sn.dentary.presentation.ui.auth.welcome.WelcomeScreen
 import com.m7md7sn.dentary.presentation.ui.home.HomeScreen
 import com.m7md7sn.dentary.presentation.ui.medicalhistory.AddMedicalHistoryScreen
+import com.m7md7sn.dentary.presentation.ui.medicalhistory.AddMedicalHistoryViewModel
 import com.m7md7sn.dentary.presentation.ui.splash.SplashScreen
 import com.m7md7sn.dentary.presentation.ui.patients.PatientsScreen
 import com.m7md7sn.dentary.presentation.ui.patients.PatientsViewModel
@@ -109,7 +110,19 @@ fun DentaryNavHost(
         else -> navController.previousBackStackEntry != null
     }
 
-    val isTopBarColorBlue = currentRoute == Screen.Patient.route || currentRoute == Screen.MedicalHistoryScreen.route
+    val isMedicalHistoryScreen = currentRoute == Screen.MedicalHistoryScreen.route
+    val medicalHistoryViewModel: AddMedicalHistoryViewModel? = if (isMedicalHistoryScreen) {
+        val entry = remember(navBackStackEntry) {
+            try {
+                navController.getBackStackEntry(Screen.MedicalHistoryScreen.route)
+            } catch (e: Exception) {
+                null
+            }
+        }
+        if (entry != null) hiltViewModel(entry) else null
+    } else null
+
+    val isTopBarColorBlue = currentRoute == Screen.Patient.route || isMedicalHistoryScreen
 
     val showFAB = when (currentRoute) {
         Screen.Home.route, Screen.Patients.route -> true
@@ -263,10 +276,10 @@ fun DentaryNavHost(
                         )
                     }
                 }
-            } else if( currentRoute == Screen.MedicalHistoryScreen.route){
+            } else if (currentRoute == Screen.MedicalHistoryScreen.route) {
                 IconButton(
                     onClick = {
-
+                        medicalHistoryViewModel?.showAttachmentSheet()
                     },
                     colors = IconButtonDefaults.filledIconButtonColors(
                         containerColor = Color(0xFF5F67EC),
@@ -467,7 +480,10 @@ fun DentaryNavHost(
                     arguments = listOf(navArgument("patientId") { type = NavType.StringType })
                 ) { backStackEntry ->
                     val patientId = backStackEntry.arguments?.getString("patientId") ?: ""
-                    AddMedicalHistoryScreen(patientId = patientId)
+                    AddMedicalHistoryScreen(
+                        patientId = patientId,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
             }
         }

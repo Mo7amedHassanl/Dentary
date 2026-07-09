@@ -45,7 +45,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -58,9 +58,9 @@ fun PatientInformationCard(
         targetState = isExpanded,
         transitionSpec = {
             if (targetState) {
-                expandVertically(expandFrom = Alignment.Top) with shrinkVertically(shrinkTowards = Alignment.Top)
+                expandVertically(expandFrom = Alignment.Top) togetherWith shrinkVertically(shrinkTowards = Alignment.Top)
             } else {
-                expandVertically(expandFrom = Alignment.Top) with shrinkVertically(shrinkTowards = Alignment.Top)
+                expandVertically(expandFrom = Alignment.Top) togetherWith shrinkVertically(shrinkTowards = Alignment.Top)
             }
         }
     ) { expanded ->

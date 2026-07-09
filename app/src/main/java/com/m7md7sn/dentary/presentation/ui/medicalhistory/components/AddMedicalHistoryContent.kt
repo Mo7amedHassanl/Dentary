@@ -21,12 +21,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.m7md7sn.dentary.R
+import com.m7md7sn.dentary.data.repository.AttachmentCandidate
 import com.m7md7sn.dentary.presentation.theme.AlexandriaBold
 import com.m7md7sn.dentary.presentation.theme.DentaryBlue
 import com.m7md7sn.dentary.presentation.ui.settings.components.common.SettingsTextFieldNoIcon
 
 @Composable
-fun AddMedicalHistoryContent(modifier: Modifier = Modifier) {
+fun AddMedicalHistoryContent(
+    description: String = "",
+    onDescriptionChanged: (String) -> Unit = {},
+    attachments: List<AttachmentCandidate> = emptyList(),
+    onRemoveAttachment: (Int) -> Unit = {},
+    onAddAttachmentClick: () -> Unit = {},
+    onSave: () -> Unit = {},
+    onCancel: () -> Unit = {},
+    isSaving: Boolean = false,
+    modifier: Modifier = Modifier
+) {
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -38,6 +49,8 @@ fun AddMedicalHistoryContent(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         SettingsTextFieldNoIcon(
+            value = description,
+            onValueChange = onDescriptionChanged,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(160.dp),
@@ -51,10 +64,27 @@ fun AddMedicalHistoryContent(modifier: Modifier = Modifier) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         MedicalHistoryAttachmentsList(
-            attachments = listOf("","") // Replace with actual attachments data
+            attachments = attachments,
+            onRemoveAttachment = onRemoveAttachment,
         )
+        if (attachments.isEmpty()) {
+            Text(
+                text = stringResource(R.string.no_attachments),
+                style = TextStyle(
+                    fontSize = 12.sp,
+                    fontFamily = AlexandriaBold,
+                    fontWeight = FontWeight.Bold,
+                    color = DentaryBlue.copy(alpha = 0.5f)
+                ),
+                modifier = Modifier.padding(start = 21.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
-        AddMedicalHealthActionButtons()
+        AddMedicalHealthActionButtons(
+            onSave = onSave,
+            onCancel = onCancel,
+            isSaving = isSaving,
+        )
     }
 }
 

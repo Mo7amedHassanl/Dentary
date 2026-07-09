@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.room.Room
 import com.m7md7sn.dentary.data.source.local.DentaryDatabase
 import com.m7md7sn.dentary.data.source.local.dao.AppointmentDao
+import com.m7md7sn.dentary.data.source.local.dao.AttachmentDao
+import com.m7md7sn.dentary.data.source.local.dao.MedicalHistoryDao
 import com.m7md7sn.dentary.data.source.local.dao.PatientDao
 import com.m7md7sn.dentary.data.source.local.dao.ProfileDao
 import dagger.Module
@@ -25,7 +27,7 @@ object DatabaseModule {
             DentaryDatabase::class.java,
             DentaryDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
+            .addMigrations(DentaryDatabase.MIGRATION_3_4)
             .build()
     }
 
@@ -45,5 +47,17 @@ object DatabaseModule {
     @Singleton
     fun provideProfileDao(database: DentaryDatabase): ProfileDao {
         return database.profileDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideMedicalHistoryDao(database: DentaryDatabase): MedicalHistoryDao {
+        return database.medicalHistoryDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideAttachmentDao(database: DentaryDatabase): AttachmentDao {
+        return database.attachmentDao
     }
 }
